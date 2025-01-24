@@ -25,7 +25,11 @@ public class SolveController {
         Logger.getAnonymousLogger().info(converter.convert(optimizationProblemDTO).toString());
         OptimizationProblem optimizationProblem = converter.convert(optimizationProblemDTO);
         GraphicalSolver graphicalSolver = new GraphicalSolver(optimizationProblem);
-        graphicalSolver.findAllIntersections(optimizationProblem.getConstraints());
+        graphicalSolver.findConstraintIntersections(optimizationProblem.getConstraints());
+        System.out.println("----");
+        System.out.println("Axis intersections:");
+        System.out.println("----");
+        graphicalSolver.findAxisIntersections(optimizationProblem.getConstraints());
         return ResponseEntity.ok().build();
     }
 

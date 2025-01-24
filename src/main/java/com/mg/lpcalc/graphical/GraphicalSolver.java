@@ -26,7 +26,7 @@ public class GraphicalSolver {
 
     }
 
-    public List<Point> findAllIntersections(List<Constraint> constraints) {
+    public List<Point> findConstraintIntersections(List<Constraint> constraints) {
         List<Point> intersections = new ArrayList<>();
 
         for (int i = 0; i < constraints.size(); i++) {
@@ -53,4 +53,31 @@ public class GraphicalSolver {
 
         return intersections;
     }
+
+    public List<Point> findAxisIntersections(List<Constraint> constraints) {
+        List<Point> intersections = new ArrayList<>();
+
+        for (Constraint c : constraints) {
+            // Пересечение с осью X
+            if (Math.abs(c.getA()) > EPS) {
+                double x = c.getC() / c.getA();
+                intersections.add(new Point(x, 0.0));
+            }
+
+            // Пересечение с осью Y
+            if (Math.abs(c.getB()) > EPS) {
+                double y = c.getC() / c.getB();
+                intersections.add(new Point(0.0, y));
+            }
+        }
+
+        // todo для отладки - удалить
+        for (Point point : intersections) {
+            System.out.println(point);
+        }
+
+        return intersections;
+    }
+
+
 }
