@@ -14,4 +14,16 @@ public class Constraint {
     private List<Double> coefficients;
     private Operator operator;
     private Double rhs;
+
+    public Double getA() {
+        return coefficients.get(0);
+    }
+
+    public Double getB() {
+        return coefficients.get(1);
+    }
+
+    public Double getC() {
+        return rhs;
+    }
 }
