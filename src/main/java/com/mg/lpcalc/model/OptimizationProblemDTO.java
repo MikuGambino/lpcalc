@@ -6,11 +6,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OptimizationProblem {
+public class OptimizationProblemDTO {
     @JsonProperty("constraints")
-    private List<Constraint> constraints;
+    private List<ConstraintDTO> constraints;
     @JsonProperty("objective")
-    private ObjectiveFunc objectiveFunc;
+    private ObjectiveFuncDTO objectiveFunc;
 
     @Override
     public String toString() {

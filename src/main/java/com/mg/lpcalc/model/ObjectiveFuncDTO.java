@@ -1,26 +1,23 @@
 package com.mg.lpcalc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mg.lpcalc.model.enums.Operator;
+import com.mg.lpcalc.model.enums.Direction;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class Constraint {
+public class ObjectiveFuncDTO {
     @JsonProperty("coefficients")
     private List<Double> coefficients;
-    @JsonProperty("operator")
-    private Operator operator;
-    @JsonProperty("rhs")
-    private Double rhs;
+    @JsonProperty("direction")
+    private Direction direction;
 
     @Override
     public String toString() {
-        return "Constraint{" +
+        return "ObjectiveFunc{" +
                 "coefficients=" + coefficients +
-                ", operator='" + operator.getTitle() + '\'' +
-                ", rhs=" + rhs +
+                ", direction='" + direction.getTitle() + '\'' +
                 '}';
     }
 }
