@@ -34,7 +34,8 @@ public class SolveController {
         System.out.println("----");
         System.out.println("Bounds");
         graphicalSolver.initGraphicBounds();
+        System.out.println("----");
+        graphicalSolver.initFeasibleRegion();
         return ResponseEntity.ok().build();
     }
-
 }

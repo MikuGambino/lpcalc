@@ -10,6 +10,7 @@ public class GraphicalSolver {
     private List<Constraint> constraints;
     private ObjectiveFunc objectiveFunc;
     private GraphBounds graphBounds;
+    private List<Point> currentFeasibleRegion;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = optimizationProblem.getConstraints();
@@ -57,6 +58,19 @@ public class GraphicalSolver {
                 minY, maxY,
                 Math.max(paddingX, paddingY)
         );
+    }
+
+    public void initFeasibleRegion() {
+        Point leftBottom = new Point(0, 0);
+        Point leftTop = new Point(0, graphBounds.getMaxY());
+        Point rightTop = new Point(graphBounds.getMaxX(), graphBounds.getMaxY());
+        Point rightBottom = new Point(graphBounds.getMaxX(), 0);
+
+        this.currentFeasibleRegion = new ArrayList<>(List.of(leftBottom, leftTop, rightBottom, rightTop));
+        System.out.println("leftTop: " + leftTop);
+        System.out.println("leftBottom: " + leftBottom);
+        System.out.println("rightTop: " + rightTop);
+        System.out.println("rightBottom: " + rightBottom);
     }
 
     public List<Point> findConstraintIntersections(List<Constraint> constraints) {
