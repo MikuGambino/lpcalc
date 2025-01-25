@@ -1,9 +1,6 @@
 package com.mg.lpcalc.graphical;
 
-import com.mg.lpcalc.graphical.model.Constraint;
-import com.mg.lpcalc.graphical.model.ObjectiveFunc;
-import com.mg.lpcalc.graphical.model.OptimizationProblem;
-import com.mg.lpcalc.graphical.model.Point;
+import com.mg.lpcalc.graphical.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +9,7 @@ public class GraphicalSolver {
     private final double EPS = 1e-9;
     private List<Constraint> constraints;
     private ObjectiveFunc objectiveFunc;
+    private GraphBounds graphBounds;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = optimizationProblem.getConstraints();
@@ -22,8 +20,43 @@ public class GraphicalSolver {
 
     }
 
-    private void initGraphicCoordinates() {
+    public void initGraphicBounds() {
+        List<Point> constraintIntersections = findConstraintIntersections(constraints);
+        List<Point> axisIntersections = findAxisIntersections(constraints);
+        List<Point> points = new ArrayList<>();
+        points.addAll(constraintIntersections);
+        points.addAll(axisIntersections);
 
+        double minX = points.get(0).getX();
+        double maxX = points.get(0).getX();
+        double minY = points.get(0).getY();
+        double maxY = points.get(0).getY();
+
+        for (Point p : points) {
+            minX = Math.min(minX, p.getX());
+            maxX = Math.max(maxX, p.getX());
+            minY = Math.min(minY, p.getY());
+            maxY = Math.max(maxY, p.getY());
+        }
+
+        // График должен точку (0;0). Начало оси координат
+        minX = Math.min(minX, 0);
+        maxX = Math.max(maxX, 0);
+        minY = Math.min(minY, 0);
+        maxY = Math.max(maxY, 0);
+
+        // Рассчитываем отступ
+        double xRange = maxX - minX;
+        double yRange = maxY - minY;
+        double paddingPercentage = 0.25;
+        double paddingX = xRange * paddingPercentage;
+        double paddingY = yRange * paddingPercentage;
+
+        this.graphBounds = new GraphBounds(
+                minX, maxX,
+                minY, maxY,
+                Math.max(paddingX, paddingY)
+        );
     }
 
     public List<Point> findConstraintIntersections(List<Constraint> constraints) {
@@ -78,6 +111,4 @@ public class GraphicalSolver {
 
         return intersections;
     }
-
-
 }
