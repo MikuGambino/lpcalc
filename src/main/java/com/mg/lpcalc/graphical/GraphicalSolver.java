@@ -1,6 +1,7 @@
 package com.mg.lpcalc.graphical;
 
 import com.mg.lpcalc.graphical.model.*;
+import com.mg.lpcalc.model.enums.Operator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +11,27 @@ public class GraphicalSolver {
     private List<Constraint> constraints;
     private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
-    private GraphBounds graphBounds;
-    private List<Point> currentFeasibleRegion;
+    private List<Point> currentFeasibleRegion = new ArrayList<>();
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
-        this.constraints = optimizationProblem.getConstraints();
+        this.constraints = new ArrayList<>(optimizationProblem.getConstraints());
         this.objectiveFunc = optimizationProblem.getObjectiveFunc();
     }
 
     public void solve() {
-        initGraphicBounds();
-        initFeasibleRegion();
+        List<Constraint> initialConstraints = initConstraints();
+
+        for (Constraint c : initialConstraints) {
+            addConstraint(c);
+        }
 
         for (Constraint c : constraints) {
             System.out.println("НОВАЯ ПРЯМАЯ НОВАЯ ПРЯМАЯ");
+            System.out.println(c);
             addConstraint(c);
         }
+
+        findOptimalSolution();
     }
 
     private void initGraphicBounds() {
@@ -54,13 +60,17 @@ public class GraphicalSolver {
         maxY = Math.max(maxY, 0);
     }
 
-    private void initFeasibleRegion() {
-        Point leftBottom = new Point(0, 0);
-        Point leftTop = new Point(0, Double.POSITIVE_INFINITY);
-        Point rightTop = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        Point rightBottom = new Point(Double.POSITIVE_INFINITY, 0);
+    private List<Constraint> initConstraints() {
+        List<Constraint> initialConstraints = new ArrayList<>();
 
-        this.currentFeasibleRegion = new ArrayList<>(List.of(leftBottom, leftTop, rightBottom, rightTop));
+        initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false));
+        initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false));
+        initialConstraints.add(new Constraint(0., 1., 20., Operator.LEQ, true));
+        initialConstraints.add(new Constraint(1., 0., 20., Operator.LEQ, true));
+
+
+        this.currentFeasibleRegion = new ArrayList<>();
+        return initialConstraints;
     }
 
     private List<Point> findConstraintIntersections(List<Constraint> constraints) {
@@ -78,7 +88,12 @@ public class GraphicalSolver {
                     double x = (c2.getB() * c1.getC() - c1.getB() * c2.getC()) / det;
                     double y = (c1.getA() * c2.getC() - c2.getA() * c1.getC()) / det;
 
-                    intersections.add(new Point(x, y));
+                    Point point = new Point(x, y);
+                    if (c1.isUnbounded() || c2.isUnbounded()) {
+                        point.setUnbounded(true);
+                    }
+
+                    intersections.add(point);
                 }
             }
         }
@@ -116,7 +131,7 @@ public class GraphicalSolver {
         for (Constraint c : constraints) {
             double leftSide = c.getA() * x + c.getB() * y;
 
-            if (c.isLessOrEqual()) {
+            if (c.isLEQ()) {
                 if (leftSide > c.getC() + EPS) return false;
             } else {
                 if (leftSide < c.getC() - EPS) return false;
@@ -132,7 +147,6 @@ public class GraphicalSolver {
         List<Point> newFeasibleRegion = new ArrayList<>();
 
         List<Point> points = findConstraintIntersections(this.currentConstraints);
-        points.addAll(findAxisIntersections(List.of(constraint)));
         points.addAll(this.currentFeasibleRegion);
 
         for (Point point : points) {
@@ -141,7 +155,42 @@ public class GraphicalSolver {
             }
         }
 
-        this.currentFeasibleRegion = newFeasibleRegion;
+        this.currentFeasibleRegion = newFeasibleRegion.stream().distinct().toList();
         System.out.println(currentFeasibleRegion);
+    }
+
+    private void findOptimalSolution() {
+        if (this.currentFeasibleRegion.isEmpty()) {
+            System.out.println("Нет допустимых решений (ОДР пуста).");
+        }
+
+        List<Double> zValues = new ArrayList<>();
+        for (Point point : this.currentFeasibleRegion) {
+            zValues.add(objectiveFunc.getA() * point.getX() + objectiveFunc.getB() * point.getY());
+        }
+
+        double optimalValue = zValues.get(0);
+        for (double z: zValues) {
+            if (objectiveFunc.isMaximization() && z > optimalValue) {
+                optimalValue = z;
+            } else if (objectiveFunc.isMinimization() && z < optimalValue) {
+                optimalValue = z;
+            }
+        }
+
+        System.out.println(zValues);
+
+        List<Point> optimalPoints = new ArrayList<>();
+        for (int i = 0; i < zValues.size(); i++) {
+            if (zValues.get(i) == optimalValue) {
+                optimalPoints.add(this.currentFeasibleRegion.get(i));
+            }
+        }
+
+        if (optimalPoints.size() == 1) {
+            System.out.println("Оптимальное решение: " + optimalPoints.get(0));
+        } else {
+            System.out.println("Множество оптимальных решений между вершинами: " + optimalPoints);
+        }
     }
 }

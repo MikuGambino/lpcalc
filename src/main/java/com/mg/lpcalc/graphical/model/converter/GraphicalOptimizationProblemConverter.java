@@ -3,7 +3,6 @@ package com.mg.lpcalc.graphical.model.converter;
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.ObjectiveFunc;
 import com.mg.lpcalc.graphical.model.OptimizationProblem;
-import com.mg.lpcalc.model.ObjectiveFuncDTO;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -18,9 +17,11 @@ public class GraphicalOptimizationProblemConverter implements Converter<Optimiza
         List<Constraint> constraints = problemDTO.getConstraints()
                 .stream()
                 .map(constraintDTO -> Constraint.builder()
-                        .rhs(constraintDTO.getRhs())
+                        .a(constraintDTO.getCoefficients().get(0))
+                        .b(constraintDTO.getCoefficients().get(1))
+                        .c(constraintDTO.getRhs())
                         .operator(constraintDTO.getOperator())
-                        .coefficients(constraintDTO.getCoefficients())
+                        .isUnbounded(false)
                         .build())
                 .toList();
 
