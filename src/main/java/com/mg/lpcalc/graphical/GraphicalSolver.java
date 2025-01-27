@@ -52,19 +52,6 @@ public class GraphicalSolver {
         maxX = Math.max(maxX, 0);
         minY = Math.min(minY, 0);
         maxY = Math.max(maxY, 0);
-
-        // todo решить что делать с отступами
-//        double xRange = maxX - minX;
-//        double yRange = maxY - minY;
-//
-//        double paddingPercentage = 0.25;
-//        double paddingX = xRange * paddingPercentage;
-//        double paddingY = yRange * paddingPercentage;
-
-        this.graphBounds = new GraphBounds(
-                minX, maxX,
-                minY, maxY
-        );
     }
 
     private void initFeasibleRegion() {
