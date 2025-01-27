@@ -8,6 +8,7 @@ import java.util.List;
 public class GraphicalSolver {
     private final double EPS = 1e-9;
     private List<Constraint> constraints;
+    private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
     private GraphBounds graphBounds;
     private List<Point> currentFeasibleRegion;
@@ -18,10 +19,16 @@ public class GraphicalSolver {
     }
 
     public void solve() {
+        initGraphicBounds();
+        initFeasibleRegion();
 
+        for (Constraint c : constraints) {
+            System.out.println("НОВАЯ ПРЯМАЯ НОВАЯ ПРЯМАЯ");
+            addConstraint(c);
+        }
     }
 
-    public void initGraphicBounds() {
+    private void initGraphicBounds() {
         List<Point> constraintIntersections = findConstraintIntersections(constraints);
         List<Point> axisIntersections = findAxisIntersections(constraints);
         List<Point> points = new ArrayList<>();
@@ -46,34 +53,30 @@ public class GraphicalSolver {
         minY = Math.min(minY, 0);
         maxY = Math.max(maxY, 0);
 
-        // Рассчитываем отступ
-        double xRange = maxX - minX;
-        double yRange = maxY - minY;
-        double paddingPercentage = 0.25;
-        double paddingX = xRange * paddingPercentage;
-        double paddingY = yRange * paddingPercentage;
+        // todo решить что делать с отступами
+//        double xRange = maxX - minX;
+//        double yRange = maxY - minY;
+//
+//        double paddingPercentage = 0.25;
+//        double paddingX = xRange * paddingPercentage;
+//        double paddingY = yRange * paddingPercentage;
 
         this.graphBounds = new GraphBounds(
                 minX, maxX,
-                minY, maxY,
-                Math.max(paddingX, paddingY)
+                minY, maxY
         );
     }
 
-    public void initFeasibleRegion() {
+    private void initFeasibleRegion() {
         Point leftBottom = new Point(0, 0);
-        Point leftTop = new Point(0, graphBounds.getMaxY());
-        Point rightTop = new Point(graphBounds.getMaxX(), graphBounds.getMaxY());
-        Point rightBottom = new Point(graphBounds.getMaxX(), 0);
+        Point leftTop = new Point(0, Double.POSITIVE_INFINITY);
+        Point rightTop = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        Point rightBottom = new Point(Double.POSITIVE_INFINITY, 0);
 
         this.currentFeasibleRegion = new ArrayList<>(List.of(leftBottom, leftTop, rightBottom, rightTop));
-        System.out.println("leftTop: " + leftTop);
-        System.out.println("leftBottom: " + leftBottom);
-        System.out.println("rightTop: " + rightTop);
-        System.out.println("rightBottom: " + rightBottom);
     }
 
-    public List<Point> findConstraintIntersections(List<Constraint> constraints) {
+    private List<Point> findConstraintIntersections(List<Constraint> constraints) {
         List<Point> intersections = new ArrayList<>();
 
         for (int i = 0; i < constraints.size(); i++) {
@@ -93,15 +96,10 @@ public class GraphicalSolver {
             }
         }
 
-        // todo для отладки - удалить
-        for (Point point : intersections) {
-            System.out.println(point);
-        }
-
         return intersections;
     }
 
-    public List<Point> findAxisIntersections(List<Constraint> constraints) {
+    private List<Point> findAxisIntersections(List<Constraint> constraints) {
         List<Point> intersections = new ArrayList<>();
 
         for (Constraint c : constraints) {
@@ -118,11 +116,45 @@ public class GraphicalSolver {
             }
         }
 
-        // todo для отладки - удалить
-        for (Point point : intersections) {
-            System.out.println(point);
+        return intersections;
+    }
+
+    private boolean isFeasible(Point point, List<Constraint> constraints) {
+        double x = point.getX();
+        double y = point.getY();
+
+        // Проверка неотрицательности переменных (x >= 0, y >= 0)
+        if (x < -EPS || y < -EPS) return false;
+
+        for (Constraint c : constraints) {
+            double leftSide = c.getA() * x + c.getB() * y;
+
+            if (c.isLessOrEqual()) {
+                if (leftSide > c.getC() + EPS) return false;
+            } else {
+                if (leftSide < c.getC() - EPS) return false;
+            }
         }
 
-        return intersections;
+        return true;
+    }
+
+    private void addConstraint(Constraint constraint) {
+        this.currentConstraints.add(constraint);
+
+        List<Point> newFeasibleRegion = new ArrayList<>();
+
+        List<Point> points = findConstraintIntersections(this.currentConstraints);
+        points.addAll(findAxisIntersections(List.of(constraint)));
+        points.addAll(this.currentFeasibleRegion);
+
+        for (Point point : points) {
+            if (isFeasible(point, this.currentConstraints)) {
+                newFeasibleRegion.add(point);
+            }
+        }
+
+        this.currentFeasibleRegion = newFeasibleRegion;
+        System.out.println(currentFeasibleRegion);
     }
 }

@@ -25,17 +25,7 @@ public class SolveController {
         Logger.getAnonymousLogger().info(converter.convert(optimizationProblemDTO).toString());
         OptimizationProblem optimizationProblem = converter.convert(optimizationProblemDTO);
         GraphicalSolver graphicalSolver = new GraphicalSolver(optimizationProblem);
-        graphicalSolver.findConstraintIntersections(optimizationProblem.getConstraints());
-        System.out.println("Constraint intersections:");
-        System.out.println("----");
-        System.out.println("Axis intersections:");
-        System.out.println("----");
-        graphicalSolver.findAxisIntersections(optimizationProblem.getConstraints());
-        System.out.println("----");
-        System.out.println("Bounds");
-        graphicalSolver.initGraphicBounds();
-        System.out.println("----");
-        graphicalSolver.initFeasibleRegion();
+        graphicalSolver.solve();
         return ResponseEntity.ok().build();
     }
 }

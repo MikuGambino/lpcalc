@@ -26,4 +26,8 @@ public class Constraint {
     public Double getC() {
         return rhs;
     }
+
+    public boolean isLessOrEqual() {
+        return operator.equals(Operator.LEQ);
+    }
 }
