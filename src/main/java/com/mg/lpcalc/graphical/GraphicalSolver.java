@@ -1,17 +1,20 @@
 package com.mg.lpcalc.graphical;
 
 import com.mg.lpcalc.graphical.model.*;
+import com.mg.lpcalc.graphical.solution.GraphicalSolutionBuilder;
 import com.mg.lpcalc.model.enums.Operator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GraphicalSolver {
+    private final double PADDING_PERCENTAGE = 1.25;
     private final double EPS = 1e-9;
     private List<Constraint> constraints;
     private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
     private List<Point> currentFeasibleRegion = new ArrayList<>();
+    private GraphicalSolutionBuilder solutionBuilder;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = new ArrayList<>(optimizationProblem.getConstraints());
@@ -31,45 +34,48 @@ public class GraphicalSolver {
             addConstraint(c);
         }
 
+        List<Point> allPoints = findAllFeasiblePoints();
+        this.solutionBuilder = new GraphicalSolutionBuilder(allPoints, PADDING_PERCENTAGE);
+
         findOptimalSolution();
     }
 
-    private void initGraphicBounds() {
-        List<Point> constraintIntersections = findConstraintIntersections(constraints);
-        List<Point> axisIntersections = findAxisIntersections(constraints);
+    private List<Point> findAllFeasiblePoints() {
+        List<Point> constraintIntersections = findConstraintIntersections(this.constraints);
+        List<Point> axisIntersections = findAxisIntersections(this.constraints);
+
         List<Point> points = new ArrayList<>();
         points.addAll(constraintIntersections);
         points.addAll(axisIntersections);
+        points.addAll(this.currentFeasibleRegion);
 
-        double minX = points.get(0).getX();
-        double maxX = points.get(0).getX();
-        double minY = points.get(0).getY();
-        double maxY = points.get(0).getY();
+        return points.stream()
+                .filter(p -> {
+                    boolean isOnNegativeXAxis = (p.getX() == 0 && p.getY() <= 0);
+                    boolean isOnNegativeYAxis = (p.getY() == 0 && p.getX() <= 0);
+                    boolean isInFirstQuadrant = (p.getX() >= 0 && p.getY() >= 0);
 
-        for (Point p : points) {
-            minX = Math.min(minX, p.getX());
-            maxX = Math.max(maxX, p.getX());
-            minY = Math.min(minY, p.getY());
-            maxY = Math.max(maxY, p.getY());
-        }
-
-        // График должен точку (0;0). Начало оси координат
-        minX = Math.min(minX, 0);
-        maxX = Math.max(maxX, 0);
-        minY = Math.min(minY, 0);
-        maxY = Math.max(maxY, 0);
+                    return isOnNegativeXAxis || isOnNegativeYAxis || isInFirstQuadrant;
+                })
+                .toList();
     }
 
     private List<Constraint> initConstraints() {
         List<Constraint> initialConstraints = new ArrayList<>();
+        List<Point> axisIntersections = findAxisIntersections(this.constraints);
+        double maxX = axisIntersections.get(0).getX();
+        double maxY = axisIntersections.get(0).getY();
+
+        for (Point point : axisIntersections) {
+            if (point.getX() > maxX) maxX = point.getX();
+            if (point.getY() > maxY) maxY = point.getY();
+        }
 
         initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false));
         initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false));
-        initialConstraints.add(new Constraint(0., 1., 20., Operator.LEQ, true));
-        initialConstraints.add(new Constraint(1., 0., 20., Operator.LEQ, true));
+        initialConstraints.add(new Constraint(0., 1., maxY, Operator.LEQ, true));
+        initialConstraints.add(new Constraint(1., 0., maxX, Operator.LEQ, true));
 
-
-        this.currentFeasibleRegion = new ArrayList<>();
         return initialConstraints;
     }
 
@@ -182,7 +188,7 @@ public class GraphicalSolver {
 
         List<Point> optimalPoints = new ArrayList<>();
         for (int i = 0; i < zValues.size(); i++) {
-            if (zValues.get(i) == optimalValue) {
+            if (Math.abs(zValues.get(i) - optimalValue) < EPS) {
                 optimalPoints.add(this.currentFeasibleRegion.get(i));
             }
         }

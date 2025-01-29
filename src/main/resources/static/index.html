@@ -166,27 +166,34 @@
 <script>
     function generateRandomData() {
         // Генерация целевой функции
-        document.getElementById('obj0').value = getRandomInt(-10, 10);
-        document.getElementById('obj1').value = getRandomInt(-10, 10);
-        document.getElementById('directionSelect').value = Math.random() > 0.5 ? 'MAX' : 'MIN';
+        document.getElementById('obj0').value = 1;
+        document.getElementById('obj1').value = -1;
+        document.getElementById('directionSelect').value = 'MAX';
     
-        // Генерация 3 ограничений
-        for(let i = 0; i < 3; i++) {
-            // Коэффициенты
-            document.getElementById(`v${i}0`).value = getRandomInt(-10, 10);
-            document.getElementById(`v${i}1`).value = getRandomInt(-10, 10);
-            
-            // Знак неравенства
-            const select = document.querySelector(`#c${i} select`);
-            select.value = Math.random() > 0.5 ? 'LEQ' : 'GEQ';
-            
-            // Правая часть (положительное число)
-            document.getElementById(`rhs${i}`).value = getRandomInt(1, 20);
-        }
-    }
-    
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        document.getElementById(`v00`).value = 1;
+        document.getElementById(`v01`).value = 1;
+        document.querySelector(`#c0 select`).value = 'LEQ';
+        document.getElementById(`rhs0`).value = 7;
+
+        document.getElementById(`v10`).value = 0;
+        document.getElementById(`v11`).value = 1;
+        document.querySelector(`#c1 select`).value = 'LEQ';
+        document.getElementById(`rhs1`).value = 5;
+
+        document.getElementById(`v20`).value = 1;
+        document.getElementById(`v21`).value = 1;
+        document.querySelector(`#c2 select`).value = 'GEQ';
+        document.getElementById(`rhs2`).value = 3;
+
+        document.getElementById(`v30`).value = 0;
+        document.getElementById(`v31`).value = 1;
+        document.querySelector(`#c3 select`).value = 'GEQ';
+        document.getElementById(`rhs3`).value = 2;
+
+        document.getElementById(`v40`).value = 1;
+        document.getElementById(`v41`).value = 0;
+        document.querySelector(`#c4 select`).value = 'LEQ';
+        document.getElementById(`rhs4`).value = 4;
     }
 </script>
 </html>
