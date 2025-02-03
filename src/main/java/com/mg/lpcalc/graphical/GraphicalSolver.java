@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphicalSolver {
-    private final double PADDING_PERCENTAGE = 1.2;
     private final double EPS = 1e-9;
     private List<Constraint> constraints;
     private List<Constraint> currentConstraints = new ArrayList<>();
@@ -35,7 +34,7 @@ public class GraphicalSolver {
         }
 
         List<Point> allPoints = findAllFeasiblePoints();
-        solutionBuilder.init(allPoints, PADDING_PERCENTAGE);
+        solutionBuilder.init(allPoints);
 
         findOptimalSolution();
     }

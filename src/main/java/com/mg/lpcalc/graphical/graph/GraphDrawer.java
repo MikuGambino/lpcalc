@@ -8,12 +8,11 @@ import java.util.List;
 
 public class GraphDrawer {
     private final int GRAPH_SIZE = 500;
-    private final double PADDING_PERCENTAGE;
+    private final double PADDING_PERCENTAGE = 0.2;
     private GraphParams graphParams;
     private List<Graph> graphs = new ArrayList<>();
 
-    public GraphDrawer(List<Point> points, double PADDING_PERCENTAGE) {
-        this.PADDING_PERCENTAGE = PADDING_PERCENTAGE;
+    public GraphDrawer(List<Point> points) {
         initGraphParams(points);
     }
 
@@ -41,7 +40,7 @@ public class GraphDrawer {
 
         double viewBoxSize = GRAPH_SIZE / 2.;
         double pxSize = viewBoxSize / maxRange;
-        pxSize -= pxSize * (PADDING_PERCENTAGE - 1);
+        pxSize -= pxSize * PADDING_PERCENTAGE;
 
         ViewBoxParams viewBoxParams = new ViewBoxParams(minX, minY, viewBoxSize, pxSize, PADDING_PERCENTAGE);
 

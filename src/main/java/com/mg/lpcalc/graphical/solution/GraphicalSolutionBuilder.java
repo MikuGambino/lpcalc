@@ -17,8 +17,8 @@ public class GraphicalSolutionBuilder {
         constraints.add(constraint);
     }
 
-    public void init(List<Point> points, double PADDING_PERCENTAGE) {
-        this.graphDrawer = new GraphDrawer(points, PADDING_PERCENTAGE);
+    public void init(List<Point> points) {
+        this.graphDrawer = new GraphDrawer(points);
         for (Constraint constraint : constraints) {
             graphDrawer.addConstraint(constraint);
         }
