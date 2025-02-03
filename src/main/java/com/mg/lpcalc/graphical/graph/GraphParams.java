@@ -14,5 +14,6 @@ public class GraphParams {
     double minY;
     double maxPadding;
     double pxSize;
+    int graphSize;
     ViewBoxParams viewBoxParams;
 }

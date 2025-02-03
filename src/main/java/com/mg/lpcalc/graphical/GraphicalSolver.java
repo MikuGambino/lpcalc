@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphicalSolver {
-    private final double PADDING_PERCENTAGE = 1.25;
+    private final double PADDING_PERCENTAGE = 1.2;
     private final double EPS = 1e-9;
     private List<Constraint> constraints;
     private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
     private List<Point> currentFeasibleRegion = new ArrayList<>();
-    private GraphicalSolutionBuilder solutionBuilder;
+    private GraphicalSolutionBuilder solutionBuilder = new GraphicalSolutionBuilder();;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = new ArrayList<>(optimizationProblem.getConstraints());
@@ -35,7 +35,7 @@ public class GraphicalSolver {
         }
 
         List<Point> allPoints = findAllFeasiblePoints();
-        this.solutionBuilder = new GraphicalSolutionBuilder(allPoints, PADDING_PERCENTAGE);
+        solutionBuilder.init(allPoints, PADDING_PERCENTAGE);
 
         findOptimalSolution();
     }
@@ -71,10 +71,10 @@ public class GraphicalSolver {
             if (point.getY() > maxY) maxY = point.getY();
         }
 
-        initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false));
-        initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false));
-        initialConstraints.add(new Constraint(0., 1., maxY, Operator.LEQ, true));
-        initialConstraints.add(new Constraint(1., 0., maxX, Operator.LEQ, true));
+        initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false, true));
+        initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false, true));
+        initialConstraints.add(new Constraint(0., 1., maxY, Operator.LEQ, true, true));
+        initialConstraints.add(new Constraint(1., 0., maxX, Operator.LEQ, true, true));
 
         return initialConstraints;
     }
@@ -163,6 +163,10 @@ public class GraphicalSolver {
 
         this.currentFeasibleRegion = newFeasibleRegion.stream().distinct().toList();
         System.out.println(currentFeasibleRegion);
+
+        if (!constraint.isInitial()) {
+            solutionBuilder.addConstraint(constraint);
+        }
     }
 
     private void findOptimalSolution() {

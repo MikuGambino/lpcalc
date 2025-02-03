@@ -1,12 +1,14 @@
 package com.mg.lpcalc.graphical.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Objects;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class Point {
     double x;
     double y;

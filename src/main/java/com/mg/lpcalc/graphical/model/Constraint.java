@@ -4,6 +4,7 @@ import com.mg.lpcalc.model.enums.Operator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder
@@ -14,6 +15,7 @@ public class Constraint {
     private Double c;
     private Operator operator;
     private boolean isUnbounded;
+    private boolean isInitial;
 
     public boolean isLEQ() {
         return operator.equals(Operator.LEQ);

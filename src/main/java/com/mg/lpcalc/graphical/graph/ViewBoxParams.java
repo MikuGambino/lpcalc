@@ -1,5 +1,8 @@
 package com.mg.lpcalc.graphical.graph;
 
+import lombok.Data;
+
+@Data
 public class ViewBoxParams {
     double minX;
     double minY;
