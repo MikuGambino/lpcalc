@@ -1,5 +1,6 @@
 package com.mg.lpcalc.graphical.graph;
 
+import com.mg.lpcalc.graphical.model.Point;
 import lombok.Data;
 
 import java.util.List;
@@ -10,9 +11,11 @@ public class Graph {
     private GraphParams graphParams;
     private StringBuilder svg = new StringBuilder();
     private List<Line> lines;
+    private Polygon feasibleRegion;
 
-    public Graph(GraphParams graphParams, List<Line> lines) {
+    public Graph(GraphParams graphParams, List<Line> lines, Polygon feasibleRegion) {
         this.lines = lines;
+        this.feasibleRegion = feasibleRegion;
         this.graphParams = graphParams;
     }
 
@@ -53,11 +56,26 @@ public class Graph {
         svg.append(String.format(Locale.US, SVGCode.GROUP, graphParams.graphSize / 2., graphParams.graphSize / 2.));
     }
 
+    private void addFeasibleRegion() {
+        svg.append("\t\t");
+        StringBuilder pointsString = new StringBuilder();
+        for (Point p : feasibleRegion.getPoints()) {
+            pointsString.append(String.format(Locale.US,"%.2f,%.2f ", p.getX(), p.getY()));
+        }
+
+        svg.append(String.format(Locale.US, SVGCode.POLYGON,
+                feasibleRegion.getFill(),
+                feasibleRegion.getOpacity(),
+                pointsString
+            ));
+    }
+
     public String getSVG() {
         addSvgHeader();
         addAxis();
         addGroup();
         addLines();
+        addFeasibleRegion();
         return svg.toString();
     }
 }

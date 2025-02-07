@@ -4,8 +4,11 @@ import com.mg.lpcalc.graphical.model.*;
 import com.mg.lpcalc.graphical.solution.GraphicalSolutionBuilder;
 import com.mg.lpcalc.model.enums.Operator;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GraphicalSolver {
     private final double EPS = 1e-9;
@@ -13,7 +16,9 @@ public class GraphicalSolver {
     private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
     private List<Point> currentFeasibleRegion = new ArrayList<>();
-    private GraphicalSolutionBuilder solutionBuilder = new GraphicalSolutionBuilder();;
+    private GraphicalSolutionBuilder solutionBuilder = new GraphicalSolutionBuilder();
+    private double maxX;
+    private double maxY;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = new ArrayList<>(optimizationProblem.getConstraints());
@@ -40,11 +45,9 @@ public class GraphicalSolver {
     }
 
     private List<Point> findAllFeasiblePoints() {
-        List<Point> constraintIntersections = findConstraintIntersections(this.constraints);
         List<Point> axisIntersections = findAxisIntersections(this.constraints);
 
         List<Point> points = new ArrayList<>();
-        points.addAll(constraintIntersections);
         points.addAll(axisIntersections);
         points.addAll(this.currentFeasibleRegion);
 
@@ -62,13 +65,21 @@ public class GraphicalSolver {
     private List<Constraint> initConstraints() {
         List<Constraint> initialConstraints = new ArrayList<>();
         List<Point> axisIntersections = findAxisIntersections(this.constraints);
-        double maxX = axisIntersections.get(0).getX();
-        double maxY = axisIntersections.get(0).getY();
+        List<Point> constraintsIntersections = findConstraintIntersections(this.constraints);
+        List<Point> allPoints = Stream.concat(axisIntersections.stream(), constraintsIntersections.stream()).toList();
+        double maxX = allPoints.get(0).getX();
+        double maxY = allPoints.get(0).getY();
 
-        for (Point point : axisIntersections) {
+        System.out.println("AXIS INTER");
+        System.out.println(allPoints);
+        for (Point point : allPoints) {
             if (point.getX() > maxX) maxX = point.getX();
             if (point.getY() > maxY) maxY = point.getY();
         }
+
+        System.out.println(maxX);
+        this.maxX = maxX;
+        this.maxY = maxY;
 
         initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false, true));
         initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false, true));
@@ -94,8 +105,13 @@ public class GraphicalSolver {
                     double y = (c1.getA() * c2.getC() - c2.getA() * c1.getC()) / det;
 
                     Point point = new Point(x, y);
+                    boolean intersectionMaxCoordinate = (point.getX() == this.maxX || point.getY() == this.maxY)
+                             && (c1.isInitial() ? isFillInAbove(c2) : isFillInAbove(c1));
+
                     if (c1.isUnbounded() || c2.isUnbounded()) {
                         point.setUnbounded(true);
+                    } else if (intersectionMaxCoordinate) {
+                        point.setFeasibleRegionIsAbove(true);
                     }
 
                     intersections.add(point);
@@ -103,7 +119,19 @@ public class GraphicalSolver {
             }
         }
 
+        System.out.println("INTER INTER");
+        System.out.println(intersections);
         return intersections;
+    }
+
+    // Вычисление, сверху или снизу от прямой закрашивать ОДР
+    private boolean isFillInAbove(Constraint constraint) {
+        if (constraint.getB() == 0) return false;
+        if (constraint.getOperator().equals(Operator.LEQ)) {
+            return constraint.getB() < 0;
+        } else {
+            return constraint.getB() > 0;
+        }
     }
 
     private List<Point> findAxisIntersections(List<Constraint> constraints) {
@@ -126,6 +154,7 @@ public class GraphicalSolver {
         return intersections;
     }
 
+    // Проверка на то, является ли точка допустимой
     private boolean isFeasible(Point point, List<Constraint> constraints) {
         double x = point.getX();
         double y = point.getY();
@@ -160,12 +189,27 @@ public class GraphicalSolver {
             }
         }
 
-        this.currentFeasibleRegion = newFeasibleRegion.stream().distinct().toList();
-        System.out.println(currentFeasibleRegion);
+        this.currentFeasibleRegion = removeUnboundedDuplicates(newFeasibleRegion);
 
         if (!constraint.isInitial()) {
-            solutionBuilder.addConstraint(constraint);
+            solutionBuilder.addConstraint(constraint, currentFeasibleRegion);
         }
+    }
+
+    // Убираем дублирующие точки
+    // Если есть две точки с одинаковыми координатами, но одна unbounded, а вторая нет - оставляем !unbounded
+    public static List<Point> removeUnboundedDuplicates(List<Point> points) {
+        return points.stream()
+                .collect(Collectors.groupingBy(
+                        p -> new AbstractMap.SimpleEntry<>(p.getX(), p.getY())
+                ))
+                .values()
+                .stream()
+                .map(group -> group.stream()
+                        .filter(p -> !p.isUnbounded())
+                        .findFirst()
+                        .orElse(group.get(0)))
+                .collect(Collectors.toList());
     }
 
     private void findOptimalSolution() {

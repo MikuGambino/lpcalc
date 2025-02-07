@@ -4,6 +4,7 @@ import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.Point;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class GraphDrawer {
@@ -39,7 +40,9 @@ public class GraphDrawer {
         double maxRange = Math.max(xRange, yRange);
 
         double viewBoxSize = GRAPH_SIZE / 2.;
+        // Масштаб внутри ViewBox
         double pxSize = viewBoxSize / maxRange;
+        // Учёт отступа с каждой стороны графика
         pxSize -= pxSize * PADDING_PERCENTAGE;
 
         ViewBoxParams viewBoxParams = new ViewBoxParams(minX, minY, viewBoxSize, pxSize, PADDING_PERCENTAGE);
@@ -56,7 +59,7 @@ public class GraphDrawer {
                 .build();
     }
 
-    public String addConstraint(Constraint constraint) {
+    public String addConstraint(Constraint constraint, List<Point> feasibleRegion) {
         List<Point> linePoints = findLinePoints(constraint);
         Line line = new Line(
                 linePoints.get(0).getX(),
@@ -70,15 +73,23 @@ public class GraphDrawer {
             Graph lastGraph = this.graphs.get(graphs.size() - 1);
             graphLines = new ArrayList<>(lastGraph.getLines());
         }
-
         graphLines.add(line);
-        Graph newGraph = new Graph(graphParams, graphLines);
+
+        // Сортировка точек многоугольника
+        System.out.println("FEASIBLE REGION!!");
+        System.out.println(feasibleRegion);
+        // Преобразование координат в пиксели
+        List<Point> feasibleRegionPx = feasibleRegionPointsToPx(feasibleRegion, graphLines);
+        // Сортировка точек для построения многоугольника
+        List<Point> sortedFeasibleRegion = sortPolygonPoints(feasibleRegionPx);
+        Polygon polygon = new Polygon(sortedFeasibleRegion);
+
+        Graph newGraph = new Graph(graphParams, graphLines, polygon);
         this.graphs.add(newGraph);
         System.out.println(newGraph.getSVG());
         System.out.println("-------------------");
         return newGraph.getSVG();
     }
-
 
     public List<Point> findLinePoints(Constraint constraint) {
         List<Point> points = new ArrayList<>();
@@ -106,10 +117,134 @@ public class GraphDrawer {
         return points;
     }
 
+    // Сортировка точек многоугольника по углу
+    private List<Point> sortPolygonPoints(List<Point> points) {
+        if (points.size() < 3) {
+            return points;
+        }
+
+        Point center = findCentroid(points);
+
+        List<Point> sortedPoints = new ArrayList<>(points);
+        sortedPoints.sort(Comparator.comparingDouble(p -> Math.atan2(p.getY() - center.getY(), p.getX() - center.getX())));
+
+        return sortedPoints;
+    }
+
+    private Point findCentroid(List<Point> points) {
+        double sumX = 0;
+        double sumY = 0;
+
+        for (Point p : points) {
+            sumX += p.getX();
+            sumY += p.getY();
+        }
+
+        return new Point(
+                sumX / points.size(),
+                sumY / points.size()
+        );
+    }
+
+    private List<Point> feasibleRegionPointsToPx(List<Point> points, List<Line> lines) {
+        // "Бесконечная точка" и точка, выше которой располагается ОДР в данном алгоритме равнозначны
+        // Чтобы не писать дублирующего кода, "feasibleRegionIsAbove" точки делаем также Unbounded
+        for (Point point : points) {
+            if (point.isFeasibleRegionIsAbove()) {
+                point.setUnbounded(true);
+            }
+        }
+
+        ViewBoxParams viewBox = graphParams.getViewBoxParams();
+        List<Point> pointsPx = new ArrayList<>();
+        Point cornerPoint = null;
+
+        for (Point point : points) {
+            Point pxPoint = toPx(point);
+            // Если точка не лежит не является "бесконечной", то точка добавляется в массив,
+            // и происходит переход к следующей
+            if (!point.isUnbounded()) {
+                pointsPx.add(pxPoint);
+                continue;
+            }
+
+            // Если точка на границе графика, нужно определить координаты новой точки, учитывая отступ графика
+            // Вычисление координат происходит путём поиска прямой, на которой лежит точка
+            Line line = findLineContainingPoint(lines, pxPoint);
+            if (line != null && line.getEndPoint().getY() >= 0) { // Проверка на то, что точка в I четверти
+                pointsPx.add(line.getEndPoint());
+                pointsPx.add(pxPoint);
+                continue;
+            }
+
+            // Если точка имеет бесконечную координату X и Y, то она потенциально может являться угловой (maxX && maxY)
+            if (point.isUnbounded() && point.getX() != 0 && point.getY() != 0) {
+                cornerPoint = new Point(viewBox.getMinX(), viewBox.getMinY());
+                continue;
+            }
+
+            // Если точка не находится на прямой, значит она лежит на оси координат
+            // В таком случае, для "бесконечной" координаты точки используется край видимой области (ViewBox)
+            Point newPoint = null;
+
+            if (point.getY() == 0) {
+                newPoint = new Point(viewBox.getMinX(), pxPoint.getY());
+            }
+            if (point.getX() == 0) {
+                newPoint = new Point(pxPoint.getX(), viewBox.getMinY());
+            }
+
+            if (newPoint != null) {
+                pointsPx.add(newPoint);
+            }
+            pointsPx.add(pxPoint);
+         }
+
+        // Если имеется "угловая точка", нужно проверить действительно ли она является таковой
+        // Для этого нужно узнать, есть ли точка правее и выше угловой
+        boolean isCorner = true;
+        if (cornerPoint != null) {
+            for (Point point : pointsPx) {
+                if (point.getY() >= cornerPoint.getY() && point.getX() >= cornerPoint.getX()) {
+                    isCorner = false;
+                    break;
+                }
+            }
+            if (isCorner) {
+                pointsPx.add(cornerPoint);
+            }
+        }
+
+        return pointsPx;
+    }
+
+    // Функция для поиска прямой, на которой находится точка
+    public Line findLineContainingPoint(List<Line> lines, Point point) {
+        for (Line line : lines) {
+            if (isPointOnLine(point, line)) {
+                return line;
+            }
+        }
+
+        return null;
+    }
+
+    // Функция для проверки, находится ли точка на прямой
+    public boolean isPointOnLine(Point p, Line line) {
+        Point a = line.getBeginPoint();
+        Point b = line.getEndPoint();
+
+        double crossProduct = (b.getX() - a.getX()) * (p.getY() - a.getY())
+                - (b.getY() - a.getY()) * (p.getX() - a.getX());
+        return !(Math.abs(crossProduct) > 1e-9);
+    }
+
+    // Преобразования координат в пиксели
     private Point toPx(Point point) {
         return new Point(point.getX() * graphParams.getPxSize(), point.getY() * graphParams.getPxSize());
     }
 
+    // Преобразование пикселей в координаты
     private double toCords(Double num) {
         return num / graphParams.getPxSize();
     }

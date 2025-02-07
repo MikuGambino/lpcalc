@@ -13,6 +13,7 @@ public class Point {
     double x;
     double y;
     boolean isUnbounded;
+    boolean feasibleRegionIsAbove;
 
     // todo добавить точке список прямых
 

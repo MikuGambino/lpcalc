@@ -10,4 +10,6 @@ public class SVGCode {
 
     public static final String GROUP = "<g transform='translate(%.2f, %.2f)'>\n";
 
+    public static final String POLYGON = "<polygon fill='%s' opacity='%.2f' points='%s'/>\n";
+
 }

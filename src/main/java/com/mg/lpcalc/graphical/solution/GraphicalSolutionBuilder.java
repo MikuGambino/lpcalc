@@ -11,16 +11,18 @@ import java.util.List;
 @NoArgsConstructor
 public class GraphicalSolutionBuilder {
     private List<Constraint> constraints = new ArrayList<>();
+    private List<List<Point>> feasibleRegions = new ArrayList<>();
     private GraphDrawer graphDrawer;
 
-    public void addConstraint(Constraint constraint) {
+    public void addConstraint(Constraint constraint, List<Point> feasibleRegion) {
         constraints.add(constraint);
+        feasibleRegions.add(feasibleRegion);
     }
 
     public void init(List<Point> points) {
         this.graphDrawer = new GraphDrawer(points);
-        for (Constraint constraint : constraints) {
-            graphDrawer.addConstraint(constraint);
+        for (int i = 0; i < constraints.size(); i++) {
+            graphDrawer.addConstraint(constraints.get(i), feasibleRegions.get(i));
         }
     }
 }

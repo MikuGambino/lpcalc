@@ -1,5 +1,6 @@
 package com.mg.lpcalc.graphical.graph;
 
+import com.mg.lpcalc.graphical.model.Point;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -19,6 +20,14 @@ public class Line {
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+    }
+
+    public Point getBeginPoint() {
+        return new Point(x1, y1);
+    }
+
+    public Point getEndPoint() {
+        return new Point(x2, y2);
     }
 
     public String toSVG() {
