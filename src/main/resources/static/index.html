@@ -26,6 +26,7 @@
 
     <button onclick="sendData()">Решить задачу</button>
     <button onclick="generateRandomData()">Случайные данные</button>
+    <input type="file" id="fileInput" />
 </body>
 
 <script>
@@ -196,4 +197,99 @@
         document.getElementById(`rhs4`).value = 4;
     }
 </script>
+<script>
+    // При выборе файла читаем его с помощью FileReader
+    document.getElementById("fileInput").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const content = event.target.result;
+        // Выводим содержимое в консоль (можно убрать)
+        console.log("Содержимое файла:\n" + content);
+        // Парсим содержимое файла
+        const lpProblem = parseLPFile(content);
+        console.log(lpProblem);
+
+        document.getElementById("constraintCount").value = lpProblem.numConstraints;
+        const changeEvent = new Event("change", {
+            bubbles: false,    // событие всплывающее, если это необходимо
+            cancelable: false // событие нельзя отменить
+        });   
+        document.getElementById("constraintCount").dispatchEvent(changeEvent);
+        for (let i = 0; i < lpProblem.numConstraints; i++) {
+            document.getElementById(`v${i}0`).value = lpProblem.constraints[i].coefficients[0];
+            document.getElementById(`v${i}1`).value = lpProblem.constraints[i].coefficients[1];
+
+            if (lpProblem.constraints[i].comparator == ">=") {
+                document.querySelector(`#c${i} select`).value = 'GEQ';
+            } else {
+                document.querySelector(`#c${i} select`).value = 'LEQ';
+            }
+
+            document.getElementById(`rhs${i}`).value = lpProblem.constraints[i].rhs;
+        }
+
+        document.getElementById('obj0').value = lpProblem.objective.coefficients[0];
+        document.getElementById('obj1').value = lpProblem.objective.coefficients[1];
+        document.getElementById('directionSelect').value = lpProblem.objective.type;
+      };
+      reader.readAsText(file);
+    });
+
+    /**
+     * Функция для парсинга текста файла в объект с ограничениями и целевой функцией.
+     * @param {string} content - содержимое файла
+     * @return {Object} объект с полями:
+     *         numConstraints - количество ограничений,
+     *         constraints - массив ограничений { coefficients, comparator, rhs },
+     *         objective - целевая функция { type, coefficients }
+     */
+    function parseLPFile(content) {
+      // Разбиваем содержимое на строки, удаляя пустые строки
+      const lines = content.split(/\r?\n/).filter((line) => line.trim() !== "");
+      let index = 0;
+
+      // Первая строка – число ограничений
+      const numConstraints = parseInt(lines[index].trim(), 10);
+      index++;
+
+      const constraints = [];
+
+      // Читаем ограничения
+      for (let i = 0; i < numConstraints; i++, index++) {
+        // Например строка "1 -2 >= 3"
+        // Разбиваем строку на токены по пробелам
+        const tokens = lines[index].trim().split(/\s+/);
+        // Предполагаем, что последние два токена – это знак неравенства и значение правой части,
+        // а остальные токены – коэффициенты
+        const coefficients = tokens.slice(0, tokens.length - 2).map(Number);
+        const comparator = tokens[tokens.length - 2]; // например, ">=" или "<="
+        const rhs = Number(tokens[tokens.length - 1]);
+
+        constraints.push({
+          coefficients,
+          comparator,
+          rhs,
+        });
+      }
+
+      // Следующая строка – тип целевой функции ("max" или "min")
+      const objectiveType = lines[index].trim().toUpperCase();
+      index++;
+
+      // Следующая строка – коэффициенты целевой функции
+      const objectiveCoefficients = lines[index].trim().split(/\s+/).map(Number);
+      index++;
+
+      return {
+        numConstraints,
+        constraints,
+        objective: {
+          type: objectiveType,
+          coefficients: objectiveCoefficients,
+        },
+      };
+    }
+  </script>
 </html>
