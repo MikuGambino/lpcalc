@@ -8,12 +8,12 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class GraphParams {
-    double maxX;
-    double maxY;
-    double minX;
-    double minY;
-    double maxPadding;
-    double pxSize;
-    int graphSize;
-    ViewBoxParams viewBoxParams;
+    private double maxX;
+    private double maxY;
+    private double minX;
+    private double minY;
+    private double maxPadding;
+    private double pxSize;
+    private int graphSize;
+    private ViewBoxParams viewBoxParams;
 }

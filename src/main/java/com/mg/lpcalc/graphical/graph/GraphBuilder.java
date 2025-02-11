@@ -1,5 +1,9 @@
 package com.mg.lpcalc.graphical.graph;
 
+import com.mg.lpcalc.graphical.graph.model.Circle;
+import com.mg.lpcalc.graphical.graph.model.Graph;
+import com.mg.lpcalc.graphical.graph.model.Line;
+import com.mg.lpcalc.graphical.graph.model.Polygon;
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.Point;
 
@@ -7,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class GraphDrawer {
+public class GraphBuilder {
     private final int GRAPH_SIZE = 500;
     private final double PADDING_PERCENTAGE = 0.2;
     private GraphParams graphParams;
     private List<Graph> graphs = new ArrayList<>();
 
-    public GraphDrawer(List<Point> points) {
+    public GraphBuilder(List<Point> points) {
         initGraphParams(points);
     }
 
@@ -59,16 +63,13 @@ public class GraphDrawer {
                 .build();
     }
 
-    public String addConstraint(Constraint constraint, List<Point> feasibleRegion) {
+    public String addConstraint(Constraint constraint, List<Point> feasibleRegion, List<Point> axisPoints) {
+        // Поиск точки начала и точки конца прямой
         List<Point> linePoints = findLinePoints(constraint);
-        Line line = new Line(
-                linePoints.get(0).getX(),
-                linePoints.get(0).getY(),
-                linePoints.get(1).getX(),
-                linePoints.get(1).getY()
-            );
+        Line line = new Line(linePoints.get(0), linePoints.get(1));
 
         List<Line> graphLines = new ArrayList<>();
+        // Сбор линий прошлых графиков
         if (!this.graphs.isEmpty()) {
             Graph lastGraph = this.graphs.get(graphs.size() - 1);
             graphLines = new ArrayList<>(lastGraph.getLines());
@@ -84,11 +85,14 @@ public class GraphDrawer {
         List<Point> sortedFeasibleRegion = sortPolygonPoints(feasibleRegionPx);
         Polygon polygon = new Polygon(sortedFeasibleRegion);
 
-        Graph newGraph = new Graph(graphParams, graphLines, polygon);
+        List<Circle> feasibleRegionPoints = pointsToCircles(feasibleRegion);
+        List<Circle> axisCircles = pointsToCircles(axisPoints).stream().distinct().toList();
+
+        Graph newGraph = new Graph(graphParams, graphLines, polygon, feasibleRegionPoints, axisCircles);
         this.graphs.add(newGraph);
-        System.out.println(newGraph.getSVG());
+        System.out.println(newGraph.toSVG());
         System.out.println("-------------------");
-        return newGraph.getSVG();
+        return newGraph.toSVG();
     }
 
     public List<Point> findLinePoints(Constraint constraint) {
@@ -146,20 +150,37 @@ public class GraphDrawer {
         );
     }
 
+    private List<Circle> pointsToCircles(List<Point> points) {
+        System.out.println(points);
+        List<Circle> circles = new ArrayList<>();
+        for (Point point : points) {
+            if (point.isUnbounded()) continue;
+            Point pxPoint = toPx(point);
+            Circle circle = new Circle(pxPoint.getX(), pxPoint.getY(), point.getX(), point.getY());
+            circles.add(circle);
+        }
+
+        return circles;
+    }
+
     private List<Point> feasibleRegionPointsToPx(List<Point> points, List<Line> lines) {
         // "Бесконечная точка" и точка, выше которой располагается ОДР в данном алгоритме равнозначны
         // Чтобы не писать дублирующего кода, "feasibleRegionIsAbove" точки делаем также Unbounded
+        List<Point> pCopies = new ArrayList<>();
         for (Point point : points) {
+            Point pointCopy = new Point(point);
             if (point.isFeasibleRegionIsAbove()) {
-                point.setUnbounded(true);
+                pointCopy.setUnbounded(true);
             }
+            pCopies.add(pointCopy);
+
         }
 
         ViewBoxParams viewBox = graphParams.getViewBoxParams();
         List<Point> pointsPx = new ArrayList<>();
         Point cornerPoint = null;
 
-        for (Point point : points) {
+        for (Point point : pCopies) {
             Point pxPoint = toPx(point);
             // Если точка не лежит не является "бесконечной", то точка добавляется в массив,
             // и происходит переход к следующей

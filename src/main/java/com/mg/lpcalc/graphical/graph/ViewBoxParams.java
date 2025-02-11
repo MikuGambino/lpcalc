@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class ViewBoxParams {
-    double minX;
-    double minY;
-    double size;
+    private double minX;
+    private double minY;
+    private double size;
 
     // minX - минимальная точка X на графике
     // minY - минимальная точка Y на графике

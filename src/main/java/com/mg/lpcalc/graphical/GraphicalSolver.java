@@ -180,7 +180,9 @@ public class GraphicalSolver {
 
         List<Point> newFeasibleRegion = new ArrayList<>();
 
-        List<Point> points = findConstraintIntersections(this.currentConstraints);
+        List<Point> intersections = findConstraintIntersections(this.currentConstraints);
+        List<Point> points = new ArrayList<>();
+        points.addAll(intersections);
         points.addAll(this.currentFeasibleRegion);
 
         for (Point point : points) {
@@ -192,7 +194,8 @@ public class GraphicalSolver {
         this.currentFeasibleRegion = removeUnboundedDuplicates(newFeasibleRegion);
 
         if (!constraint.isInitial()) {
-            solutionBuilder.addConstraint(constraint, currentFeasibleRegion);
+            List<Point> axisPoints = findAxisIntersections(currentConstraints.subList(3, currentConstraints.size()));
+            solutionBuilder.addConstraint(constraint, currentFeasibleRegion, axisPoints);
         }
     }
 

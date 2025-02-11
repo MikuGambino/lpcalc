@@ -25,6 +25,14 @@ public class Point {
         this.isUnbounded = false;
     }
 
+    // Копирующий конструктор
+    public Point(Point point) {
+        this.x = point.getX();
+        this.y = point.getY();
+        this.isUnbounded = point.isUnbounded();
+        this.feasibleRegionIsAbove = point.isFeasibleRegionIsAbove();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,25 +1,33 @@
-package com.mg.lpcalc.graphical.graph;
+package com.mg.lpcalc.graphical.graph.model;
 
+import com.mg.lpcalc.graphical.graph.SVGCode;
 import com.mg.lpcalc.graphical.model.Point;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Locale;
 
 @Data
-public class Line {
+public class Line implements SVGElement {
     private double x1;
     private double y1;
     private double x2;
     private double y2;
     private String stroke = "black";
-    private double strokeWidth = 1.;
+    private double strokeWidth = 0.5;
 
-    public Line(double x1, double y1, double x2, double y2) {
+    public Line(double x1, double y1, double x2, double y2, double strokeWidth) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+        this.strokeWidth = strokeWidth;
+    }
+
+    public Line(Point begin, Point end) {
+        this.x1 = begin.getX();
+        this.y1 = begin.getY();
+        this.x2 = end.getX();
+        this.y2 = end.getY();
     }
 
     public Point getBeginPoint() {

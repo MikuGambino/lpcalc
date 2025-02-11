@@ -1,6 +1,6 @@
 package com.mg.lpcalc.graphical.solution;
 
-import com.mg.lpcalc.graphical.graph.GraphDrawer;
+import com.mg.lpcalc.graphical.graph.GraphBuilder;
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.Point;
 import lombok.NoArgsConstructor;
@@ -12,17 +12,19 @@ import java.util.List;
 public class GraphicalSolutionBuilder {
     private List<Constraint> constraints = new ArrayList<>();
     private List<List<Point>> feasibleRegions = new ArrayList<>();
-    private GraphDrawer graphDrawer;
+    private List<List<Point>> axisPoints = new ArrayList<>();
+    private GraphBuilder graphBuilder;
 
-    public void addConstraint(Constraint constraint, List<Point> feasibleRegion) {
+    public void addConstraint(Constraint constraint, List<Point> feasibleRegion, List<Point> axisPoints) {
         constraints.add(constraint);
         feasibleRegions.add(feasibleRegion);
+        this.axisPoints.add(axisPoints);
     }
 
     public void init(List<Point> points) {
-        this.graphDrawer = new GraphDrawer(points);
+        this.graphBuilder = new GraphBuilder(points);
         for (int i = 0; i < constraints.size(); i++) {
-            graphDrawer.addConstraint(constraints.get(i), feasibleRegions.get(i));
+            graphBuilder.addConstraint(constraints.get(i), feasibleRegions.get(i), axisPoints.get(i));
         }
     }
 }
