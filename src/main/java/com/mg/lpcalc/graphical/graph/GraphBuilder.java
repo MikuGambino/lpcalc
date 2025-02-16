@@ -1,10 +1,8 @@
 package com.mg.lpcalc.graphical.graph;
 
-import com.mg.lpcalc.graphical.graph.model.Circle;
-import com.mg.lpcalc.graphical.graph.model.Graph;
-import com.mg.lpcalc.graphical.graph.model.Line;
-import com.mg.lpcalc.graphical.graph.model.Polygon;
+import com.mg.lpcalc.graphical.graph.model.*;
 import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
 import com.mg.lpcalc.graphical.model.Point;
 
 import java.util.ArrayList;
@@ -258,6 +256,36 @@ public class GraphBuilder {
         double crossProduct = (b.getX() - a.getX()) * (p.getY() - a.getY())
                 - (b.getY() - a.getY()) * (p.getX() - a.getX());
         return !(Math.abs(crossProduct) > 1e-9);
+    }
+
+    public void addObjectiveFunc(ObjectiveFunc objectiveFunc) {
+        ViewBoxParams viewBox = graphParams.getViewBoxParams();
+        double minX = viewBox.getMinX() - viewBox.getSize();
+        double minY = viewBox.getMinY() - viewBox.getSize();
+
+        double a = objectiveFunc.getA();
+        double b = objectiveFunc.getB();
+
+        double endX = a * graphParams.getPxSize();
+        double endY = b * graphParams.getPxSize();
+
+        if (endX < minX || endY < minY) {
+            if (endX <= endY) {
+                endX = minX + 5;
+                endY = (objectiveFunc.getA() * endX) / objectiveFunc.getB();
+                endY = objectiveFunc.getB() > 0 ? Math.abs(endY) : -Math.abs(endY);
+            } else {
+                endY = minY + 5;
+                endX = (objectiveFunc.getA() * endY) / objectiveFunc.getB();
+                endX = objectiveFunc.getA() > 0 ? Math.abs(endX) : -Math.abs(endX);
+            }
+        }
+
+        Arrow objectiveFuncArrow = new Arrow(endX, endY);
+
+        Graph lastGraph = this.graphs.get(graphs.size() - 1);
+        lastGraph.setObjectiveFunc(objectiveFuncArrow);
+        System.out.println(lastGraph.toSVG());
     }
 
     // Преобразования координат в пиксели

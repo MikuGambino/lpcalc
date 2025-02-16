@@ -39,7 +39,7 @@ public class GraphicalSolver {
         }
 
         List<Point> allPoints = findAllFeasiblePoints();
-        solutionBuilder.init(allPoints);
+        solutionBuilder.init(allPoints, objectiveFunc);
 
         findOptimalSolution();
     }

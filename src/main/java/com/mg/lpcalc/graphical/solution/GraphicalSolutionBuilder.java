@@ -2,6 +2,7 @@ package com.mg.lpcalc.graphical.solution;
 
 import com.mg.lpcalc.graphical.graph.GraphBuilder;
 import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
 import com.mg.lpcalc.graphical.model.Point;
 import lombok.NoArgsConstructor;
 
@@ -21,10 +22,12 @@ public class GraphicalSolutionBuilder {
         this.axisPoints.add(axisPoints);
     }
 
-    public void init(List<Point> points) {
+    public void init(List<Point> points, ObjectiveFunc objectiveFunc) {
         this.graphBuilder = new GraphBuilder(points);
         for (int i = 0; i < constraints.size(); i++) {
             graphBuilder.addConstraint(constraints.get(i), feasibleRegions.get(i), axisPoints.get(i));
         }
+
+        graphBuilder.addObjectiveFunc(objectiveFunc);
     }
 }

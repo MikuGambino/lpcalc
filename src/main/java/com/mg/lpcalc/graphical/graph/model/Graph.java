@@ -16,6 +16,7 @@ public class Graph implements SVGElement {
     private Polygon feasibleRegion;
     private List<Circle> feasibleRegionPoints;
     private List<Circle> axisPoints;
+    private Arrow objectiveFunc;
 
     public Graph(GraphParams graphParams, List<Line> lines, Polygon feasibleRegion,
                  List<Circle> feasibleRegionPoints, List<Circle> axisPoints) {
@@ -118,6 +119,11 @@ public class Graph implements SVGElement {
         }
     }
 
+    private void addObjectiveFunc() {
+        svg.append("\t\t");
+        svg.append(objectiveFunc.toSVG());
+    }
+
     public String toSVG() {
         addSvgMetadata();
         addAxis();
@@ -126,6 +132,9 @@ public class Graph implements SVGElement {
         addAxisPoints();
         addFeasibleRegion();
         addFeasibleRegionPoints();
+        if (objectiveFunc != null) {
+            addObjectiveFunc();
+        }
         return svg.toString();
     }
 }
