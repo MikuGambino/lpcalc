@@ -17,9 +17,14 @@ public class Axis implements SVGElement {
     @Override
     public String toSVG() {
         StringBuilder svg = new StringBuilder();
+        Text text;
         // Если ось X
-        String label = x1 == 0 ? "X₁" : "X₂";
-        Text text = new Text(x2 - 8, -(y2 - 6), "axis", label);;
+        if (x1 == 0) {
+            text = new Text(x2 - 5, -(y2 - 6), "axis", "X₁");
+        } else {
+            text = new Text(x2 - 8, -y2, "axis", "X₂");
+        }
+
         svg.append(text.toSVG());
 
         svg.append("\t");
