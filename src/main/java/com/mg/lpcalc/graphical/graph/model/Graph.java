@@ -3,7 +3,6 @@ package com.mg.lpcalc.graphical.graph.model;
 import com.mg.lpcalc.graphical.graph.GraphParams;
 import com.mg.lpcalc.graphical.graph.SVGCode;
 import com.mg.lpcalc.graphical.graph.ViewBoxParams;
-import com.mg.lpcalc.graphical.model.Point;
 import lombok.Data;
 
 import java.util.List;
@@ -27,10 +26,10 @@ public class Graph implements SVGElement {
         this.axisPoints = axisPoints;
     }
 
-    private void addSvgHeader() {
+    private void addSvgMetadata() {
         ViewBoxParams viewBox = graphParams.getViewBoxParams();
         svg.append(String.format(Locale.US,
-                SVGCode.SVG_HEADER,
+                SVGCode.SVG_METADATA,
                 viewBox.getMinX(),
                 viewBox.getMinY(),
                 viewBox.getSize(),
@@ -41,13 +40,25 @@ public class Graph implements SVGElement {
     }
 
     private void addAxis() {
+        ViewBoxParams viewBox = graphParams.getViewBoxParams();
+
         // Ось x
-        Line xAxis = new Line(0, 250, 500, 250, 1);
+        Axis xAxis = new Axis(
+                0,
+                graphParams.getGraphSize() / 2,
+                viewBox.getSize() + viewBox.getMinX() - 5,
+                graphParams.getGraphSize() / 2
+        );
         svg.append("\t");
         svg.append(xAxis.toSVG());
 
         // Ось y
-        Line yAxis = new Line(250, 0, 250, 500, 1);
+        Axis yAxis = new Axis(
+                graphParams.getGraphSize() / 2,
+                0,
+                graphParams.getGraphSize() / 2,
+                viewBox.getSize() + viewBox.getMinY() - 5
+        );
         svg.append("\t");
         svg.append(yAxis.toSVG());
     }
@@ -108,7 +119,7 @@ public class Graph implements SVGElement {
     }
 
     public String toSVG() {
-        addSvgHeader();
+        addSvgMetadata();
         addAxis();
         addGroup();
         addLines();
