@@ -38,10 +38,10 @@ public class GraphicalSolver {
             addConstraint(c);
         }
 
-        List<Point> allPoints = findAllFeasiblePoints();
-        solutionBuilder.init(allPoints, objectiveFunc);
+        List<Point> optimalPoints = findOptimalSolution();
 
-        findOptimalSolution();
+        List<Point> allPoints = findAllFeasiblePoints();
+        solutionBuilder.init(allPoints, objectiveFunc, optimalPoints);
     }
 
     private List<Point> findAllFeasiblePoints() {
@@ -215,7 +215,7 @@ public class GraphicalSolver {
                 .collect(Collectors.toList());
     }
 
-    private void findOptimalSolution() {
+    private List<Point> findOptimalSolution() {
         if (this.currentFeasibleRegion.isEmpty()) {
             System.out.println("Нет допустимых решений (ОДР пуста).");
         }
@@ -248,5 +248,7 @@ public class GraphicalSolver {
         } else {
             System.out.println("Множество оптимальных решений между вершинами: " + optimalPoints);
         }
+
+        return optimalPoints;
     }
 }

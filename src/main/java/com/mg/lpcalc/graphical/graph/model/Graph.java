@@ -17,6 +17,8 @@ public class Graph implements SVGElement {
     private List<Circle> feasibleRegionPoints;
     private List<Circle> axisPoints;
     private Arrow objectiveFunc;
+    private Line perpendicularLine;
+    private List<Circle> optimalPoints;
 
     public Graph(GraphParams graphParams, List<Line> lines, Polygon feasibleRegion,
                  List<Circle> feasibleRegionPoints, List<Circle> axisPoints) {
@@ -124,16 +126,37 @@ public class Graph implements SVGElement {
         svg.append(objectiveFunc.toSVG());
     }
 
+    private void addPerpendicularLine() {
+        svg.append("\t\t");
+        perpendicularLine.setStroke("#c20000");
+        perpendicularLine.setStrokeWidth(0.5);
+        svg.append(perpendicularLine.toSVG());
+    }
+
+    private void addOptimalPoints() {
+        for (Circle circle : optimalPoints) {
+            svg.append("\t\t");
+            circle.setFill("#c20000");
+            svg.append(circle.toSVG());
+        }
+    }
+
     public String toSVG() {
         addSvgMetadata();
         addAxis();
         addGroup();
+        addFeasibleRegion();
         addLines();
         addAxisPoints();
-        addFeasibleRegion();
         addFeasibleRegionPoints();
         if (objectiveFunc != null) {
             addObjectiveFunc();
+        }
+        if (perpendicularLine != null) {
+            addPerpendicularLine();
+        }
+        if (optimalPoints != null) {
+            addOptimalPoints();
         }
         return svg.toString();
     }

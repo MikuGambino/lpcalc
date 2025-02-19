@@ -22,12 +22,13 @@ public class GraphicalSolutionBuilder {
         this.axisPoints.add(axisPoints);
     }
 
-    public void init(List<Point> points, ObjectiveFunc objectiveFunc) {
+    public void init(List<Point> points, ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
         this.graphBuilder = new GraphBuilder(points);
         for (int i = 0; i < constraints.size(); i++) {
             graphBuilder.addConstraint(constraints.get(i), feasibleRegions.get(i), axisPoints.get(i));
         }
 
         graphBuilder.addObjectiveFunc(objectiveFunc);
+        graphBuilder.getFinalGraph(objectiveFunc, optimalPoints);
     }
 }

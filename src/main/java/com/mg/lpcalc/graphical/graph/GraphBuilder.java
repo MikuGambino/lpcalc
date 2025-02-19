@@ -62,9 +62,7 @@ public class GraphBuilder {
     }
 
     public String addConstraint(Constraint constraint, List<Point> feasibleRegion, List<Point> axisPoints) {
-        // Поиск точки начала и точки конца прямой
-        List<Point> linePoints = findLinePoints(constraint);
-        Line line = new Line(linePoints.get(0), linePoints.get(1));
+        Line line = getLineByConstraint(constraint);
 
         List<Line> graphLines = new ArrayList<>();
         // Сбор линий прошлых графиков
@@ -93,7 +91,7 @@ public class GraphBuilder {
         return newGraph.toSVG();
     }
 
-    public List<Point> findLinePoints(Constraint constraint) {
+    public Line getLineByConstraint(Constraint constraint) {
         List<Point> points = new ArrayList<>();
         ViewBoxParams viewBox = graphParams.getViewBoxParams();
         double minX = toCords(viewBox.getMinX() - viewBox.getSize());
@@ -116,7 +114,7 @@ public class GraphBuilder {
             points.add(toPx(new Point(xAtMaxY, maxY)));
         }
 
-        return points;
+        return new Line(points.get(0), points.get(1));
     }
 
     // Сортировка точек многоугольника по углу
@@ -269,6 +267,7 @@ public class GraphBuilder {
         double endX = a * graphParams.getPxSize();
         double endY = b * graphParams.getPxSize();
 
+        // Если функция выходит за график
         if (endX < minX || endY < minY) {
             if (endX <= endY) {
                 endX = minX + 5;
@@ -288,6 +287,23 @@ public class GraphBuilder {
         System.out.println(lastGraph.toSVG());
     }
 
+    public void getFinalGraph(ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
+        Point answerPoint = optimalPoints.get(0);
+        double a = objectiveFunc.getA();
+        double b = objectiveFunc.getB();
+        double c = a * answerPoint.getX() + b * answerPoint.getY();
+
+        // уравнение прямой через нормальный вектор
+        Constraint perpendicularConstraint = new Constraint(a, b, c);
+        System.out.println(perpendicularConstraint);
+        Line perpendicularLine = getLineByConstraint(perpendicularConstraint);
+        List<Circle> answerCircles = pointsToCircles(optimalPoints);
+        Graph lastGraph = this.graphs.get(graphs.size() - 1);
+        lastGraph.setPerpendicularLine(perpendicularLine);
+        lastGraph.setOptimalPoints(answerCircles);
+        System.out.println(lastGraph.toSVG());
+    }
+
     // Преобразования координат в пиксели
     private Point toPx(Point point) {
         return new Point(point.getX() * graphParams.getPxSize(), point.getY() * graphParams.getPxSize());
@@ -297,4 +313,5 @@ public class GraphBuilder {
     private double toCords(Double num) {
         return num / graphParams.getPxSize();
     }
+
 }

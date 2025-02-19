@@ -15,14 +15,6 @@ public class Line implements SVGElement {
     private String stroke = "black";
     private double strokeWidth = 0.5;
 
-    public Line(double x1, double y1, double x2, double y2, double strokeWidth) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
-        this.strokeWidth = strokeWidth;
-    }
-
     public Line(Point begin, Point end) {
         this.x1 = begin.getX();
         this.y1 = begin.getY();

@@ -17,6 +17,12 @@ public class Constraint {
     private boolean isUnbounded;
     private boolean isInitial;
 
+    public Constraint(Double a, Double b, Double c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
     public boolean isLEQ() {
         return operator.equals(Operator.LEQ);
     }
