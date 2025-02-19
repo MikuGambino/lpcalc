@@ -1,4 +1,4 @@
-package com.mg.lpcalc.graphical.model;
+package com.mg.lpcalc.graphical.solver.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mg.lpcalc.model.enums.Direction;

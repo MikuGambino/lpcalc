@@ -1,8 +1,8 @@
 package com.mg.lpcalc.controller;
 
-import com.mg.lpcalc.graphical.GraphicalSolver;
-import com.mg.lpcalc.graphical.model.OptimizationProblem;
-import com.mg.lpcalc.graphical.model.converter.GraphicalOptimizationProblemConverter;
+import com.mg.lpcalc.graphical.solver.GraphicalSolver;
+import com.mg.lpcalc.graphical.solver.model.OptimizationProblem;
+import com.mg.lpcalc.graphical.solver.model.converter.GraphicalOptimizationProblemConverter;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
