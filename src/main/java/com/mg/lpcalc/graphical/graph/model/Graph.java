@@ -67,10 +67,38 @@ public class Graph implements SVGElement {
     }
 
     private void addLines() {
-        for (Line line : lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            Line line = lines.get(i);
+            String label = "(%s)".formatted(i);
+            Text text = getText(line, label);
             svg.append("\t\t");
             svg.append(line.toSVG());
+            svg.append("\t\t");
+            svg.append(text.toSVG());
         }
+    }
+
+    private Text getText(Line line, String label) {
+        double x = line.getX1() + 4;
+        double y = line.getY1() > 0 ? line.getY1() - 10 : line.getY1() + 10;
+        // Если конец линии выше видимой области
+        if (y > graphParams.getViewBoxParams().getMinY()) {
+            x = -20;
+            y = graphParams.getViewBoxParams().getMinY() - 10;
+        } else if (y < graphParams.getMinY() * getGraphParams().getPxSize()) {
+            x = -20;
+            y = graphParams.getMinY() * getGraphParams().getPxSize() - 10;
+        }
+
+        Text text;
+        if (line.getX1() == line.getX2()) {
+            text = new Text(line.getX1() + 2, -line.getY1() - 5, "line-label", label);
+        } else if (line.getY1() == line.getY2()) {
+            text = new Text(line.getX1() + 2, -line.getY1() - 5, "line-label", label);
+        } else {
+            text = new Text(x, -y, "line-label", label);
+        }
+        return text;
     }
 
     private void addGroup() {

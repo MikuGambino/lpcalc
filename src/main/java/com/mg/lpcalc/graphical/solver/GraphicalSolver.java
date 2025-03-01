@@ -80,6 +80,7 @@ public class GraphicalSolver {
             if (point.getY() > maxY) maxY = point.getY();
         }
 
+
         System.out.println(maxX);
         this.maxX = maxX;
         this.maxY = maxY;

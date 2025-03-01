@@ -12,7 +12,7 @@ public class GraphParams {
     private double maxY;
     private double minX;
     private double minY;
-    private double maxPadding;
+    private double paddingPx;
     private double pxSize;
     private int graphSize;
     private ViewBoxParams viewBoxParams;

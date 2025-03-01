@@ -46,15 +46,17 @@ public class GraphBuilder {
         double pxSize = viewBoxSize / maxRange;
         // Учёт отступа с каждой стороны графика
         pxSize -= pxSize * PADDING_PERCENTAGE;
+        // Отступ по краям
+        double paddingPx = (viewBoxSize * PADDING_PERCENTAGE) / 2;
 
-        ViewBoxParams viewBoxParams = new ViewBoxParams(minX, minY, viewBoxSize, pxSize, PADDING_PERCENTAGE);
+        ViewBoxParams viewBoxParams = new ViewBoxParams(minX, minY, viewBoxSize, pxSize, paddingPx);
 
         this.graphParams = GraphParams.builder()
                 .maxX(maxX)
                 .minX(minX)
                 .minY(minY)
                 .maxY(maxY)
-                .maxPadding(maxRange)
+                .paddingPx(paddingPx)
                 .pxSize(pxSize)
                 .viewBoxParams(viewBoxParams)
                 .graphSize(GRAPH_SIZE)
@@ -106,7 +108,7 @@ public class GraphBuilder {
             double yAtMaxX = (-constraint.getA() * maxX + constraint.getC()) / constraint.getB();
             points.add(toPx(new Point(maxX, yAtMaxX)));
         }
-        else if (constraint.getA() != 0) {
+        if (constraint.getA() != 0) {
             double xAtMinY  = (-constraint.getB() * minY + constraint.getC()) / constraint.getA();
             points.add(toPx(new Point(xAtMinY, minY)));
 

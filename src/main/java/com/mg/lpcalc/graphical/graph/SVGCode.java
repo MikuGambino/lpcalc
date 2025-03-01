@@ -5,15 +5,18 @@ public class SVGCode {
     public static final String SVG_METADATA = """
             <style>
                 text {
-                    font-size: 6px;
-                    paint-order: stroke fill;
-                    transform: scale(1, -1);
-                    stroke: white;
-                    stroke-width: 2;
+                  font-size: 6px;
+                  paint-order: stroke fill;
+                  transform: scale(1, -1);
+                  stroke: white;
+                  stroke-width: 2;
                 }
                 .no-stroke {
-                    stroke: none;
-                    stroke-width: 2;
+                  stroke: none;
+                  stroke-width: 2;
+                }
+                .line-label {
+                  font-size: 5px;
                 }
             </style>
             <svg xmlns='http://www.w3.org/2000/svg' transform='scale(1, -1)' viewBox='%.2f %.2f %.2f %.2f' width='%d' height='%d'>

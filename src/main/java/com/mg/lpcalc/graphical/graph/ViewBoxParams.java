@@ -13,8 +13,7 @@ public class ViewBoxParams {
     // size - размер графика
     // pxSize - перевод координат в пиксели
     // padding - отступ от краев
-    public ViewBoxParams(double minX, double minY, double size, double pxSize, double paddingPercentage) {
-        double paddingPx = (size * paddingPercentage) / 2; // отступ по краям
+    public ViewBoxParams(double minX, double minY, double size, double pxSize, double paddingPx) {
         this.minY = size + minY * pxSize - paddingPx;
         this.minX = size + minX * pxSize - paddingPx;
 
