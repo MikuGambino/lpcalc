@@ -28,4 +28,10 @@ public class SolveController {
         graphicalSolver.solve();
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/simplex")
+    public ResponseEntity<?> simplexSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
+        System.out.println(optimizationProblemDTO);
+        return ResponseEntity.ok().build();
+    }
 }
