@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class ObjectiveFuncDTO {
     @JsonProperty("coefficients")
-    private List<Double> coefficients;
+    private List<Fraction> coefficients;
     @JsonProperty("direction")
     private Direction direction;
 

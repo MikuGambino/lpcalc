@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class ConstraintDTO {
     @JsonProperty("coefficients")
-    private List<Double> coefficients;
+    private List<Fraction> coefficients;
     @JsonProperty("operator")
     private Operator operator;
     @JsonProperty("rhs")
-    private Double rhs;
+    private Fraction rhs;
 
     @Override
     public String toString() {
