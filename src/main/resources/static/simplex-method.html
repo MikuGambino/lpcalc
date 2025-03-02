@@ -27,9 +27,9 @@
 
     <div id="objectiveFunc">
         <span>F = </span>
-        <input type="number" id="obj0">
+        <input type="text" id="obj0">
         <span> + </span>
-        <input type="number" id="obj1">
+        <input type="text" id="obj1">
         <span>→</span>
         <select id="directionSelect" class="direction-select">
             <option value="MIN">min</option>
@@ -81,7 +81,7 @@
             variablesDiv.className = 'variablesDiv';
             for (let j = 0; j < 2; j++) {
                 let variableTextbox = document.createElement('input');
-                variableTextbox.setAttribute('type', 'number');
+                variableTextbox.setAttribute('type', 'text');
                 variableTextbox.setAttribute('id', `v${i}${j}`);
 
                 let xLabel = document.createElement('span');
@@ -121,7 +121,7 @@
 
 
             let rhsTextbox = document.createElement('input');
-            rhsTextbox.setAttribute('type', 'number');
+            rhsTextbox.setAttribute('type', 'text');
             rhsTextbox.setAttribute('id', `rhs${i}`);
 
             constraintDiv.appendChild(select);
@@ -212,8 +212,8 @@
     function getData() {
         const objective = {
             coefficients: [
-                parseFloat(document.getElementById('obj0').value) || 0,
-                parseFloat(document.getElementById('obj1').value) || 0
+                parseFraction(document.getElementById('obj0').value),
+                parseFraction(document.getElementById('obj1').value)
             ],
             direction: document.getElementById('directionSelect').value
         };
@@ -227,13 +227,14 @@
             
             for(let i = 0; i < variablesCount; i++) {
                 const input = document.getElementById(`v${index}${i}`);
-                coeffs.push(parseFloat(input.value) || 0);
+                console.log("input: " + input.value);
+                coeffs.push(parseFraction(input.value));
             }
 
             const constraint = {
                 coefficients: coeffs,
                 operator: document.querySelector(`#c${index} select`).value,
-                rhs: parseFloat(document.getElementById(`rhs${index}`).value) || 0
+                rhs: parseFraction(document.getElementById(`rhs${index}`).value)
             };
             
             constraints.push(constraint);
@@ -351,6 +352,63 @@
             coefficients: objectiveCoefficients,
             },
         };
+    }
+  </script>
+  <script>
+    function parseFraction(input) {
+        console.log("here1");
+        console.log(input);
+        if (!input || input.trim() === '') {
+            return { numerator: 0, denominator: 1 };
+        }
+        
+        // Проверяем, содержит ли строка символ "/"
+        if (input.includes('/')) {
+            console.log('here3');
+            const parts = input.split('/');
+            console.log(parts);
+            if (parts.length === 2) {
+                const numerator = parseInt(parts[0].trim());
+                const denominatorStr = parts[1].trim();
+                
+                if (denominatorStr === '0') {
+                    alert('Знаменатель не может быть равен нулю!');
+                    return { numerator: 0, denominator: 1 };
+                }
+                
+                const denominator = parseInt(denominatorStr) || 1;
+                return { numerator, denominator };
+            }
+        }
+        
+        // Если это десятичное число
+        if (!isNaN(parseFloat(input))) {
+            // Преобразуем десятичное число в дробь
+            const decimal = parseFloat(input);
+            // Десятичное число как "5" просто станет дробью 5/1
+            if (Number.isInteger(decimal)) {
+                return { numerator: decimal, denominator: 1 };
+            } 
+            // Для чисел вроде 0.5 превращаем их в дробь 1/2
+            else {
+                // Находим количество десятичных знаков
+                const strNum = decimal.toString();
+                const decimalPart = strNum.includes('.') ? strNum.split('.')[1] : '';
+                const multiplier = Math.pow(10, decimalPart.length);
+                
+                // Умножаем на 10^n, чтобы получить целое число
+                const numerator = Math.round(decimal * multiplier);
+                const denominator = multiplier;
+                
+                return { 
+                    numerator: numerator, 
+                    denominator: denominator 
+                };
+            }
+        }
+        
+        // Если не удалось распарсить, возвращаем ноль
+        return { numerator: 0, denominator: 1 };
     }
   </script>
 </html>
