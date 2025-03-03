@@ -22,9 +22,10 @@ public class SimplexSolver {
         // Если есть неравенства со знаком >=, умножаем их на -1
         makeConstraintsLEQ();
         System.out.println(constraints);
+        System.out.println(isInitialSolutionFeasible());
     }
 
-    public void makeConstraintsLEQ() {
+    private void makeConstraintsLEQ() {
         for (Constraint constraint : constraints) {
             if (constraint.getOperator().equals(Operator.GEQ)) {
                 List<Fraction> newCoefficients = new ArrayList<>();
@@ -36,5 +37,16 @@ public class SimplexSolver {
                 constraint.setOperator(Operator.LEQ);
             }
         }
+    }
+
+    // допустимость начального базисного решения
+    private boolean isInitialSolutionFeasible() {
+        for (Constraint constraint : constraints) {
+            if (constraint.getRhs().isNegative()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
