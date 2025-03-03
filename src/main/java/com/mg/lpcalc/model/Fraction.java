@@ -81,6 +81,10 @@ public class Fraction {
         return new Fraction(-this.numerator, this.denominator);
     }
 
+    public boolean isNegative() {
+        return numerator < 0;
+    }
+
     public Double doubleValue() {
         return (double) (numerator / denominator);
     }

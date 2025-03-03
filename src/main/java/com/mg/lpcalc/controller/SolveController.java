@@ -4,6 +4,8 @@ import com.mg.lpcalc.graphical.solver.GraphicalSolver;
 import com.mg.lpcalc.graphical.solver.model.OptimizationProblem;
 import com.mg.lpcalc.graphical.solver.model.converter.GraphicalOptimizationProblemConverter;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
+import com.mg.lpcalc.simplex.SimplexSolver;
+import com.mg.lpcalc.simplex.model.converter.SimplexOptimizationProblemConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,20 +20,20 @@ import java.util.logging.Logger;
 @RequestMapping("/solve")
 public class SolveController {
 
-    private final GraphicalOptimizationProblemConverter converter;
+    private final GraphicalOptimizationProblemConverter graphicalConverter;
+    private final SimplexOptimizationProblemConverter simplexConverter;
 
     @PostMapping("/graph")
     public ResponseEntity<?> graphSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
-        Logger.getAnonymousLogger().info(converter.convert(optimizationProblemDTO).toString());
-        OptimizationProblem optimizationProblem = converter.convert(optimizationProblemDTO);
-        GraphicalSolver graphicalSolver = new GraphicalSolver(optimizationProblem);
+        GraphicalSolver graphicalSolver = new GraphicalSolver(graphicalConverter.convert(optimizationProblemDTO));
         graphicalSolver.solve();
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/simplex")
     public ResponseEntity<?> simplexSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
-        System.out.println(optimizationProblemDTO);
+        SimplexSolver simplexSolver = new SimplexSolver(simplexConverter.convert(optimizationProblemDTO));
+        simplexSolver.solve();
         return ResponseEntity.ok().build();
     }
 }
