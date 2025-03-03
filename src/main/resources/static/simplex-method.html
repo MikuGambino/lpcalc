@@ -13,6 +13,14 @@
             display: flex;
             flex-direction: row;
         }
+        #objectiveFunc {
+            display: flex;
+            flex-direction: row;
+        }
+        #objectiveVariables {
+            display: flex;
+            flex-direction: row;
+        }
     </style>
 </head>
 <body>
@@ -26,10 +34,10 @@
     </div>
 
     <div id="objectiveFunc">
-        <span>F = </span>
-        <input type="text" id="obj0">
-        <span> + </span>
-        <input type="text" id="obj1">
+        <span>F =</span>
+        <div id="objectiveVariables">
+
+        </div>
         <span>→</span>
         <select id="directionSelect" class="direction-select">
             <option value="MIN">min</option>
@@ -131,11 +139,11 @@
     }
 
     let variableCountTextbox = document.getElementById("variableCount");
-    variableCountTextbox.addEventListener('change', handleVariableChange);
-    window.addEventListener('load', () => handleVariableChange({target: variableCountTextbox}));
-    constraintCountTextbox.addEventListener('change', handleVariableChange);
+    variableCountTextbox.addEventListener('change', handleVariableCountChange);
+    window.addEventListener('load', () => handleVariableCountChange({target: variableCountTextbox}));
+    constraintCountTextbox.addEventListener('change', handleVariableCountChange);
 
-    function handleVariableChange() {
+    function handleVariableCountChange() {
         // Проверка ввода количества ограничений
         let targetCount = parseInt(variableCountTextbox.value) || 2;
         targetCount = Math.max(2, Math.min(10, targetCount));
@@ -143,24 +151,25 @@
 
         let currentCount = document.querySelectorAll('#constraintsContainer>#c0>.variablesDiv>div').length;
         if (currentCount > targetCount) {
-            removeVariable(targetCount);
+            removeVariables(targetCount);
+            removeObjectiveVariables(targetCount);
         } else {
-            addVariable(targetCount);
+            addVariables(targetCount);
+            addObjectiveVariables(targetCount);
         }
     }
 
-    function removeVariable(targetCount) {
+    function removeVariables(targetCount) {
         let constraintsLength = document.querySelectorAll('#constraintsContainer>div').length;
         for (let i = 0; i < constraintsLength; i++) {
             let variables = document.querySelectorAll(`#c${i} .variablesDiv div`);
-            console.log(variables);
             for (let j = variables.length; j > targetCount; j--) {
                 variables[j - 1].remove();
             }
         }
     }
 
-    function addVariable(targetCount) {
+    function addVariables(targetCount) {
         let constraintsLength = document.querySelectorAll('#constraintsContainer>div').length;
         for (let i = 0; i < constraintsLength; i++) {
             let variablesDiv = document.querySelector(`#c${i}>.variablesDiv`);
@@ -185,7 +194,34 @@
                 variablesDiv.appendChild(variableDiv);
             }
         }
+    }
 
+    function addObjectiveVariables(targetCount) {
+        let objectiveContainer = document.getElementById('objectiveVariables');
+        let variablesLength = document.querySelectorAll('#objectiveVariables>.objVarDiv').length;
+
+        for (let i = variablesLength; i < targetCount; i++) {
+            let variableDiv = document.createElement('div');
+            variableDiv.className = 'objVarDiv';
+
+            let input = document.createElement('input');
+            input.id = `obj${i}`;
+
+            if (i != 0) {
+                let spanPlus = document.createElement('span');
+                spanPlus.innerHTML = '<span>+</span>';
+                variableDiv.appendChild(spanPlus);
+            }
+            variableDiv.appendChild(input);
+            objectiveContainer.appendChild(variableDiv);
+        }
+    }
+
+    function removeObjectiveVariables(targetCount) {
+        let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
+        for (let i = objectiveVars.length; i > targetCount; i--) {
+            objectiveVars[i - 1].remove();
+        }
     }
 
 
@@ -210,11 +246,14 @@
     }
 
     function getData() {
+        let objectiveFuncCoefficients = [];
+        let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
+        for (let i = 0; i < objectiveVars.length; i++) {
+            objectiveFuncCoefficients.push(parseFraction(document.getElementById(`obj${i}`).value));
+        }
+
         const objective = {
-            coefficients: [
-                parseFraction(document.getElementById('obj0').value),
-                parseFraction(document.getElementById('obj1').value)
-            ],
+            coefficients: objectiveFuncCoefficients,
             direction: document.getElementById('directionSelect').value
         };
 
@@ -287,8 +326,10 @@
             document.getElementById(`rhs${i}`).value = lpProblem.constraints[i].rhs;
         }
 
-        document.getElementById('obj0').value = lpProblem.objective.coefficients[0];
-        document.getElementById('obj1').value = lpProblem.objective.coefficients[1];
+        let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
+        for (let i = 0; i < objectiveVars.length; i++) {
+            document.getElementById(`obj${i}`).value = lpProblem.objective.coefficients[i];
+        }
         document.getElementById('directionSelect').value = lpProblem.objective.type;
       };
       reader.readAsText(file);
