@@ -6,13 +6,10 @@ import java.util.Objects;
 
 @Data
 public class Fraction {
+    public static final Fraction ZERO = new Fraction(0, 1);
+    public static final Fraction ONE = new Fraction(1, 1);
     private int numerator;
     private int denominator;
-
-    public Fraction() {
-        this.numerator = 0;
-        this.denominator = 1;
-    }
 
     public Fraction(int numerator, int denominator) {
         if (denominator == 0) {
