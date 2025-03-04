@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 public enum Operator {
-    LEQ("<="), GEQ(">=");
+    LEQ("<="), GEQ(">="), EQ("=");
 
     private final String title;
     Operator(String title) {
