@@ -34,6 +34,7 @@ public class SolveController {
     public ResponseEntity<?> simplexSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
         SimplexSolver simplexSolver = new SimplexSolver(simplexConverter.convert(optimizationProblemDTO));
         simplexSolver.solve();
+        System.out.println(optimizationProblemDTO);
         return ResponseEntity.ok().build();
     }
 }

@@ -5,27 +5,39 @@ import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.OptimizationProblem;
+import com.mg.lpcalc.simplex.model.RowColumnPair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SimplexSolver {
     private List<Constraint> constraints;
     private ObjectiveFunc objectiveFunc;
+    private SimplexTable currentSimplexTable;
+    private int numVars;
+    private int numConstraints;
+    private int numSlacks;
 
     public SimplexSolver(OptimizationProblem problem) {
         this.constraints = problem.getConstraints();
         this.objectiveFunc = problem.getObjectiveFunc();
+        this.numVars = constraints.get(0).getCoefficients().size();
+        this.numConstraints = constraints.size();
+        this.numSlacks = countSlacks();
     }
 
     public void solve() {
         // Если есть неравенства со знаком >=, умножаем их на -1
         makeConstraintsLEQ();
-        int numInequality = countInequality();
-        initSimplexTable(numInequality);
-        System.out.println(objectiveFunc);
-
+        // инициализация начальной симплекс таблицы
+        this.currentSimplexTable = new SimplexTable(
+                numSlacks,
+                numVars,
+                numConstraints,
+                getCosts(),
+                constraints
+        );
+        findInitialBasis();
     }
 
     private void makeConstraintsLEQ() {
@@ -54,7 +66,7 @@ public class SimplexSolver {
     }
 
     // подсчёт количества неравенств
-    private int countInequality() {
+    private int countSlacks() {
         int num = 0;
         for (Constraint constraint : constraints) {
             if (!constraint.getOperator().equals(Operator.EQ)) {
@@ -65,46 +77,68 @@ public class SimplexSolver {
         return num;
     }
 
-    private void initSimplexTable(int numSlack) {
-        int numVars = constraints.get(0).getCoefficients().size();
-        int numConstraints = constraints.size();
-
-        // +1 строка для целевой функции, +1 столбец для правой части (RHS)
-        Fraction[][] tableau = new Fraction[numConstraints + 1][numVars + numSlack + 1];
-
-        for (int i = 0; i < numConstraints; i++) {
-            Constraint constraint = constraints.get(i);
-            // копирование коэффициентов ограничений
-            for (int j = 0; j < numVars; j++) {
-                tableau[i][j] = constraint.getCoefficients().get(j);
-            }
-
-            for (int j = numVars; j < numConstraints + numVars; j++) {
-                tableau[i][j] = Fraction.ZERO;
-            }
-
-            // добавляем переменные балансировки
-            if (!constraint.getOperator().equals(Operator.EQ)) {
-                tableau[i][numVars + i] = Fraction.ONE;
-            }
-
-            // добавляем правую часть (RHS)
-            tableau[i][numVars + numSlack] = constraint.getRhs();
-
-            // Заполняем строку целевой функции (последняя строка)
-            for (int j = 0; j < numVars; j++) {
-                tableau[numConstraints][j] = objectiveFunc.getCoefficients().get(j);
-            }
-
-            // Остальные элементы в строке целевой функции = 0
-            for (int j = numVars; j < numVars + numSlack; j++) {
-                tableau[numConstraints][j] = Fraction.ZERO;
-            }
-
-            // Начальное значение целевой функции = 0
-            tableau[numConstraints][numVars + numSlack] = Fraction.ZERO;
+    private Fraction[] getCosts() {
+        Fraction[] costs = new Fraction[numVars + numSlacks];
+        for (int i = 0; i < numVars; i++) {
+            costs[i] = objectiveFunc.getCoefficients().get(i);
+        }
+        for (int i = numVars; i < costs.length; i++) {
+            costs[i] = Fraction.ZERO;
         }
 
-        System.out.println(Arrays.deepToString(tableau));
+        return costs;
+    }
+
+    private void findInitialBasis() {
+        int[] basis = currentSimplexTable.getBasis();
+        for (int i = 0; i < basis.length; i++) {
+            if (basis[i] != -1) {
+                continue;
+            }
+            if (tryFindBasisUsingUnitVectors()) {
+                continue;
+            }
+            if (tryFindBasisUsingSingleNonZeroElements()) {
+                continue;
+            }
+            createBasisUsingGaussianElimination(i);
+        }
+
+        currentSimplexTable.print();
+    }
+
+    private boolean tryFindBasisUsingUnitVectors() {
+        RowColumnPair rowColumnPair = currentSimplexTable.findNonBasisUnitVector();
+        if (rowColumnPair == null) {
+            return false;
+        }
+
+        int[] basis = currentSimplexTable.getBasis();
+        basis[rowColumnPair.getRow()] = rowColumnPair.getColumn();
+
+        return true;
+    }
+
+    private boolean tryFindBasisUsingSingleNonZeroElements() {
+        RowColumnPair rowColumnPair = currentSimplexTable.findNonBasisColumnWithSingleNonZeroElement();
+        if (rowColumnPair == null) {
+            return false;
+        }
+
+        Fraction divisor = currentSimplexTable.getElement(rowColumnPair.getRow(), rowColumnPair.getColumn());
+        currentSimplexTable.divideRow(rowColumnPair.getRow(), divisor);
+
+        int[] basis = currentSimplexTable.getBasis();
+        basis[rowColumnPair.getRow()] = rowColumnPair.getColumn();
+
+        return true;
+    }
+
+    private void createBasisUsingGaussianElimination(int row) {
+        int column = currentSimplexTable.findFirstNonBasisColumn();
+        currentSimplexTable.gaussianElimination(row, column);
+
+        int[] basis = currentSimplexTable.getBasis();
+        basis[row] = column;
     }
 }
