@@ -127,7 +127,9 @@ public class SimplexTable {
     public void subtractRow(int targetRowIndex, int sourceRowIndex, Fraction multiplier) {
         for (int i = 0; i < numColumns; i++) {
             Fraction sourceElement = tableau[sourceRowIndex][i];
-            tableau[targetRowIndex][i] = tableau[targetRowIndex][i].subtract(sourceElement.multiply(multiplier));
+            Fraction reduced = tableau[targetRowIndex][i];
+            Fraction deductible = sourceElement.multiply(multiplier);
+            tableau[targetRowIndex][i] = reduced.subtract(deductible);
         }
     }
 
@@ -166,10 +168,58 @@ public class SimplexTable {
     public void gaussianElimination(int row, int column) {
         divideRow(row, tableau[row][column]);
 
+        print();
+
         for (int i = 0; i < numConstraints; i++) {
             if (i == row) continue;
-            subtractRow(i, row, tableau[i][0]);
+            subtractRow(i, row, tableau[i][column]);
+            print();
         }
+    }
+
+    public boolean isContainsNegativeB() {
+        for (int i = 0; i < numConstraints; i++) {
+            if (this.tableau[i][numColumns - 1].isNegative()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Поиск строки, в которой отрицательный свободный коэффициент максимален по модулю
+    public int findMaxModuloNegativeBRow() {
+        int row = 0;
+        Fraction maxAbsB = Fraction.ZERO;
+        for (int i = 0; i < numConstraints; i++) {
+            Fraction currentFraction = this.tableau[i][numColumns - 1];
+            if (!currentFraction.isNegative()) continue;
+            if (currentFraction.abs().isGreater(maxAbsB.abs())) {
+                row = i;
+                maxAbsB = currentFraction;
+            }
+        }
+
+        return row;
+    }
+
+    public int finMaxModuloNegativeColumn(int row) {
+        int column = -1;
+        Fraction maxAbsFraction = Fraction.ZERO;
+        for (int i = 0; i < numVars + numSlack; i++) {
+            Fraction currentFraction = this.tableau[row][i];
+            if (!currentFraction.isNegative()) continue;
+            if (currentFraction.abs().isGreater(maxAbsFraction.abs())) {
+                maxAbsFraction = currentFraction;
+                column = i;
+            }
+        }
+
+        return column;
+    }
+
+    public void setBasisVariable(int variable, int position) {
+        this.basis[position] = variable;
     }
 
     public void checkIndexes(int row, int column) {

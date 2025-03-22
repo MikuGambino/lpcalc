@@ -38,6 +38,27 @@ public class SimplexSolver {
                 constraints
         );
         findInitialBasis();
+        if (currentSimplexTable.isContainsNegativeB()) {
+            removeNegativeB();
+        }
+        if (currentSimplexTable.isContainsNegativeB()) {
+            System.out.println("Нет решения");
+        }
+
+    }
+
+    private void removeNegativeB() {
+        while (currentSimplexTable.isContainsNegativeB()) {
+            this.currentSimplexTable.print();
+            int row = this.currentSimplexTable.findMaxModuloNegativeBRow();
+            int column = this.currentSimplexTable.finMaxModuloNegativeColumn(row);
+            if (column == -1) {
+                break;
+            }
+            this.currentSimplexTable.setBasisVariable(column, row);
+            this.currentSimplexTable.gaussianElimination(row, column);
+            this.currentSimplexTable.print();
+        }
     }
 
     private void makeConstraintsLEQ() {

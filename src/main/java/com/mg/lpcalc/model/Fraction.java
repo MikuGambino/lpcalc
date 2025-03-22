@@ -86,6 +86,14 @@ public class Fraction {
         return (double) (numerator / denominator);
     }
 
+    public Fraction abs() {
+        return new Fraction(Math.abs(this.numerator), this.denominator);
+    }
+
+    public boolean isGreater(Fraction other) {
+        return this.doubleValue() > other.doubleValue();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
