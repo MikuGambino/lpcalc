@@ -3,6 +3,7 @@ package com.mg.lpcalc.simplex;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
 import lombok.Data;
 
@@ -216,6 +217,20 @@ public class SimplexTable {
         }
 
         return column;
+    }
+
+    // Потенциально перенести в SimplexSolver
+    public void calculateDeltas() {
+        for (int i = 0; i < numColumns; i++) {
+            Fraction delta = Fraction.ZERO;
+            for (int j = 0; j < numConstraints; j++) {
+                delta = delta.add(costs[basis[j]].multiply(tableau[j][i])); // Δi = ce1·a1i + ce2·a2i + ... + cem·ami
+            }
+            if (i != numColumns - 1) {
+                delta = delta.subtract(costs[i]);
+            }
+            tableau[numConstraints][i] = delta;
+        }
     }
 
     public void setBasisVariable(int variable, int position) {

@@ -43,7 +43,10 @@ public class SimplexSolver {
         }
         if (currentSimplexTable.isContainsNegativeB()) {
             System.out.println("Нет решения");
+            return;
         }
+        this.currentSimplexTable.calculateDeltas();
+        this.currentSimplexTable.print();
 
     }
 
