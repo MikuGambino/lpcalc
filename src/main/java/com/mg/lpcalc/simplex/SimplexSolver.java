@@ -1,12 +1,14 @@
 package com.mg.lpcalc.simplex;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.OptimizationProblem;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class SimplexSolver {
     private List<Constraint> constraints;
     private ObjectiveFunc objectiveFunc;
     private SimplexTable currentSimplexTable;
+    private Direction direction;
     private int numVars;
     private int numConstraints;
     private int numSlacks;
@@ -24,6 +27,7 @@ public class SimplexSolver {
         this.numVars = constraints.get(0).getCoefficients().size();
         this.numConstraints = constraints.size();
         this.numSlacks = countSlacks();
+        this.direction = objectiveFunc.getDirection();
     }
 
     public void solve() {
@@ -47,7 +51,12 @@ public class SimplexSolver {
         }
         this.currentSimplexTable.calculateDeltas();
         this.currentSimplexTable.print();
-
+        System.out.println("Is optimal " + this.currentSimplexTable.isOptimal(objectiveFunc.getDirection()));
+        while (!this.currentSimplexTable.isOptimal(direction)) {
+            this.currentSimplexTable.pivot(direction);
+            this.currentSimplexTable.calculateDeltas();
+            this.currentSimplexTable.print();
+        }
     }
 
     private void removeNegativeB() {

@@ -1,12 +1,14 @@
 package com.mg.lpcalc.simplex;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -169,12 +171,9 @@ public class SimplexTable {
     public void gaussianElimination(int row, int column) {
         divideRow(row, tableau[row][column]);
 
-        print();
-
         for (int i = 0; i < numConstraints; i++) {
             if (i == row) continue;
             subtractRow(i, row, tableau[i][column]);
-            print();
         }
     }
 
@@ -231,6 +230,73 @@ public class SimplexTable {
             }
             tableau[numConstraints][i] = delta;
         }
+    }
+
+    public boolean isOptimal(Direction direction) {
+        for (int i = 0; i < numColumns; i++) {
+            Fraction delta = tableau[numConstraints][i];
+            if (Direction.MAX.equals(direction) && delta.isNegative()) return false;
+            if (Direction.MIN.equals(direction) && delta.isPositive()) return false;
+        }
+
+        return true;
+    }
+
+    public int findPivotColumn(Direction direction) {
+        int columnIdx = 0;
+        Fraction targetDelta = tableau[numConstraints][columnIdx];
+
+        for (int i = 1; i < numColumns; i++) {
+            Fraction currentDelta = tableau[numConstraints][i];
+            if (Direction.MAX.equals(direction) && currentDelta.isLess(targetDelta) ||
+                Direction.MIN.equals(direction) && currentDelta.isGreater(targetDelta)) {
+                targetDelta = currentDelta;
+                columnIdx = i;
+            }
+        }
+
+        return columnIdx;
+    }
+
+    public int findPivotRow(int column) {
+        List<Fraction> simplexRatioList = new ArrayList<>();
+        for (int i = 0; i < numConstraints; i++) {
+            Fraction freeCoefficient = tableau[i][numColumns - 1];
+            Fraction columnElement = tableau[i][column];
+            if (columnElement.equals(Fraction.ZERO)) {
+                simplexRatioList.add(Fraction.ZERO);
+                continue;
+            }
+            Fraction simplexRatio = freeCoefficient.divide(columnElement);
+            simplexRatioList.add(simplexRatio);
+        }
+
+        if (simplexRatioList.isEmpty()) return -1;
+
+        int rowIdx = 0;
+        Fraction minQ = simplexRatioList.get(rowIdx);
+        for (int i = 1; i < simplexRatioList.size(); i++) {
+            Fraction simplexRatio = simplexRatioList.get(i);
+            if (simplexRatio.isNegative() || simplexRatio.equals(Fraction.ZERO)) continue;
+            if (simplexRatio.isLess(minQ)) {
+                minQ = simplexRatio;
+                rowIdx = i;
+            }
+        }
+
+        return rowIdx;
+    }
+
+    public void pivot(Direction direction) {
+        int pivotColumn = findPivotColumn(direction);
+        int pivotRow = findPivotRow(pivotColumn);
+        if (pivotRow == -1) {
+            // todo целевая функция не ограничена и решения не существует
+            return;
+        }
+
+        gaussianElimination(pivotRow, pivotColumn);
+        setBasisVariable(pivotColumn, pivotRow);
     }
 
     public void setBasisVariable(int variable, int position) {

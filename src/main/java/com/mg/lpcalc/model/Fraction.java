@@ -82,6 +82,10 @@ public class Fraction {
         return numerator < 0;
     }
 
+    public boolean isPositive() {
+        return numerator > 0;
+    }
+
     public Double doubleValue() {
         return (double) (numerator / denominator);
     }
@@ -92,6 +96,10 @@ public class Fraction {
 
     public boolean isGreater(Fraction other) {
         return this.doubleValue() > other.doubleValue();
+    }
+
+    public boolean isLess(Fraction other) {
+        return this.doubleValue() < other.doubleValue();
     }
 
     @Override
