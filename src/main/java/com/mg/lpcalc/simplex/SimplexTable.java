@@ -3,6 +3,7 @@ package com.mg.lpcalc.simplex;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
+import com.mg.lpcalc.simplex.model.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
@@ -246,10 +247,10 @@ public class SimplexTable {
         int columnIdx = 0;
         Fraction targetDelta = tableau[numConstraints][columnIdx];
 
-        for (int i = 1; i < numColumns; i++) {
+        for (int i = 0; i < numColumns; i++) {
             Fraction currentDelta = tableau[numConstraints][i];
-            if (Direction.MAX.equals(direction) && currentDelta.isLess(targetDelta) ||
-                Direction.MIN.equals(direction) && currentDelta.isGreater(targetDelta)) {
+            if (Direction.MAX.equals(direction) && (targetDelta.equals(Fraction.ZERO) || currentDelta.isLess(targetDelta)) ||
+                Direction.MIN.equals(direction) && (targetDelta.equals(Fraction.ZERO) || currentDelta.isGreater(targetDelta))) {
                 targetDelta = currentDelta;
                 columnIdx = i;
             }
@@ -273,12 +274,12 @@ public class SimplexTable {
 
         if (simplexRatioList.isEmpty()) return -1;
 
-        int rowIdx = 0;
-        Fraction minQ = simplexRatioList.get(rowIdx);
-        for (int i = 1; i < simplexRatioList.size(); i++) {
+        int rowIdx = -1;
+        Fraction minQ = Fraction.ZERO;
+        for (int i = 0; i < simplexRatioList.size(); i++) {
             Fraction simplexRatio = simplexRatioList.get(i);
             if (simplexRatio.isNegative() || simplexRatio.equals(Fraction.ZERO)) continue;
-            if (simplexRatio.isLess(minQ)) {
+            if (simplexRatio.isLess(minQ) || minQ.equals(Fraction.ZERO)) {
                 minQ = simplexRatio;
                 rowIdx = i;
             }
@@ -287,20 +288,55 @@ public class SimplexTable {
         return rowIdx;
     }
 
-    public void pivot(Direction direction) {
+    public boolean pivot(Direction direction) {
         int pivotColumn = findPivotColumn(direction);
         int pivotRow = findPivotRow(pivotColumn);
         if (pivotRow == -1) {
             // todo целевая функция не ограничена и решения не существует
-            return;
+            // todo (возрастает или убывает?)
+            System.out.println("Целевая функция не ограничена и решения не существует");
+            return false;
         }
 
         gaussianElimination(pivotRow, pivotColumn);
         setBasisVariable(pivotColumn, pivotRow);
+        return true;
     }
+
+    public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
+        int pivotColumn = findPivotColumn(direction);
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) System.out.println("Убывает");
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) System.out.println("Возрастает");
+    }
+
 
     public void setBasisVariable(int variable, int position) {
         this.basis[position] = variable;
+    }
+
+    public int getVariablePosition(int num) {
+        for (int i = 0; i < basis.length; i++) {
+            if (basis[i] == num) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public Answer getFinalAnswer() {
+        List<Fraction> variablesValues = new ArrayList<>();
+        for (int i = 0; i < numVars; i++) {
+            int variablePosition = getVariablePosition(i);
+            if (variablePosition == -1) {
+                variablesValues.add(Fraction.ZERO);
+                continue;
+            }
+            variablesValues.add(tableau[variablePosition][numColumns - 1]);
+        }
+
+        Fraction objectiveValue = tableau[numConstraints][numColumns - 1];
+        return new Answer(variablesValues, objectiveValue);
     }
 
     public void checkIndexes(int row, int column) {

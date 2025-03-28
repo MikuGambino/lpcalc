@@ -42,6 +42,7 @@ public class SimplexSolver {
                 constraints
         );
         findInitialBasis();
+        currentSimplexTable.print();
         if (currentSimplexTable.isContainsNegativeB()) {
             removeNegativeB();
         }
@@ -53,10 +54,15 @@ public class SimplexSolver {
         this.currentSimplexTable.print();
         System.out.println("Is optimal " + this.currentSimplexTable.isOptimal(objectiveFunc.getDirection()));
         while (!this.currentSimplexTable.isOptimal(direction)) {
-            this.currentSimplexTable.pivot(direction);
+            boolean success = this.currentSimplexTable.pivot(direction);
+            if (!success) {
+                currentSimplexTable.checkUnboundedDirection(direction, objectiveFunc);
+                return;
+            }
             this.currentSimplexTable.calculateDeltas();
             this.currentSimplexTable.print();
         }
+        System.out.println(currentSimplexTable.getFinalAnswer());
     }
 
     private void removeNegativeB() {
