@@ -45,6 +45,11 @@
         </select>
     </div>
 
+    <select id="method">
+        <option value="BASIC">Базовый симплекс-метод</option>
+        <option value="BIG_M">Метод искусственного базиса</option>
+    </select>
+
     <button onclick="sendData()">Решить задачу</button>
     <input type="file" id="fileInput" />
 </body>
@@ -280,9 +285,12 @@
             constraints.push(constraint);
         });
 
+        let method = document.getElementById("method").value;
+
         const data = {
             objective,
-            constraints
+            constraints,
+            method
         };
         console.log(data);
 

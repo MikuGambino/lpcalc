@@ -20,6 +20,7 @@ public class SimplexOptimizationProblemConverter implements Converter<Optimizati
         return OptimizationProblem.builder()
                 .objectiveFunc(objectiveFunc)
                 .constraints(constraints)
+                .method(problemDTO.getMethod())
                 .build();
     }
 }
