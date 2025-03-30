@@ -51,6 +51,17 @@ public class BasicSimplexTable extends SimplexTable {
         print();
     }
 
+    public void print() {
+        for (Fraction[] fractions : tableau) {
+            System.out.println(Arrays.toString(fractions));
+        }
+
+        for (int b : basis) {
+            System.out.print(b + 1 + " ");
+        }
+        System.out.println();
+    }
+
     public int findPivotColumn(Direction direction) {
         int columnIdx = 0;
         Fraction targetDelta = tableau[numConstraints][columnIdx];

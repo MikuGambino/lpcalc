@@ -20,17 +20,6 @@ public abstract class SimplexTable {
     protected int numColumns;
     protected int[] basis;
 
-    public void print() {
-        for (Fraction[] fractions : tableau) {
-            System.out.println(Arrays.toString(fractions));
-        }
-
-        for (int b : basis) {
-            System.out.print(b + 1 + " ");
-        }
-        System.out.println();
-    }
-
     // Возвращает индекс Fraction.ONE если единичный вектор существует
     public RowColumnPair findNonBasisUnitVector() {
         for (int i = 0; i < numVars + numSlack; i++) {

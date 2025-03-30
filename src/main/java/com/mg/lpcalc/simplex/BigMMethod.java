@@ -40,9 +40,12 @@ public class BigMMethod implements SimplexMethod{
                 numVars,
                 numConstraints,
                 getCosts(),
-                constraints
+                constraints,
+                direction
         );
 
+        simplexTable.print();
+        simplexTable.calculateDeltas();
         simplexTable.print();
 
         return null;
