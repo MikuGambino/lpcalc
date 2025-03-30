@@ -1,0 +1,83 @@
+package com.mg.lpcalc.simplex;
+
+import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
+import com.mg.lpcalc.model.enums.Operator;
+import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class BigMMethod implements SimplexMethod{
+    private List<Constraint> constraints;
+    private ObjectiveFunc objectiveFunc;
+    private BigMSimplexTable simplexTable;
+    private Direction direction;
+    private int numVars;
+    private int numConstraints;
+    private int numSlacks;
+    private int numAuxVars;
+
+    public BigMMethod(List<Constraint> constraints, ObjectiveFunc objectiveFunc, Direction direction,
+                              int numVars, int numConstraints) {
+        this.constraints = constraints;
+        this.objectiveFunc = objectiveFunc;
+        this.direction = direction;
+        this.numVars = numVars;
+        this.numConstraints = numConstraints;
+    }
+
+    @Override
+    public Answer run() {
+        makeFreeCoefficientsPositive();
+        countAuxVariables();
+
+        this.simplexTable = new BigMSimplexTable(
+                numSlacks,
+                numAuxVars,
+                numVars,
+                numConstraints,
+                getCosts(),
+                constraints
+        );
+
+        simplexTable.print();
+
+        return null;
+    }
+
+    private void makeFreeCoefficientsPositive() {
+        for (Constraint constraint : constraints) {
+            if (constraint.getRhs().isNegative()) {
+                List<Fraction> newCoefficients = new ArrayList<>();
+                for (Fraction coefficient : constraint.getCoefficients()) {
+                    newCoefficients.add(coefficient.negate());
+                }
+                constraint.setRhs(constraint.getRhs().negate());
+                constraint.setCoefficients(newCoefficients);
+                constraint.switchOperator();
+            }
+        }
+    }
+
+    private void countAuxVariables() {
+        for (Constraint constraint : constraints) {
+            if (!constraint.getOperator().equals(Operator.LEQ)) numAuxVars++;
+            if (!constraint.getOperator().equals(Operator.EQ)) numSlacks++;
+        }
+    }
+
+    public Fraction[] getCosts() {
+        Fraction[] costs = new Fraction[numVars + numSlacks];
+        for (int i = 0; i < numVars; i++) {
+            costs[i] = objectiveFunc.getCoefficients().get(i);
+        }
+        for (int i = numVars; i < costs.length; i++) {
+            costs[i] = Fraction.ZERO;
+        }
+
+        return costs;
+    }
+}

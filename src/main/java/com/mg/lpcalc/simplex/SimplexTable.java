@@ -25,7 +25,10 @@ public abstract class SimplexTable {
             System.out.println(Arrays.toString(fractions));
         }
 
-        System.out.println(Arrays.toString(basis));
+        for (int b : basis) {
+            System.out.print(b + 1 + " ");
+        }
+        System.out.println();
     }
 
     // Возвращает индекс Fraction.ONE если единичный вектор существует

@@ -172,7 +172,7 @@ public class BasicSimplexMethod implements SimplexMethod {
                 }
                 constraint.setRhs(constraint.getRhs().negate());
                 constraint.setCoefficients(newCoefficients);
-                constraint.setOperator(Operator.LEQ);
+                constraint.switchOperator();
             }
         }
     }

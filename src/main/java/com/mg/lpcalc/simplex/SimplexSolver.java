@@ -29,6 +29,10 @@ public class SimplexSolver {
             simplexMethod = new BasicSimplexMethod(constraints, objectiveFunc, direction, numVars, numConstraints);
         }
 
+        if (method.equals(Method.BIG_M)) {
+            simplexMethod = new BigMMethod(constraints, objectiveFunc, direction, numVars, numConstraints);
+        }
+
         Answer answer = simplexMethod.run();
     }
 }
