@@ -4,7 +4,6 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
-import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +65,7 @@ public class BasicSimplexTable extends SimplexTable {
         int columnIdx = 0;
         Fraction targetDelta = tableau[numConstraints][columnIdx];
 
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < numColumns - 1; i++) {
             Fraction currentDelta = tableau[numConstraints][i];
             if (Direction.MAX.equals(direction) && (targetDelta.equals(Fraction.ZERO) || currentDelta.isLess(targetDelta)) ||
                     Direction.MIN.equals(direction) && (targetDelta.equals(Fraction.ZERO) || currentDelta.isGreater(targetDelta))) {
@@ -79,7 +78,7 @@ public class BasicSimplexTable extends SimplexTable {
     }
 
     public boolean isOptimal(Direction direction) {
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < numColumns - 1; i++) {
             Fraction delta = tableau[numConstraints][i];
             if (Direction.MAX.equals(direction) && delta.isNegative()) return false;
             if (Direction.MIN.equals(direction) && delta.isPositive()) return false;
@@ -99,24 +98,5 @@ public class BasicSimplexTable extends SimplexTable {
             }
             tableau[numConstraints][i] = delta;
         }
-    }
-
-    public boolean pivot(Direction direction) {
-        int pivotColumn = findPivotColumn(direction);
-        int pivotRow = findPivotRow(pivotColumn);
-        if (pivotRow == -1) {
-            System.out.println("Целевая функция не ограничена и решения не существует");
-            return false;
-        }
-
-        gaussianElimination(pivotRow, pivotColumn);
-        setBasisVariable(pivotColumn, pivotRow);
-        return true;
-    }
-
-    public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
-        int pivotColumn = findPivotColumn(direction);
-        if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) System.out.println("Убывает");
-        if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) System.out.println("Возрастает");
     }
 }

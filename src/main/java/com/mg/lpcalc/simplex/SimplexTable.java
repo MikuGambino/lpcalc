@@ -1,12 +1,13 @@
 package com.mg.lpcalc.simplex;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // todo возможно добавить абстрактных методов (но после реализации двухфазного симплекса)
@@ -19,6 +20,27 @@ public abstract class SimplexTable {
     protected int numSlack;
     protected int numColumns;
     protected int[] basis;
+
+    public abstract int findPivotColumn(Direction direction);
+
+    public boolean pivot(Direction direction) {
+        int pivotColumn = findPivotColumn(direction);
+        int pivotRow = findPivotRow(pivotColumn);
+        if (pivotRow == -1) {
+            System.out.println("Целевая функция не ограничена и решения не существует");
+            return false;
+        }
+
+        gaussianElimination(pivotRow, pivotColumn);
+        setBasisVariable(pivotColumn, pivotRow);
+        return true;
+    }
+
+    public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
+        int pivotColumn = findPivotColumn(direction);
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) System.out.println("Убывает");
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) System.out.println("Возрастает");
+    }
 
     // Возвращает индекс Fraction.ONE если единичный вектор существует
     public RowColumnPair findNonBasisUnitVector() {

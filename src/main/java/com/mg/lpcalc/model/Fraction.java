@@ -87,7 +87,7 @@ public class Fraction {
     }
 
     public Double doubleValue() {
-        return (double) (numerator / denominator);
+        return  numerator / (double) denominator;
     }
 
     public Fraction abs() {

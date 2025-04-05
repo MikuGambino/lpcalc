@@ -98,6 +98,62 @@ public class BigMSimplexTable extends SimplexTable {
         return variable >= numSlack + numVars;
     }
 
+    public boolean isOptimal(Direction direction) {
+        for (int i = 0; i < numColumns - 1; i++) {
+            if (tableau[numConstraints][i].equals(Fraction.ZERO)) continue;
+            if (Direction.MAX.equals(direction) && !isPositiveDelta(i)) return false;
+            if (Direction.MIN.equals(direction) && isPositiveDelta(i)) return false;
+        }
+
+        return true;
+    }
+
+    public int findPivotColumn(Direction direction) {
+        int columnIdx = 0;
+
+        for (int i = 0; i < numColumns - 1; i++) {
+            if (Direction.MAX.equals(direction) && (isZeroDelta(columnIdx) || !isFirstDeltaGreater(i, columnIdx)) ||
+                    Direction.MIN.equals(direction) && (isZeroDelta(columnIdx) || isFirstDeltaGreater(i, columnIdx))) {
+                columnIdx = i;
+            }
+        }
+
+        return columnIdx;
+    }
+
+    private boolean isPositiveDelta(int column) {
+        Fraction delta = tableau[numConstraints][column];
+        Fraction deltaM = mValues[column];
+
+        return deltaM.isPositive() || deltaM.equals(Fraction.ZERO) && delta.isPositive();
+    }
+
+    private boolean isZeroDelta(int column) {
+        return tableau[numConstraints][column].equals(Fraction.ZERO) && mValues[column].equals(Fraction.ZERO);
+    }
+
+    private boolean isFirstDeltaGreater(int first, int second) {
+        Fraction firstDelta = tableau[numConstraints][first];
+        Fraction firstDeltaM = mValues[first];
+
+        Fraction secondDelta = tableau[numConstraints][second];
+        Fraction secondDeltaM = mValues[second];
+
+        if (firstDeltaM.equals(Fraction.ZERO) && secondDeltaM.equals(Fraction.ZERO)) {
+            return firstDelta.isGreater(secondDelta);
+        }
+
+        return firstDeltaM.isGreater(secondDeltaM);
+    }
+
+    public boolean solutionContainsArtVariables() {
+        for (int i = 0; i < numSlack + numVars; i++) {
+            if (!mValues[i].equals(Fraction.ZERO)) return true;
+        }
+
+        return false;
+    }
+
     public void print() {
         for (Fraction[] fractions : tableau) {
             System.out.println(Arrays.toString(fractions));

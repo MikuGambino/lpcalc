@@ -48,7 +48,25 @@ public class BigMMethod implements SimplexMethod{
         simplexTable.calculateDeltas();
         simplexTable.print();
 
-        return null;
+        System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
+        while (!simplexTable.isOptimal(direction)) {
+            boolean success = simplexTable.pivot(direction);
+            if (!success) {
+                simplexTable.checkUnboundedDirection(direction, objectiveFunc);
+                return null;
+            }
+            simplexTable.calculateDeltas();
+            simplexTable.print();
+        }
+
+        if (simplexTable.solutionContainsArtVariables()) {
+            System.out.println("Решение содержит искусственные переменные.\nРешения нет");
+            return null;
+        }
+
+        Answer answer = simplexTable.getFinalAnswer();
+        System.out.println(answer);
+        return answer;
     }
 
     private void makeFreeCoefficientsPositive() {
