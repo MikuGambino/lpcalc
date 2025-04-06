@@ -70,7 +70,6 @@ function parseFraction(input) {
     
     // Проверяем, содержит ли строка символ "/"
     if (input.includes('/')) {
-        console.log('here3');
         const parts = input.split('/');
         console.log(parts);
         if (parts.length === 2) {
