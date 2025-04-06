@@ -71,8 +71,11 @@ input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(45, 91, 132, 0.2);
 }
-label, p, span {
+label, p, span, pre {
     font-size: 18px;
+}
+pre {
+    margin: 10px 0;
 }
 /* Удаление стрелок */
 input[type=number] {
@@ -81,5 +84,73 @@ input[type=number] {
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
+    margin: 0;
+}
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 1px solid rgba(45, 91, 132, 0.3);
+    padding-bottom: 1px;
+    cursor: pointer;
+}
+a:hover {
+    color: var(--secondary);
+    border-bottom-color: rgba(241, 124, 58, 0.5);
+}
+.link-button {
+    transition: color 0.2s, border-bottom 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--primary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    text-decoration: none;
+}
+.link-button:hover {
+    color: var(--secondary);
+    border-bottom-color: rgba(241, 124, 58, 0.5);
+}
+.popup-dialog {
+    padding: 20px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 500px;
+}
+/* Стили для фона при открытии модального окна */
+.popup-dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+/* Стили для шапки диалога */
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+/* Стили для кнопки закрытия */
+.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #555;
+}
+.close-button:hover {
+    color: #000;
+}
+/* Стили для контента диалога */
+.dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.popup-dialog p {
     margin: 0;
 }

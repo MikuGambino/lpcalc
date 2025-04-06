@@ -56,15 +56,46 @@
             <hr style="width: 100%; margin-top: 20px;">
             <div id="fileLoad">
                 <div>
-                    <label for="fileInput">Загрузить условие задачи из файла</label>
-                    <span> (?):</span>
+                    <span>Загрузить условие задачи из файла</span>
+                    <button id="openDialog" class="link-button">(?)</button>
                 </div>
                 <input type="file" id="fileInput" />
             </div>
+
+            <dialog id="myDialog" class="popup-dialog">
+                <div class="dialog-header">
+                    <h3>Инструкция по загрузке данных задачи</h3>
+                    <button id="closeDialog" class="close-button">&times;</button>
+                </div>
+                <div class="dialog-content">
+                    <p>Для загрузки задачи используйте текстовый файл (.txt) со следующей структурой:</p>
+                    <pre class="code-example">
+3 2    
+1 1 >= 55
+2 3 <= 120
+12 30 = 960
+MAX
+3 4</pre>
+                    <p>Первая строка - два числа, разделённых пробелом.</p>
+                    <p>Количество <strong>ограничений</strong> 
+                    и количество <strong>переменных</strong>.</p>
+                    <br>
+                    <p>Последующие n строк - коэффициенты <strong>ограничений</strong>.</p>
+                    <br>
+                    <p>После ограничений - <strong> направление оптимизации</strong> (MIN/MAX).</p>
+                    <br>
+                    <p>Последняя строка - коэффициенты <strong>целевой функции</strong>.</p>
+                    <br>
+                    <h3 class="dialog-header">Важные замечания</h3>
+                    <p>Между значениями должен быть хотя бы один пробел.</p>
+                    <p>Можно использовать целые, дробные числа (с точкой в качестве разделителя) и обыкновенную дробь (1/2).</p>
+                </div>
+            </dialog>
         </div>
     </div>
 </body>
 <script src="../js/simplex-input.js"></script>
 <script src="../js/simplex-send.js"></script>
 <script src="../js/parse-file.js"></script>
+<script src="../js/popup.js"></script>
 </html>
