@@ -1,0 +1,85 @@
+:root {
+    --primary: #2D5B84;      /* Основной синий */
+    --primary-light: #3E7CB4; /* Светлый оттенок основного */
+    --secondary: #F17C3A;    /* Оранжевый акцент */
+    --secondary-light: #F7A668; /* Светлый оранжевый */
+    --background: #F4F5F7;   /* Фоновый светло-серый */
+    --form-bg: #E9EEF6;      /* Фон для блоков с формулами */
+    --text: #475466;         /* Основной текст */
+    --text-light: #6E7A8E;   /* Светлый текст */
+    --error: #E75D5D;        /* Красный для ошибок */
+    --success: #4CAF50;      /* Зеленый для успеха */
+}
+html {
+    background: var(--background);
+}
+#content-container {
+    justify-content: center;
+    display: flex;
+    max-width: 1200px;
+    margin: 50px auto;
+}
+h3, .text-title {
+    font-size: 21px;
+    margin: 5px 0;
+    text-align: center;
+}
+/* Reset buttons styles */
+.button {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+}
+.button{
+    text-decoration: none;
+    color: white;
+    background: var(--secondary);
+    border-radius: 10px;
+}
+.button:hover{
+    color: white;
+    background: var(--secondary-light);
+}
+input[type=text], input[type=number] {
+    height: 20px;
+    width: 40px;
+    margin-right: 5px;
+    text-align: right;
+    border: 1px solid #C8D0DE;
+    border-radius: 5px;
+    padding: 4px 6px;
+    transition: border-color 0.1s;
+}
+input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #2D5B84;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(45, 91, 132, 0.2);
+}
+.text {
+    font-size: 18px;
+}
+/* Удаление стрелок */
+input[type=number] {
+    -moz-appearance: textfield; /* Firefox */
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

@@ -1,0 +1,75 @@
+.constraintDiv { 
+    display: flex;
+    flex-direction: row;
+}
+.variablesDiv {
+    display: flex;
+    flex-direction: row;
+}
+#objectiveFunc {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 5px 0;
+}
+#objectiveVariables {
+    display: flex;
+    flex-direction: row;
+}
+#input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 450px;
+    padding: 25px;
+    background: var(--form-bg);
+    border-radius: 15px;
+    border: 1px solid;
+}
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.settings-container div {
+    margin: 5px 0;
+}
+#constraintsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#constraintsContainer select, .plus, #objectiveFunc select, .arrow {
+    margin: 0 5px;
+}
+#objectiveFunc select {
+    height: 100%;
+}
+#objectiveFunc span {
+    margin-right: 5px;
+}
+#constraintsContainer .constraintDiv {
+    margin: 5px 0;
+}
+#objectiveFunc {
+    align-items: center;
+}
+.method-container {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+#input-container hr {
+    width: 100%;
+    margin: 20px 0;
+}
+#method {
+    height: 30px;
+}
+#fileLoad{ 
+    display: flex;
+    flex-direction: column;
+}
+#fileLoad div {
+    margin-bottom: 5px;
+}
