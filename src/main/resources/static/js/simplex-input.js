@@ -196,3 +196,20 @@ function variablesList() {
 
     listSpan.innerHTML += ' ⩾ 0';
 }
+function clearInputs() {
+    // Находим все input элементы на странице и очищаем их
+    const inputs = document.querySelectorAll('#input-container input[type="text"], #input-container input[type="number"]');
+    inputs.forEach(input => {
+        if (input.className != 'numTextBox') {
+            input.value = '';
+        }
+    });
+    
+    // Сбрасываем все select элементы к первому значению
+    const selects = document.querySelectorAll('#input-container select');
+    selects.forEach(select => {
+        if (select.options.length > 0) {
+            select.selectedIndex = 0;
+        }
+    });
+}
