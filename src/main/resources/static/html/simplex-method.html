@@ -12,12 +12,12 @@
         <div id="input-container">
             <div class="settings-container">
                 <div>
-                    <label for="constraintCount" class="text">Количество ограничений: </label>
+                    <label for="constraintCount">Количество ограничений: </label>
                     <input type="number" class="numTextBox" min="2" max="10" value="3" id="constraintCount">
                 </div>
 
                 <div>
-                    <label for="variableCount" class="text">Количество переменных: </label>
+                    <label for="variableCount">Количество переменных: </label>
                     <input type="number" class="numTextBox" min="2" max="10" value="3" id="variableCount">
                 </div>
             </div>
@@ -38,6 +38,9 @@
                         <option value="MAX">max</option>
                     </select>
             </div>
+
+            <span id="variablesList"></span>
+
             <div class="method-container">
                 <select id="method">
                     <option value="BASIC">Базовый симплекс-метод</option>
@@ -49,7 +52,7 @@
             <hr style="width: 100%; margin-top: 20px;">
             <div id="fileLoad">
                 <div>
-                    <label for="fileInput" class="text">Загрузить условие задачи из файла</label>
+                    <label for="fileInput">Загрузить условие задачи из файла</label>
                     <span> (?):</span>
                 </div>
                 <input type="file" id="fileInput" />

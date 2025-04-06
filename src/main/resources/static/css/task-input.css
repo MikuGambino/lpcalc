@@ -48,7 +48,7 @@
 #objectiveFunc span {
     margin-right: 5px;
 }
-#constraintsContainer .constraintDiv {
+#constraintsContainer .constraintDiv, #variablesList {
     margin: 5px 0;
 }
 #objectiveFunc {

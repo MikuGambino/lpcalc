@@ -71,7 +71,7 @@ input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(45, 91, 132, 0.2);
 }
-.text {
+label, p, span {
     font-size: 18px;
 }
 /* Удаление стрелок */

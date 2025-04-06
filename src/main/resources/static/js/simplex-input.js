@@ -91,7 +91,9 @@ function addConstraint(constraintsContainer, currentLength, targetConstraintCoun
 
 let variableCountTextbox = document.getElementById("variableCount");
 variableCountTextbox.addEventListener('change', handleVariableCountChange);
+variableCountTextbox.addEventListener('change', variablesList);
 window.addEventListener('load', () => handleVariableCountChange({target: variableCountTextbox}));
+window.addEventListener('load', () => variablesList());
 constraintCountTextbox.addEventListener('change', handleVariableCountChange);
 
 function handleVariableCountChange() {
@@ -178,4 +180,19 @@ function removeObjectiveVariables(targetCount) {
     for (let i = objectiveVars.length; i > targetCount; i--) {
         objectiveVars[i - 1].remove();
     }
+}
+
+function variablesList() {
+    let variablesCount = document.getElementById("variableCount").value;
+    let listSpan = document.getElementById("variablesList");
+    listSpan.innerHTML = "";
+
+    for (let i = 0; i < variablesCount; i++) {
+        listSpan.innerHTML += `x<sub>${i + 1}</sub>`;
+        if (i != variablesCount - 1) {
+            listSpan.innerHTML += ', ';
+        }
+    }
+
+    listSpan.innerHTML += ' ⩾ 0';
 }
