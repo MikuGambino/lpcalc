@@ -3,293 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Graphical method</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/task-input.css">
 </head>
 <body>
-    <span>Количество ограничений: </span>
-    <input type="number" class="numTextBox" min="2" max="10" value="3" id="constraintCount">
-    <div id="constraintsContainer">
+    <div id="content-container">
+        <div id="input-container">
+            <div class="settings-container">
+                <div>
+                    <label for="constraintCount">Количество ограничений: </label>
+                    <input type="number" class="numTextBox" min="2" max="10" value="3" id="constraintCount">
+                </div>
+            </div>
 
+            <h3 class="text-title">Ограничения:</h3>
+            <div id="constraintsContainer"></div>
+
+            <h3 class="text-title">Целевая функция:</h3>
+            <div id="objectiveFunc">
+                <span>F = </span>
+                <input type="text" id="obj0" placeholder="0">
+                <span> + </span>
+                <input type="text" id="obj1" placeholder="0">
+                <span class="arrow">→</span>
+                <select id="directionSelect" class="direction-select">
+                    <option value="MIN">min</option>
+                    <option value="MAX">max</option>
+                </select>
+            </div>
+
+            <span id="variablesList">x<sub>1</sub>, x<sub>2</sub> ⩾ 0</span>
+
+            <div class="buttons-container">
+                <button onclick="clearInputs()" class="button">Очистить</button>
+                <button onclick="sendData()" class="button">Решить задачу</button>
+            </div>
+
+            <hr>
+            <div id="fileLoad">
+                <div>
+                    <span>Загрузить условие задачи из файла</span>
+                    <button id="openDialog" class="link-button">(?)</button>
+                </div>
+                <input type="file" id="fileInput" accept=".txt" />
+            </div>
+            
+            <dialog id="myDialog" class="popup-dialog">
+                <div class="dialog-header">
+                    <h3>Инструкция по загрузке данных задачи</h3>
+                    <button id="closeDialog" class="close-button">&times;</button>
+                </div>
+                <div class="dialog-content">
+                    <p>Для загрузки задачи используйте текстовый файл (.txt) со следующей структурой:</p>
+                    <pre class="code-example">
+3    
+1 1 >= 55
+2 3 <= 120
+12 30 <= 960
+MAX
+3 4</pre>
+                    <p>Первая строка - количество <strong>ограничений</strong></p>
+                    <br>
+                    <p>Последующие n строк - коэффициенты <strong>ограничений</strong>.</p>
+                    <br>
+                    <p>После ограничений - <strong> направление оптимизации</strong> (MIN/MAX).</p>
+                    <br>
+                    <p>Последняя строка - коэффициенты <strong>целевой функции</strong>.</p>
+                    <br>
+                    <h3 class="dialog-header">Важные замечания</h3>
+                    <p>Между значениями должен быть хотя бы один пробел.</p>
+                    <p>Можно использовать целые, дробные числа (с точкой в качестве разделителя) и обыкновенную дробь (1/2).</p>
+                </div>
+            </dialog>
+        </div>
     </div>
-
-    <div id="objectiveFunc">
-        <span>F = </span>
-        <input type="number" id="obj0">
-        <span> + </span>
-        <input type="number" id="obj1">
-        <span>→</span>
-        <select id="directionSelect" class="direction-select">
-            <option value="MIN">min</option>
-            <option value="MAX">max</option>
-        </select>
-    </div>
-
-    <button onclick="sendData()">Решить задачу</button>
-    <button onclick="generateRandomData()">Случайные данные</button>
-    <input type="file" id="fileInput" />
 </body>
-
 <script>
-    let constraintCountTextbox = document.getElementById("constraintCount");
-
-    constraintCountTextbox.addEventListener('change', handleConstraintChange);
-    window.addEventListener('load', () => handleConstraintChange({target: constraintCountTextbox}));
-
-    function handleConstraintChange(e) {
-        let constraintsContainer = document.getElementById('constraintsContainer');
-        let constraints = constraintsContainer.querySelectorAll("div");
-
-        // Проверка ввода количества ограничений
-        let targetConstraintCount = parseInt(e.target.value) || 2;
-        targetConstraintCount = Math.max(2, Math.min(10, targetConstraintCount));
-        constraintCountTextbox.value = targetConstraintCount;
-
-        let currentCount = constraints.length;
-
-        if (currentCount > targetConstraintCount) {
-            removeConstraint(constraints, targetConstraintCount);
-        } 
-        else if (currentCount < targetConstraintCount) {
-            addConstraint(constraintsContainer, currentCount, targetConstraintCount);
-        }
-    }
-
-    function removeConstraint(constraints, targetConstraintCount) {
-        for (let i = constraints.length; i > targetConstraintCount; i--) {
-            constraints[i - 1].remove();
-        }
-    }
-
-    function addConstraint(constraintsContainer, currentLength, targetConstraintCount) {
-        for (let i = currentLength; i < targetConstraintCount; i++) {
-            let constraintDiv = document.createElement('div');
-            constraintDiv.id = `c${i}`;
-            for (let j = 0; j < 2; j++) {
-                let variableTextbox = document.createElement('input');
-                variableTextbox.setAttribute('type', 'number');
-                variableTextbox.setAttribute('id', `v${i}${j}`);
-
-                let xLabel = document.createElement('span');
-                xLabel.innerHTML = `x<sub>${j + 1}</sub>`;
-
-                if (j != 1) {
-                    xLabel.innerText += " + ";
-                }
-
-                constraintDiv.appendChild(variableTextbox);
-                constraintDiv.appendChild(xLabel);
-            }
-
-            let select = document.createElement('select');
-            select.className = 'operator-select';
-            select.id = `operatorSelect${i}`;
-
-            const options = [
-                { value: 'LEQ', symbol: '≤' },
-                { value: 'GEQ', symbol: '≥' }
-            ];
-
-            options.forEach(opt => {
-                let option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.symbol;
-                select.appendChild(option);
-            });
-
-
-            let rhsTextbox = document.createElement('input');
-            rhsTextbox.setAttribute('type', 'number');
-            rhsTextbox.setAttribute('id', `rhs${i}`);
-
-            constraintDiv.appendChild(select);
-            constraintDiv.appendChild(rhsTextbox);            
-            constraintsContainer.appendChild(constraintDiv);
-        }
-    }
-
-    function sendData() {
-        const data = getData();
-        console.log(data);
-
-        fetch('http://localhost:8080/solve/graph', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Результат:', data);
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-        });
-    }
-
-    function getData() {
-        const objective = {
-            coefficients: [
-                parseFloat(document.getElementById('obj0').value) || 0,
-                parseFloat(document.getElementById('obj1').value) || 0
-            ],
-            direction: document.getElementById('directionSelect').value
-        };
-
-        const constraints = [];
-        const constraintDivs = document.querySelectorAll('#constraintsContainer > div');
-
-        constraintDivs.forEach((div, index) => {
-            const coeffs = [];
-            
-            for(let i = 0; i < 2; i++) {
-                const input = document.getElementById(`v${index}${i}`);
-                coeffs.push(parseFloat(input.value) || 0);
-            }
-
-            const constraint = {
-                coefficients: coeffs,
-                operator: document.querySelector(`#c${index} select`).value,
-                rhs: parseFloat(document.getElementById(`rhs${index}`).value) || 0
-            };
-            
-            constraints.push(constraint);
-        });
-
-        const data = {
-            objective,
-            constraints
-        };
-
-        return data;
-    }
-</script>
-<script>
-    function generateRandomData() {
-        // Генерация целевой функции
-        document.getElementById('obj0').value = 1;
-        document.getElementById('obj1').value = -1;
-        document.getElementById('directionSelect').value = 'MAX';
     
-        document.getElementById(`v00`).value = 1;
-        document.getElementById(`v01`).value = 1;
-        document.querySelector(`#c0 select`).value = 'LEQ';
-        document.getElementById(`rhs0`).value = 7;
-
-        document.getElementById(`v10`).value = 0;
-        document.getElementById(`v11`).value = 1;
-        document.querySelector(`#c1 select`).value = 'LEQ';
-        document.getElementById(`rhs1`).value = 5;
-
-        document.getElementById(`v20`).value = 1;
-        document.getElementById(`v21`).value = 1;
-        document.querySelector(`#c2 select`).value = 'GEQ';
-        document.getElementById(`rhs2`).value = 3;
-
-        document.getElementById(`v30`).value = 0;
-        document.getElementById(`v31`).value = 1;
-        document.querySelector(`#c3 select`).value = 'GEQ';
-        document.getElementById(`rhs3`).value = 2;
-
-        document.getElementById(`v40`).value = 1;
-        document.getElementById(`v41`).value = 0;
-        document.querySelector(`#c4 select`).value = 'LEQ';
-        document.getElementById(`rhs4`).value = 4;
-    }
-</script>
-<script>
-    // При выборе файла читаем его с помощью FileReader
-    document.getElementById("fileInput").addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const content = event.target.result;
-        // Выводим содержимое в консоль (можно убрать)
-        console.log("Содержимое файла:\n" + content);
-        // Парсим содержимое файла
-        const lpProblem = parseLPFile(content);
-        console.log(lpProblem);
-
-        document.getElementById("constraintCount").value = lpProblem.numConstraints;
-        const changeEvent = new Event("change", {
-            bubbles: false,    // событие всплывающее, если это необходимо
-            cancelable: false // событие нельзя отменить
-        });   
-        document.getElementById("constraintCount").dispatchEvent(changeEvent);
-        for (let i = 0; i < lpProblem.numConstraints; i++) {
-            document.getElementById(`v${i}0`).value = lpProblem.constraints[i].coefficients[0];
-            document.getElementById(`v${i}1`).value = lpProblem.constraints[i].coefficients[1];
-
-            if (lpProblem.constraints[i].comparator == ">=") {
-                document.querySelector(`#c${i} select`).value = 'GEQ';
-            } else {
-                document.querySelector(`#c${i} select`).value = 'LEQ';
-            }
-
-            document.getElementById(`rhs${i}`).value = lpProblem.constraints[i].rhs;
-        }
-
-        document.getElementById('obj0').value = lpProblem.objective.coefficients[0];
-        document.getElementById('obj1').value = lpProblem.objective.coefficients[1];
-        document.getElementById('directionSelect').value = lpProblem.objective.type;
-      };
-      reader.readAsText(file);
-    });
-
-    /**
-     * Функция для парсинга текста файла в объект с ограничениями и целевой функцией.
-     * @param {string} content - содержимое файла
-     * @return {Object} объект с полями:
-     *         numConstraints - количество ограничений,
-     *         constraints - массив ограничений { coefficients, comparator, rhs },
-     *         objective - целевая функция { type, coefficients }
-     */
-    function parseLPFile(content) {
-      // Разбиваем содержимое на строки, удаляя пустые строки
-      const lines = content.split(/\r?\n/).filter((line) => line.trim() !== "");
-      let index = 0;
-
-      // Первая строка – число ограничений
-      const numConstraints = parseInt(lines[index].trim(), 10);
-      index++;
-
-      const constraints = [];
-
-      // Читаем ограничения
-      for (let i = 0; i < numConstraints; i++, index++) {
-        // Например строка "1 -2 >= 3"
-        // Разбиваем строку на токены по пробелам
-        const tokens = lines[index].trim().split(/\s+/);
-        // Предполагаем, что последние два токена – это знак неравенства и значение правой части,
-        // а остальные токены – коэффициенты
-        const coefficients = tokens.slice(0, tokens.length - 2).map(Number);
-        const comparator = tokens[tokens.length - 2]; // например, ">=" или "<="
-        const rhs = Number(tokens[tokens.length - 1]);
-
-        constraints.push({
-          coefficients,
-          comparator,
-          rhs,
-        });
-      }
-
-      // Следующая строка – тип целевой функции ("max" или "min")
-      const objectiveType = lines[index].trim().toUpperCase();
-      index++;
-
-      // Следующая строка – коэффициенты целевой функции
-      const objectiveCoefficients = lines[index].trim().split(/\s+/).map(Number);
-      index++;
-
-      return {
-        numConstraints,
-        constraints,
-        objective: {
-          type: objectiveType,
-          coefficients: objectiveCoefficients,
-        },
-      };
-    }
   </script>
+  <script src="../js/graphical-method-input.js"></script>
+  <script src="../js/popup.js"></script>
+  <script src="../js/common-input.js"></script>
 </html>

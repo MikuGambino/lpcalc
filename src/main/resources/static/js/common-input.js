@@ -1,68 +1,3 @@
-function sendData() {
-    const data = getData();
-    console.log(data);
-
-    fetch('http://localhost:8080/solve/simplex', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Результат:', data);
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-    });
-}
-
-function getData() {
-    let objectiveFuncCoefficients = [];
-    let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
-    for (let i = 0; i < objectiveVars.length; i++) {
-        objectiveFuncCoefficients.push(parseFraction(document.getElementById(`obj${i}`).value));
-    }
-
-    const objective = {
-        coefficients: objectiveFuncCoefficients,
-        direction: document.getElementById('directionSelect').value
-    };
-
-    const constraints = [];
-    const constraintDivs = document.querySelectorAll('#constraintsContainer > div');
-    let variablesCount = document.getElementById("variableCount").value;
-
-    constraintDivs.forEach((div, index) => {
-        const coeffs = [];
-        
-        for(let i = 0; i < variablesCount; i++) {
-            const input = document.getElementById(`v${index}${i}`);
-            console.log("input: " + input.value);
-            coeffs.push(parseFraction(input.value));
-        }
-
-        const constraint = {
-            coefficients: coeffs,
-            operator: document.querySelector(`#c${index} select`).value,
-            rhs: parseFraction(document.getElementById(`rhs${index}`).value)
-        };
-        
-        constraints.push(constraint);
-    });
-
-    let method = document.getElementById("method").value;
-
-    const data = {
-        objective,
-        constraints,
-        method
-    };
-    console.log(data);
-
-    return data;
-}
 function parseFraction(input) {
     if (!input || input.trim() === '') {
         return { numerator: 0, denominator: 1 };
@@ -114,4 +49,45 @@ function parseFraction(input) {
     
     // Если не удалось распарсить, возвращаем ноль
     return { numerator: 0, denominator: 1 };
+}
+
+function clearInputs() {
+    // Находим все input элементы на странице и очищаем их
+    const inputs = document.querySelectorAll('#input-container input[type="text"], #input-container input[type="number"]');
+    inputs.forEach(input => {
+        if (input.className != 'numTextBox') {
+            input.value = '';
+        }
+    });
+    
+    // Сбрасываем все select элементы к первому значению
+    const selects = document.querySelectorAll('#input-container select');
+    selects.forEach(select => {
+        if (select.options.length > 0) {
+            select.selectedIndex = 0;
+        }
+    });
+}
+
+function variablesList() {
+    let variablesCount = document.getElementById("variableCount").value;
+    let listSpan = document.getElementById("variablesList");
+    listSpan.innerHTML = "";
+
+    for (let i = 0; i < variablesCount; i++) {
+        listSpan.innerHTML += `x<sub>${i + 1}</sub>`;
+        if (i != variablesCount - 1) {
+            listSpan.innerHTML += ', ';
+        }
+    }
+
+    listSpan.innerHTML += ' ⩾ 0';
+}
+
+function fractionToNumber(input) {
+    if(input.denominator == 1) {
+        return input.numerator;
+    } else {
+        return input.numerator + "/" + input.denominator;
+    }
 }
