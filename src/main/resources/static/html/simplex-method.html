@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/solve.css">
     <link rel="stylesheet" href="../css/task-input.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
     <title>Simplex method</title>
 </head>
 <body>
@@ -28,15 +33,15 @@
 
             <h3 class="text-title">Целевая функция:</h3>
             <div id="objectiveFunc">
-                    <span>F =</span>
-                    <div id="objectiveVariables">
+                <span>F =</span>
+                <div id="objectiveVariables">
 
-                    </div>
-                    <span class="arrow">→</span>
-                    <select id="directionSelect" class="direction-select">
-                        <option value="MIN">min</option>
-                        <option value="MAX">max</option>
-                    </select>
+                </div>
+                <span class="arrow">→</span>
+                <select id="directionSelect" class="direction-select">
+                    <option value="MIN">min</option>
+                    <option value="MAX">max</option>
+                </select>
             </div>
 
             <span id="variablesList"></span>
@@ -92,9 +97,16 @@ MAX
                 </div>
             </dialog>
         </div>
+        <div class="input-block">
+            <p>Найти <span id="func-dir"></span> значение функции</p>
+            <p id="objFuncInput" class="latex"></p>
+            <p>При следующих ограничениях:</p>
+            <p id="constraintsInput" class="latex"></p>
+        </div>
     </div>
 </body>
 <script src="../js/simplex-input.js"></script>
 <script src="../js/common-input.js"></script>
 <script src="../js/popup.js"></script>
+<script src="../js/katex.js"></script>
 </html>

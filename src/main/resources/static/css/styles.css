@@ -13,9 +13,12 @@
 html {
     background: var(--background);
 }
+p {
+    margin: 0;
+} 
 #content-container {
-    justify-content: center;
     display: flex;
+    flex-direction: column;
     max-width: 1200px;
     margin: 50px auto;
 }
@@ -71,7 +74,7 @@ input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(45, 91, 132, 0.2);
 }
-label, p, span, pre {
+label, p, pre, span {
     font-size: 18px;
 }
 pre {
@@ -153,4 +156,10 @@ a:hover {
 }
 .popup-dialog p {
     margin: 0;
+}
+.bold {
+    font-weight: bold;
+}
+.katex span {
+    font-size: inherit;
 }

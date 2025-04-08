@@ -184,6 +184,7 @@ function removeObjectiveVariables(targetCount) {
 
 function sendData() {
     const data = getData();
+    printInput(data);
     console.log(data);
 
     fetch('http://localhost:8080/solve/simplex', {
@@ -196,6 +197,7 @@ function sendData() {
     .then(response => response.json())
     .then(data => {
         console.log('Результат:', data);
+        printInput(data);
     })
     .catch(error => {
         console.error('Ошибка:', error);

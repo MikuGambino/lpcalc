@@ -7,10 +7,14 @@
     flex-direction: row;
     justify-content: center;
     margin: 5px 0;
+    height: 30px;
+    align-items: center;
 }
 #input-container {
     display: flex;
+    width: fit-content;
     flex-direction: column;
+    align-self: center;
     align-items: center;
     min-width: 450px;
     padding: 25px;
@@ -34,9 +38,6 @@
 }
 #constraintsContainer .constraintDiv, #variablesList, .settings-container div {
     margin: 5px 0;
-}
-#objectiveFunc {
-    align-items: center;
 }
 .method-container {
     margin: 10px 0;
