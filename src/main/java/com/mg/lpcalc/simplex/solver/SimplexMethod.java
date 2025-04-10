@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.solver;
 
 import com.mg.lpcalc.simplex.model.Answer;
 

@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.table;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;

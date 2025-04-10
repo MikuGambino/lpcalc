@@ -22,6 +22,9 @@ p {
     max-width: 1200px;
     margin: 50px auto;
 }
+h2 {
+    margin: 10px 0;
+}
 h3, .text-title {
     font-size: 21px;
     margin: 5px 0;
@@ -162,4 +165,9 @@ a:hover {
 }
 .katex span {
     font-size: inherit;
+}
+.subtitle {
+    margin: 5px 0;
+    font-size: 20px;
+    font-weight: bold;
 }

@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.solver;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
@@ -7,6 +7,8 @@ import com.mg.lpcalc.simplex.model.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
+import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +21,17 @@ public class BasicSimplexMethod implements SimplexMethod {
     private int numVars;
     private int numConstraints;
     private int numSlacks;
+    private SimplexSolutionBuilder solutionBuilder;
 
     public BasicSimplexMethod(List<Constraint> constraints, ObjectiveFunc objectiveFunc, Direction direction,
-                              int numVars, int numConstraints) {
+                              int numVars, int numConstraints, SimplexSolutionBuilder solutionBuilder) {
         this.constraints = constraints;
         this.objectiveFunc = objectiveFunc;
         this.direction = direction;
         this.numVars = numVars;
         this.numConstraints = numConstraints;
         this.numSlacks = countSlacks();
+        this.solutionBuilder = solutionBuilder;
     }
 
     public Answer run() {
@@ -68,7 +72,6 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        System.out.println(answer);
         return answer;
     }
 
@@ -164,6 +167,7 @@ public class BasicSimplexMethod implements SimplexMethod {
     }
 
     private void makeConstraintsLEQ() {
+        boolean constraintsIsChanged = false;
         for (Constraint constraint : constraints) {
             if (constraint.getOperator().equals(Operator.GEQ)) {
                 List<Fraction> newCoefficients = new ArrayList<>();
@@ -173,7 +177,9 @@ public class BasicSimplexMethod implements SimplexMethod {
                 constraint.setRhs(constraint.getRhs().negate());
                 constraint.setCoefficients(newCoefficients);
                 constraint.switchOperator();
+                constraintsIsChanged = true;
             }
         }
+        solutionBuilder.convertToLessOrEqual(constraints, constraintsIsChanged);
     }
 }

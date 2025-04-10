@@ -7,22 +7,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function printInput(input) {
-    document.getElementById('func-dir').innerText = input.objective.direction == "MAX" ? "наибольшее" : "наименьшее";
-    // Отрисовка целевой функции
-    let objectiveFunc = parseLHS(input.objective.coefficients);
-    updateMathFormula('objFuncInput', 'F = ' + objectiveFunc);
-
-    // Отрисовка ограничений
-    let constraints = '';
-    for (let i = 0; i < input.constraints.length; i++) {
-        let constraint = input.constraints[i];
-        constraints += parseLHS(constraint.coefficients) + parseRHS(constraint.operator, constraint.rhs) + '\\\\';
-    }
-    constraints = '\\begin{cases}' + constraints + '\\end{cases}';
-    updateMathFormula('constraintsInput', constraints);
-}
-
 function fractionToLatex(fraction) {
     if (fraction.denominator == 1) {
         return fraction.numerator;
@@ -63,8 +47,6 @@ function parseRHS(operator, num) {
     } else {
         output += "=";
     }
-    if (num.numerator < 0) output += "-";
     output += fractionToLatex(num);
     return output;
 } 
-

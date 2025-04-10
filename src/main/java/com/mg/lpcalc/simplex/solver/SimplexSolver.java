@@ -1,8 +1,9 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.solver;
 
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Method;
 import com.mg.lpcalc.simplex.model.*;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.List;
 
@@ -23,16 +24,18 @@ public class SimplexSolver {
         this.method = problem.getMethod();
     }
 
-    public void solve() {
+    public Answer solve() {
+        SimplexSolutionBuilder solutionBuilder = new SimplexSolutionBuilder();
         SimplexMethod simplexMethod = null;
         if (method.equals(Method.BASIC)) {
-            simplexMethod = new BasicSimplexMethod(constraints, objectiveFunc, direction, numVars, numConstraints);
+            simplexMethod = new BasicSimplexMethod(constraints, objectiveFunc, direction, numVars, numConstraints, solutionBuilder);
         }
 
         if (method.equals(Method.BIG_M)) {
-            simplexMethod = new BigMMethod(constraints, objectiveFunc, direction, numVars, numConstraints);
+            simplexMethod = new BigMMethod(constraints, objectiveFunc, direction, numVars, numConstraints, solutionBuilder);
         }
 
-        Answer answer = simplexMethod.run();
+        simplexMethod.run();
+        return solutionBuilder.getAnswer();
     }
 }

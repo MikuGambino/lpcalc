@@ -1,14 +1,11 @@
 package com.mg.lpcalc.simplex.model;
 
-import com.mg.lpcalc.model.Fraction;
-import lombok.AllArgsConstructor;
+import com.mg.lpcalc.simplex.model.solution.ConstraintTransformStep;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class Answer {
-    private List<Fraction> variablesValues;
-    private Fraction objectiveFuncValue;
+    private ConstraintTransformStep convertToLessOrEqualStep;
 }

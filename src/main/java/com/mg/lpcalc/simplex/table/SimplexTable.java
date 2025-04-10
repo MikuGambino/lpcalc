@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.table;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
@@ -246,7 +246,7 @@ public abstract class SimplexTable {
         }
 
         Fraction objectiveValue = tableau[numConstraints][numColumns - 1];
-        return new Answer(variablesValues, objectiveValue);
+        return new Answer();
     }
 
     public void checkIndexes(int row, int column) {

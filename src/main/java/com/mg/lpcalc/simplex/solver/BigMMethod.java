@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex;
+package com.mg.lpcalc.simplex.solver;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
@@ -6,6 +6,8 @@ import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
+import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +21,16 @@ public class BigMMethod implements SimplexMethod{
     private int numConstraints;
     private int numSlacks;
     private int numAuxVars;
+    private SimplexSolutionBuilder solutionBuilder;
 
     public BigMMethod(List<Constraint> constraints, ObjectiveFunc objectiveFunc, Direction direction,
-                              int numVars, int numConstraints) {
+                              int numVars, int numConstraints, SimplexSolutionBuilder solutionBuilder) {
         this.constraints = constraints;
         this.objectiveFunc = objectiveFunc;
         this.direction = direction;
         this.numVars = numVars;
         this.numConstraints = numConstraints;
+        this.solutionBuilder = solutionBuilder;
     }
 
     @Override
