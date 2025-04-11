@@ -50,3 +50,7 @@ function parseRHS(operator, num) {
     output += fractionToLatex(num);
     return output;
 } 
+
+function addColoredVariable(constraint, variableTitle, variableIndex, sign, color) {
+    return constraint + sign + `\\colorbox{${color}}{$${variableTitle + "_" + variableIndex}$}`;
+}

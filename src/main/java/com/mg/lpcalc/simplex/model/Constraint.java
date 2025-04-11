@@ -3,11 +3,15 @@ package com.mg.lpcalc.simplex.model;
 import com.mg.lpcalc.model.ConstraintDTO;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Operator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class Constraint {
     private List<Fraction> coefficients;
     private Operator operator;
@@ -25,5 +29,9 @@ public class Constraint {
         } else if (operator.equals(Operator.GEQ)) {
             this.operator = Operator.LEQ;
         }
+    }
+
+    public void addCoefficient(Fraction fraction) {
+        coefficients.add(fraction);
     }
 }

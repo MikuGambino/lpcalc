@@ -111,7 +111,15 @@ MAX
                     <p>Меняем знаки у ограничений с $\geq$, путём умножения на $-1$:</p>
                     <p id="lessOrEqualsConstraints" class="latex"></p>
                 </div>
+            </div>
 
+            <div>
+                <p class="subtitle">Шаг 2. Преобразование ограничений к равенствам.</p>
+                <p>Для каждого неравенства добавляется дополнительная переменная, которая называется балансовой.</p>
+                <p id="slackVariablesListP">Добавленные переменные: <span id="slackVariablesListSpan"></span></p>
+                <p id="noSlackVariablesTitle">Все ограничения являются равенствами, дополнительные переменные не нужны.</p>
+                <p id="equalityConstraints" class="latex"></p>
+                <p>Добавленные переменные выделены оранжевым цветом.</p>
             </div>
         </div>
     </div>
@@ -122,6 +130,7 @@ MAX
 <script src="../js/simplex-solve.js"></script>
 <script src="../js/simplex-input.js"></script>
 <script src="../js/common-input.js"></script>
+<script src="../js/common-solve.js"></script>
 <script src="../js/popup.js"></script>
 <script src="../js/katex.js"></script>
 </html>

@@ -4,13 +4,18 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class BasicSimplexTable extends SimplexTable {
 
-    public BasicSimplexTable(int numSlack, int numVars, int numConstraints, Fraction[] costs, List<Constraint> constraints) {
+    private SimplexSolutionBuilder solutionBuilder;
+
+    public BasicSimplexTable(int numSlack, int numVars, int numConstraints, Fraction[] costs, List<Constraint> constraints,
+                             SimplexSolutionBuilder solutionBuilder) {
+        this.solutionBuilder = solutionBuilder;
         this.costs = costs;
         this.numColumns = numVars + numSlack + 1;
         this.basis = new int[numConstraints];
@@ -38,6 +43,7 @@ public class BasicSimplexTable extends SimplexTable {
             if (!constraint.getOperator().equals(Operator.EQ)) {
                 tableau[i][numVars + curSlackCount] = Fraction.ONE;
                 basis[i] = numVars + curSlackCount;
+                solutionBuilder.addSlackVariable(numVars + curSlackCount + 1, i);
                 curSlackCount++;
             }
 
@@ -48,6 +54,7 @@ public class BasicSimplexTable extends SimplexTable {
         // Начальное значение целевой функции = 0
         tableau[numConstraints][numVars + numSlack] = Fraction.ZERO;
         print();
+        solutionBuilder.tableInitComplete();
     }
 
     public void print() {

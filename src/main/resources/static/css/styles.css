@@ -23,7 +23,7 @@ p {
     margin: 50px auto;
 }
 h2 {
-    margin: 10px 0;
+    margin-top: 10px;
 }
 h3, .text-title {
     font-size: 21px;
@@ -167,7 +167,7 @@ a:hover {
     font-size: inherit;
 }
 .subtitle {
-    margin: 5px 0;
+    margin: 10px 0;
     font-size: 20px;
     font-weight: bold;
 }

@@ -43,7 +43,8 @@ public class BasicSimplexMethod implements SimplexMethod {
                 numVars,
                 numConstraints,
                 getCosts(),
-                constraints
+                constraints,
+                solutionBuilder
         );
 
         findInitialBasis();
