@@ -3,7 +3,7 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
-import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;

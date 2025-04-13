@@ -46,10 +46,10 @@ public class SimplexSolutionBuilder {
     }
 
     public void addFindBasisSubStep(BasisMethod basisMethod, int column, int row,
-                                    SimplexTableDTO simplexTableBefore, BasicSimplexTable simplexTableAfter) {
-        SimplexTableDTO simplexTableAfterDTO = new SimplexTableDTO(simplexTableAfter);
+                                    BasicSimplexTable simplexTableBefore, BasicSimplexTable simplexTableAfter) {
+        SimplexTableDTO simplexTableAfter = new SimplexTableDTO(simplexTableAfter);
 
-        FindBasisSubStep subStep = new FindBasisSubStep(basisMethod, column, row, simplexTableBefore, simplexTableAfterDTO);
+        FindBasisSubStep subStep = new FindBasisSubStep(basisMethod, column, row, simplexTableBefore, simplexTableAfter);
         findBasisSubSteps.add(subStep);
     }
 

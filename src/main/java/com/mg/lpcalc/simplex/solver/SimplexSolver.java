@@ -3,6 +3,7 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Method;
 import com.mg.lpcalc.simplex.model.*;
+import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.List;

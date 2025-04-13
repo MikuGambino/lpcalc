@@ -1,7 +1,5 @@
-package com.mg.lpcalc.simplex.model;
+package com.mg.lpcalc.simplex.model.solution;
 
-import com.mg.lpcalc.simplex.model.solution.ConstraintToEqualityStep;
-import com.mg.lpcalc.simplex.model.solution.ConstraintTransformStep;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class Answer {
     private ConstraintTransformStep convertToLessOrEqualStep;
     private ConstraintToEqualityStep constraintToEqualityStep;
+    private FindBasisStep findBasisStep;
 }

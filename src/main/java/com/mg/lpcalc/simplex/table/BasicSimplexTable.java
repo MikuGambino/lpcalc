@@ -54,7 +54,7 @@ public class BasicSimplexTable extends SimplexTable {
         // Начальное значение целевой функции = 0
         tableau[numConstraints][numVars + numSlack] = Fraction.ZERO;
         print();
-        solutionBuilder.tableInitComplete();
+        solutionBuilder.tableInitComplete(this);
     }
 
     public void print() {

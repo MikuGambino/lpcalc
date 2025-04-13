@@ -3,7 +3,7 @@ package com.mg.lpcalc.controller;
 import com.mg.lpcalc.graphical.solver.GraphicalSolver;
 import com.mg.lpcalc.graphical.solver.model.converter.GraphicalOptimizationProblemConverter;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
-import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.solver.SimplexSolver;
 import com.mg.lpcalc.simplex.model.converter.SimplexOptimizationProblemConverter;
 import lombok.RequiredArgsConstructor;

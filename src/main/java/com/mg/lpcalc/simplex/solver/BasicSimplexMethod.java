@@ -3,10 +3,12 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
-import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
+import com.mg.lpcalc.simplex.model.solution.BasisMethod;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 
@@ -91,7 +93,7 @@ public class BasicSimplexMethod implements SimplexMethod {
     }
 
     public Fraction[] getCosts() {
-        Fraction[] costs = new Fraction[numVars + numSlacks];
+        Fraction[] costs = new Fraction[numVars + numSlacks + 1];
         for (int i = 0; i < numVars; i++) {
             costs[i] = objectiveFunc.getCoefficients().get(i);
         }
@@ -116,6 +118,7 @@ public class BasicSimplexMethod implements SimplexMethod {
 
     private void findInitialBasis() {
         int[] basis = simplexTable.getBasis();
+        solutionBuilder.setSlackBasis(basis);
         for (int i = 0; i < basis.length; i++) {
             if (basis[i] != -1) {
                 continue;
@@ -129,10 +132,12 @@ public class BasicSimplexMethod implements SimplexMethod {
             createBasisUsingGaussianElimination(i);
         }
 
+        solutionBuilder.basisFound();
         simplexTable.print();
     }
 
     private boolean tryFindBasisUsingUnitVectors() {
+        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
         RowColumnPair rowColumnPair = simplexTable.findNonBasisUnitVector();
         if (rowColumnPair == null) {
             return false;
@@ -141,10 +146,12 @@ public class BasicSimplexMethod implements SimplexMethod {
         int[] basis = simplexTable.getBasis();
         basis[rowColumnPair.getRow()] = rowColumnPair.getColumn();
 
+        solutionBuilder.addFindBasisSubStep(BasisMethod.UNIT_COLUMN, rowColumnPair.getColumn(), rowColumnPair.getRow(), simplexTableBefore, simplexTable);
         return true;
     }
 
     private boolean tryFindBasisUsingSingleNonZeroElements() {
+        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
         RowColumnPair rowColumnPair = simplexTable.findNonBasisColumnWithSingleNonZeroElement();
         if (rowColumnPair == null) {
             return false;
@@ -156,15 +163,18 @@ public class BasicSimplexMethod implements SimplexMethod {
         int[] basis = simplexTable.getBasis();
         basis[rowColumnPair.getRow()] = rowColumnPair.getColumn();
 
+        solutionBuilder.addFindBasisSubStep(BasisMethod.SINGLE_NONZERO, rowColumnPair.getColumn(), rowColumnPair.getRow(), simplexTableBefore, simplexTable);
         return true;
     }
 
     private void createBasisUsingGaussianElimination(int row) {
+        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
         int column = simplexTable.findFirstNonBasisColumn();
         simplexTable.gaussianElimination(row, column);
 
         int[] basis = simplexTable.getBasis();
         basis[row] = column;
+        solutionBuilder.addFindBasisSubStep(BasisMethod.GAUSS, column, row, simplexTableBefore, simplexTable);
     }
 
     private void makeConstraintsLEQ() {

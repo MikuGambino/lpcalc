@@ -184,8 +184,7 @@ function removeObjectiveVariables(targetCount) {
 
 function sendData() {
     const data = getData();
-    printInput(data);
-
+    
     fetch('http://localhost:8080/solve/simplex', {
         method: 'POST',
         headers: {
@@ -195,6 +194,7 @@ function sendData() {
     })
     .then(response => response.json())
     .then(answer => {
+        printInput(data);
         console.log('Результат:', answer);
         parseBasicSimplexAnswer(answer);
     })
@@ -224,7 +224,6 @@ function getData() {
         
         for(let i = 0; i < variablesCount; i++) {
             const input = document.getElementById(`v${index}${i}`);
-            console.log("input: " + input.value);
             coeffs.push(parseFraction(input.value));
         }
 
@@ -234,6 +233,7 @@ function getData() {
             rhs: parseFraction(document.getElementById(`rhs${index}`).value)
         };
         
+        console.log(constraint);
         constraints.push(constraint);
     });
 
@@ -244,7 +244,6 @@ function getData() {
         constraints,
         method
     };
-    console.log(data);
 
     return data;
 }
@@ -279,8 +278,10 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
 
             if (lpProblem.constraints[i].comparator == ">=") {
                     document.querySelector(`#c${i} select`).value = 'GEQ';
-                } else {
+                } else if (lpProblem.constraints[i].comparator == "<=") {
                     document.querySelector(`#c${i} select`).value = 'LEQ';
+                } else {
+                    document.querySelector(`#c${i} select`).value = 'EQ';
                 }
 
             document.getElementById(`rhs${i}`).value = fractionToNumber(lpProblem.constraints[i].rhs);

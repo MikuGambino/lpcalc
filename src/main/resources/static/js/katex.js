@@ -11,6 +11,10 @@ function fractionToLatex(fraction) {
     if (fraction.denominator == 1) {
         return fraction.numerator;
     }
+
+    if (fraction.numerator < 0) {
+        return `-\\frac{${Math.abs(fraction.numerator)}}{${fraction.denominator}}`;
+    }
     return `\\frac{${fraction.numerator}}{${fraction.denominator}}`;
 }
 

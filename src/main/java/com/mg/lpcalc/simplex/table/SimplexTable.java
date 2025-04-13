@@ -2,12 +2,13 @@ package com.mg.lpcalc.simplex.table;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
-import com.mg.lpcalc.simplex.model.Answer;
+import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // todo возможно добавить абстрактных методов (но после реализации двухфазного симплекса)
@@ -258,4 +259,21 @@ public abstract class SimplexTable {
         }
     }
 
+    public Fraction[] costsCopy() {
+        return Arrays.stream(this.costs)
+                .map(Fraction::new)
+                .toArray(Fraction[]::new);
+    }
+
+    public Fraction[][] tableauCopy() {
+        if (tableau == null) return null;
+
+        return Arrays.stream(tableau)
+                .map(row -> row == null ? null :
+                        Arrays.stream(row)
+                                .map(fraction -> fraction != null ? new Fraction(fraction) : null)
+                                .toArray(Fraction[]::new))
+                .toArray(Fraction[][]::new);
+    }
 }
+

@@ -1,10 +1,13 @@
 package com.mg.lpcalc.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Data
+@NoArgsConstructor
 public class Fraction {
     public static final Fraction ZERO = new Fraction(0, 1);
     public static final Fraction ONE = new Fraction(1, 1);
@@ -18,6 +21,11 @@ public class Fraction {
         this.numerator = numerator;
         this.denominator = denominator;
         normalize();
+    }
+
+    public Fraction(Fraction fraction) {
+        this.numerator = fraction.getNumerator();
+        this.denominator = fraction.getDenominator();
     }
 
     private void normalize() {
