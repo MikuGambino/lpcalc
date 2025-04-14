@@ -1,5 +1,6 @@
 package com.mg.lpcalc.simplex.solution;
 
+import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
@@ -20,6 +21,7 @@ public class SimplexSolutionBuilder {
     private List<Integer> constraintsIndexes = new ArrayList<>();
     private int[] slackBasis;
     private List<FindBasisSubStep> findBasisSubSteps = new ArrayList<>();
+    private List<RemoveNegativeBStep> negativeBSteps = new ArrayList<>();
 
     public SimplexSolutionBuilder(List<Constraint> constraints) {
         this.constraints = constraints;
@@ -49,11 +51,26 @@ public class SimplexSolutionBuilder {
                                     SimplexTableDTO simplexTableBefore, BasicSimplexTable simplexTableAfter) {
         SimplexTableDTO simplexTableAfterDTO = new SimplexTableDTO(simplexTableAfter);
 
-        FindBasisSubStep subStep = new FindBasisSubStep(basisMethod, column, row, simplexTableBefore, simplexTableAfterDTO);
+        Fraction pivotElement = null;
+        if (!basisMethod.equals(BasisMethod.UNIT_COLUMN)) {
+            pivotElement = simplexTableBefore.getTableau()[row][column];
+        }
+
+        FindBasisSubStep subStep = new FindBasisSubStep(basisMethod, column, row, pivotElement, simplexTableBefore, simplexTableAfterDTO);
         findBasisSubSteps.add(subStep);
     }
 
     public void basisFound() {
         answer.setFindBasisStep(new FindBasisStep(initialSimplexTable, findBasisSubSteps));
+    }
+
+    public void addRemoveNegativeBStep(int column, int row, SimplexTableDTO simplexTableBefore, BasicSimplexTable simplexTableAfter) {
+        SimplexTableDTO simplexTableAfterDTO = new SimplexTableDTO(simplexTableAfter);
+        Fraction maxNegativeB = simplexTableBefore.getTableau()[row][simplexTableBefore.getNumColumns() - 1];
+        Fraction maxNegativeRowElement = simplexTableBefore.getTableau()[row][column];
+        int oldBasis = simplexTableBefore.getBasis()[row];
+        RemoveNegativeBStep step = new RemoveNegativeBStep(column, row, oldBasis, simplexTableBefore,
+                                                            simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement);
+        answer.getRemoveNegativeBSteps().add(step);
     }
 }

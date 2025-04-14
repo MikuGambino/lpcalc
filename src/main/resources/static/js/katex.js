@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+function renderKatexElement(elementId) {
+    renderMathInElement(document.getElementById(elementId), {
+        delimiters: [
+          {left: '$', right: '$', display: false},
+          {left: '$$', right: '$$', display: true}
+        ],
+        throwOnError: false
+    });
+}
+
 function fractionToLatex(fraction) {
     if (fraction.denominator == 1) {
         return fraction.numerator;

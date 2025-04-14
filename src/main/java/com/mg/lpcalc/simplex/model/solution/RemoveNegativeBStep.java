@@ -5,14 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class FindBasisSubStep {
-    private BasisMethod method;
+public class RemoveNegativeBStep {
     private int column;
     private int row;
-    private Fraction pivotElement;
+    private int oldBasis;
     private SimplexTableDTO simplexTableBefore;
     private SimplexTableDTO simplexTableAfter;
+    private Fraction maxNegativeB;
+    private Fraction maxNegativeRowElement;
 }

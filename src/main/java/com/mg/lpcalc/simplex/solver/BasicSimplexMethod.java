@@ -80,7 +80,7 @@ public class BasicSimplexMethod implements SimplexMethod {
 
     private void removeNegativeB() {
         while (simplexTable.isContainsNegativeB()) {
-            this.simplexTable.print();
+            SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
             int row = this.simplexTable.findMaxModuloNegativeBRow();
             int column = this.simplexTable.finMaxModuloNegativeColumn(row);
             if (column == -1) {
@@ -88,7 +88,7 @@ public class BasicSimplexMethod implements SimplexMethod {
             }
             this.simplexTable.setBasisVariable(column, row);
             this.simplexTable.gaussianElimination(row, column);
-            this.simplexTable.print();
+            solutionBuilder.addRemoveNegativeBStep(column, row, simplexTableBefore, simplexTable);
         }
     }
 
