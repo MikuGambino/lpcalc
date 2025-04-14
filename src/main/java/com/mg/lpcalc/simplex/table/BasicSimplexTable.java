@@ -95,15 +95,22 @@ public class BasicSimplexTable extends SimplexTable {
     }
 
     public void calculateDeltas() {
+        solutionBuilder.startCalculateDeltas();
         for (int i = 0; i < numColumns; i++) {
             Fraction delta = Fraction.ZERO;
+            solutionBuilder.startDeltaColumnCalculating();
             for (int j = 0; j < numConstraints; j++) {
-                delta = delta.add(costs[basis[j]].multiply(tableau[j][i])); // Δi = ce1·a1i + ce2·a2i + ... + cem·ami
+                Fraction multiplier1 = costs[basis[j]];
+                Fraction multiplier2 = tableau[j][i];
+                delta = delta.add(multiplier1.multiply(multiplier2)); // Δi = ce1·a1i + ce2·a2i + ... + cem·ami
+                solutionBuilder.addDeltasProduct("C_" + (basis[j] + 1), "a_{" + (j + 1) + (i + 1) + "}", multiplier1, multiplier2);
             }
             if (i != numColumns - 1) {
                 delta = delta.subtract(costs[i]);
+                solutionBuilder.addColumnCost(costs[i]);
             }
             tableau[numConstraints][i] = delta;
         }
+        solutionBuilder.endCalculateDeltas();
     }
 }

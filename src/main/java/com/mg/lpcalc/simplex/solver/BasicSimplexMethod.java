@@ -61,6 +61,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         simplexTable.calculateDeltas();
+        solutionBuilder.setSimplexTableWithDeltas(new SimplexTableDTO(simplexTable));
 
         System.out.println("Is optimal " + simplexTable.isOptimal(direction));
 

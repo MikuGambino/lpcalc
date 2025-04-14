@@ -21,6 +21,8 @@ function parseBasicSimplexAnswer(answer) {
     parseConstraintToEqualityStep(constraintToEqualityStep.constraints, constraintToEqualityStep.constraintsIndexes, constraintToEqualityStep.slackVariablesIndexes);
     parseFindBasisStep(answer.findBasisStep);
     parseRemoveNegativeBSteps(answer.removeNegativeBSteps);
+    parseCalculatingDeltasStep(answer.simplexTableWithDeltas, answer.calculateDeltasStep);
+    activateAccordions();
     document.getElementById('solution-container').hidden = false;
 }
 
@@ -139,7 +141,7 @@ function parseFindBasisStep(step) {
     renderKatexElement('findBasisStepContainer');
 }
 
-function parseSimplexTable(simplexTable, container) {
+function parseSimplexTable(simplexTable, container, withDeltas = false) {
     const { tableau, costs, basis, numColumns } = simplexTable;
     let table = document.createElement('table');
     table.className = 'simplex-table';
@@ -183,14 +185,16 @@ function parseSimplexTable(simplexTable, container) {
         tableHTML += '</tr>';
     }
 
-    // Последняя строка - дельта
-    // tableHTML += '<tr>';
-    // tableHTML += '<th>$\\Delta$</th>';
-    // const lastRowIndex = tableau.length - 1;
-    // for (let j = 0; j < tableau[lastRowIndex].length; j++) {
-    //     tableHTML += `<td>$${formatFractionLatex(tableau[lastRowIndex][j])}$</td>`;
-    // }
-    // tableHTML += '</tr>';
+    if (withDeltas) {
+        tableHTML += '<tr>';
+        tableHTML += '<th>$\\Delta$</th>';
+        const lastRowIndex = tableau.length - 1;
+        for (let j = 0; j < tableau[lastRowIndex].length; j++) {
+            tableHTML += `<td>$${fractionToLatex(tableau[lastRowIndex][j])}$</td>`;
+        }
+        tableHTML += '</tr>';
+    }
+
     
     tableHTML += '</table>';
     
@@ -253,4 +257,71 @@ function parseRemoveNegativeBSteps(steps) {
     }
 
     renderKatexElement('removeNegativeBStepContainer');
+}
+
+function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
+    let container = document.getElementById('deltaCalculatingStep');
+
+    let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, simplexTable.tableau[simplexTable.tableau.length - 1], simplexTable.basis);
+    container.appendChild(deltasAccordion);
+    
+    parseSimplexTable(simplexTable, container, true);
+
+    renderKatexElement('deltaCalculatingStep');
+}
+
+function parseDeltasCalculationsAccordion(step, deltas, basis) {
+    let container = document.createElement('div');
+
+    let formula = document.createElement('p');
+    formula.innerText = "Вычисляем дельты: $\\Delta_i = "
+
+    for (let i = 0; i < basis.length; i++) {
+        formula.innerText += `C_{${basis[i] + 1}} \\cdot a_{${i + 1}i}`;
+        if (i != basis.length - 1) {
+            formula.innerText += "+";
+        }
+    }
+    formula.innerText += '- C_i$';
+
+    container.appendChild(formula);
+
+    let spanTrigger = document.createElement('span');
+    spanTrigger.className = 'link accordion-trigger';
+
+    let spanIndicator = document.createElement('span');
+    spanIndicator.innerHTML = '<span class="indicator">&#x25B6;</span>Подробный расчёт дельт';
+    spanTrigger.appendChild(spanIndicator);
+
+    let accordionContent = document.createElement('div');
+    accordionContent.className = 'accordion-content';
+
+    container.appendChild(spanTrigger);
+    container.appendChild(accordionContent);
+
+    for (let i = 0; i < step.columnCost.length; i++) {
+        let p = document.createElement('p');
+        p.innerText = `$\\Delta_${i + 1} = `;
+        
+        for (let j = 0; j < step.varLabels.length; j += 2) {
+            p.innerText += step.varLabels[i][j] + " \\cdot " + step.varLabels[i][j + 1];
+            if (j + 2 < step.varLabels.length) {
+                p.innerText += " + ";
+            }
+        }
+
+        p.innerText += ' - C_' + (i + 1) + " = ";
+
+        for (let j = 0; j < step.varLabels.length; j += 2) {
+            p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot " + fractionToLatex(step.varValues[i][j + 1]);
+            if (j + 2 < step.varValues.length) {
+                p.innerText += " + ";
+            }
+        }
+
+        p.innerText += '-' + fractionToLatex(step.columnCost[i]) + ' = ' + fractionToLatex(deltas[i]) + "$";
+        accordionContent.appendChild(p);
+    }
+
+    return container;
 }

@@ -13,4 +13,6 @@ public class Answer {
     private ConstraintToEqualityStep constraintToEqualityStep;
     private FindBasisStep findBasisStep;
     private List<RemoveNegativeBStep> removeNegativeBSteps = new ArrayList<>();
+    private CalculateDeltasStep calculateDeltasStep;
+    private SimplexTableDTO simplexTableWithDeltas;
 }

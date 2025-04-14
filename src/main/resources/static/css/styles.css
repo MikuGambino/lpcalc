@@ -104,7 +104,7 @@ a:hover {
     color: var(--secondary);
     border-bottom-color: rgba(241, 124, 58, 0.5);
 }
-.link-button {
+.link-button, .link {
     transition: color 0.2s, border-bottom 0.2s;
     background: none;
     border: none;
@@ -116,7 +116,7 @@ a:hover {
     font-size: inherit;
     text-decoration: none;
 }
-.link-button:hover {
+.link-button:hover, .link:hover {
     color: var(--secondary);
     border-bottom-color: rgba(241, 124, 58, 0.5);
 }
@@ -212,4 +212,24 @@ a:hover {
   .simplex-table tr:first-child th {
     background-color: rgba(241, 124, 58, 0.7);
   }
-  
+  .accordion-trigger {
+    text-decoration: underline;
+    cursor: pointer;
+    margin: 10px 0 5px 0;
+    display: block;
+}
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin: 0;
+    padding-left: 10px;
+}
+.indicator {
+    display: inline-block;
+    margin-right: 5px;
+    transition: transform 0.3s ease;
+}
+.open .indicator {
+    transform: rotate(90deg);
+}

@@ -1,12 +1,10 @@
 package com.mg.lpcalc.simplex.solution;
 
 import com.mg.lpcalc.model.Fraction;
-import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
-import com.mg.lpcalc.simplex.table.SimplexTable;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +20,7 @@ public class SimplexSolutionBuilder {
     private int[] slackBasis;
     private List<FindBasisSubStep> findBasisSubSteps = new ArrayList<>();
     private List<RemoveNegativeBStep> negativeBSteps = new ArrayList<>();
+    private CalculateDeltasStep calculateDeltasStep;
 
     public SimplexSolutionBuilder(List<Constraint> constraints) {
         this.constraints = constraints;
@@ -70,7 +69,34 @@ public class SimplexSolutionBuilder {
         Fraction maxNegativeRowElement = simplexTableBefore.getTableau()[row][column];
         int oldBasis = simplexTableBefore.getBasis()[row];
         RemoveNegativeBStep step = new RemoveNegativeBStep(column, row, oldBasis, simplexTableBefore,
-                                                            simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement);
+                simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement);
         answer.getRemoveNegativeBSteps().add(step);
+    }
+
+    public void setSimplexTableWithDeltas(SimplexTableDTO simplexTableDTO) {
+        answer.setSimplexTableWithDeltas(simplexTableDTO);
+        answer.setCalculateDeltasStep(calculateDeltasStep);
+    }
+
+    public void startCalculateDeltas() {
+        this.calculateDeltasStep = new CalculateDeltasStep();
+    }
+
+    public void addDeltasProduct(String var1Label, String var2Label, Fraction var1Value, Fraction var2Value) {
+        this.calculateDeltasStep.getVarLabels().get(calculateDeltasStep.getVarLabels().size() - 1).addAll(List.of(var1Label, var2Label));
+        this.calculateDeltasStep.getVarValues().get(calculateDeltasStep.getVarValues().size() - 1).addAll(List.of(var1Value, var2Value));
+    }
+
+    public void addColumnCost(Fraction cost) {
+        this.calculateDeltasStep.getColumnCost().add(cost);
+    }
+
+    public void startDeltaColumnCalculating() {
+        calculateDeltasStep.getVarLabels().add(new ArrayList<>());
+        calculateDeltasStep.getVarValues().add(new ArrayList<>());
+    }
+
+    public void endCalculateDeltas() {
+        this.calculateDeltasStep.getColumnCost().add(Fraction.ZERO);
     }
 }
