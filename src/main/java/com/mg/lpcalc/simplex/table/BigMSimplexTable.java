@@ -4,6 +4,8 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -164,5 +166,18 @@ public class BigMSimplexTable extends SimplexTable {
         }
         System.out.println();
         System.out.println(Arrays.toString(mValues));
+    }
+
+    public boolean pivot(Direction direction, SimplexSolutionBuilder solutionBuilder) {
+        int pivotColumn = findPivotColumn(direction);
+        int pivotRow = findPivotRow(pivotColumn);
+        if (pivotRow == -1) {
+            System.out.println("Целевая функция не ограничена и решения не существует");
+            return false;
+        }
+
+        gaussianElimination(pivotRow, pivotColumn);
+        setBasisVariable(pivotColumn, pivotRow);
+        return true;
     }
 }

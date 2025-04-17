@@ -15,4 +15,6 @@ public class Answer {
     private List<RemoveNegativeBStep> removeNegativeBSteps = new ArrayList<>();
     private CalculateDeltasStep calculateDeltasStep;
     private SimplexTableDTO simplexTableWithDeltas;
+    private OptimalityCheckStep optimalityCheckStep;
+    private List<PivotStep> pivotSteps = new ArrayList<>();
 }

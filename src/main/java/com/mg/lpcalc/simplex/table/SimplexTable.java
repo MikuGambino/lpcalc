@@ -5,6 +5,8 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -21,21 +23,9 @@ public abstract class SimplexTable {
     protected int numSlack;
     protected int numColumns;
     protected int[] basis;
+    protected SimplexSolutionBuilder solutionBuilder;
 
     public abstract int findPivotColumn(Direction direction);
-
-    public boolean pivot(Direction direction) {
-        int pivotColumn = findPivotColumn(direction);
-        int pivotRow = findPivotRow(pivotColumn);
-        if (pivotRow == -1) {
-            System.out.println("Целевая функция не ограничена и решения не существует");
-            return false;
-        }
-
-        gaussianElimination(pivotRow, pivotColumn);
-        setBasisVariable(pivotColumn, pivotRow);
-        return true;
-    }
 
     public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
         int pivotColumn = findPivotColumn(direction);
@@ -218,6 +208,7 @@ public abstract class SimplexTable {
             }
         }
 
+        solutionBuilder.saveSimplexRelations(simplexRatioList, minQ);
         return rowIdx;
     }
 

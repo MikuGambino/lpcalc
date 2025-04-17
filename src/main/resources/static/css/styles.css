@@ -175,8 +175,8 @@ a:hover {
     margin: 20px 0;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-    box-shadow: 0 0 8px rgba(45, 91, 132, 0.1);
-    background-color: #F4F5F7;
+    /* box-shadow: 0 0 8px rgba(45, 91, 132, 0.1); */
+    /* background-color: #F4F5F7; */
   }
   
   .simplex-table th, 

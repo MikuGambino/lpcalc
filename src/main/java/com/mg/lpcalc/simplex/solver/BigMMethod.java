@@ -54,7 +54,7 @@ public class BigMMethod implements SimplexMethod{
 
         System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
         while (!simplexTable.isOptimal(direction)) {
-            boolean success = simplexTable.pivot(direction);
+            boolean success = simplexTable.pivot(direction, solutionBuilder);
             if (!success) {
                 simplexTable.checkUnboundedDirection(direction, objectiveFunc);
                 return null;

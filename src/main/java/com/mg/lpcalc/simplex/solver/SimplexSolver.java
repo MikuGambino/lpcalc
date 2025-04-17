@@ -26,7 +26,7 @@ public class SimplexSolver {
     }
 
     public Answer solve() {
-        SimplexSolutionBuilder solutionBuilder = new SimplexSolutionBuilder(constraints);
+        SimplexSolutionBuilder solutionBuilder = new SimplexSolutionBuilder(constraints, direction);
         SimplexMethod simplexMethod = null;
         if (method.equals(Method.BASIC)) {
             simplexMethod = new BasicSimplexMethod(constraints, objectiveFunc, direction, numVars, numConstraints, solutionBuilder);

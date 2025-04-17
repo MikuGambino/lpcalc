@@ -22,6 +22,8 @@ function parseBasicSimplexAnswer(answer) {
     parseFindBasisStep(answer.findBasisStep);
     parseRemoveNegativeBSteps(answer.removeNegativeBSteps);
     parseCalculatingDeltasStep(answer.simplexTableWithDeltas, answer.calculateDeltasStep);
+    parseCheckOptimalityStep(answer.optimalityCheckStep);
+    parsePivotIterationsStep(answer.pivotSteps);
     activateAccordions();
     document.getElementById('solution-container').hidden = false;
 }
@@ -261,6 +263,7 @@ function parseRemoveNegativeBSteps(steps) {
 
 function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
     let container = document.getElementById('deltaCalculatingStep');
+    container.innerHTML = '';
 
     let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, simplexTable.tableau[simplexTable.tableau.length - 1], simplexTable.basis);
     container.appendChild(deltasAccordion);
@@ -324,4 +327,105 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
     }
 
     return container;
+}
+
+function parseCheckOptimalityStep(step) {
+    let container = document.getElementById('optimalityCheckStep');
+    container.innerHTML = '';
+
+    let optimality = parseCheckOptimality(step);
+    container.appendChild(optimality);
+}
+
+function parseCheckOptimality(step) {
+    let container = document.createElement('div');
+
+    let checkP = document.createElement('p');
+    let criteriaP = document.createElement('p');
+
+    if (step.direction == 'MAX') {
+        criteriaP.innerText = 'План оптимален, если в таблице отсутствуют отрицательные дельты.';
+        if (step.optimal) {
+            checkP.innerHTML = 'Проверка оптимальности: отрицательные дельты отсутствуют. <b>План оптимален.</b>';
+        } else {
+            checkP.innerHTML = 'Проверка оптимальности: <b>план не оптимален</b>, так как присутствуют отрицательные дельты.';
+        }
+    } else {
+        criteriaP.innerText = 'План оптимален, если в таблице отсутствуют положительные дельты.';
+        if (step.optimal) {
+            checkP.innerHTML = 'Проверка оптимальности: положительные дельты отсутствуют. <b>План оптимален.</b>';
+        } else {
+            checkP.innerHTML = 'Проверка оптимальности: <b>план не оптимален</b>, так как присутствуют положительные дельты.';
+        }
+    }
+
+    container.appendChild(criteriaP);
+    container.appendChild(checkP);
+    return container;
+}
+
+function parsePivotIterationsStep(pivotSteps) {
+    let container = document.getElementById('simplexIterationsStep');
+    container.innerHTML = '';
+
+    for (let i = 0; i < pivotSteps.length; i++) {
+        let iterationTitle = document.createElement('p');
+        iterationTitle.className = 'subtitle';
+        iterationTitle.innerText = `Итерация ${i + 1}.`;
+        let step = pivotSteps[i];
+        let newSimplexTable = step.simplexTableAfter;
+        let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, newSimplexTable.tableau[newSimplexTable.tableau.length - 1], newSimplexTable.basis);
+        let optimalCheck = parseCheckOptimality(step.optimalityCheckStep);
+        container.appendChild(iterationTitle);
+        container.appendChild(parsePivotIteration(step, deltasAccordion, optimalCheck));
+    }
+
+    renderKatexElement('simplexIterationsStep');
+}
+
+function parsePivotIteration(step, deltasAccordion, optimalCheck) {
+    let container = document.createElement('div');
+
+    let beforeTableP = document.createElement('p');
+    let afterTableP = document.createElement('p');
+
+    beforeTableP.innerText += 'Определяем стобец, в котором находится минимальная дельта.\n' + 
+                              `Минимальная дельта: $${fractionToLatex(step.minDelta)}$. Разрешающий столбец: $${step.column + 1}$.\n` + 
+                              `Находим симплекс-отношения ($Q$), путём деления свободных коэффициентов ($b$) на соответствующие значения столбца $${step.column + 1}$.\n` +
+                              'В найденном столбце ищем минимальное неотрицательное значение сиплекс-отношения ($Q$).\n' +
+                              `Минимальное значение симплекс-отношения $Q_{min}=${fractionToLatex(step.targetQ)}$. Разрешающая строка: $${step.row + 1}$.\n` +
+                              `На пересечении найденных столбца и строки находится разрешающий элемент: $${fractionToLatex(step.pivotElement)}$`;
+
+    container.appendChild(beforeTableP);
+    let beforeTable = parseSimplexTable(step.simplexTableBefore, container, true);
+    addQColumn(beforeTable, step);
+    highlightRowColumnAndIntersection(beforeTable, step.row + 2, step.column + 1);
+
+    afterTableP.innerText += `Делим строку $${step.row + 1}$ на $${fractionToLatex(step.pivotElement)}$. Из остальных строк вычитаем строку $${step.row + 1}$, умноженную на соответствующий элемент в столбце $${step.column + 1}$.\n` +
+                             `Базисной переменной для ограничения $${step.row + 1}$ становится $x_${step.column + 1}$.\n` +
+                             `Переменная $x_${step.lastBasisVariableIndex + 1}$ выводится из базиса.`;
+    
+    container.appendChild(afterTableP);
+    container.appendChild(deltasAccordion);
+    let afterTable = parseSimplexTable(step.simplexTableAfter, container, true);
+    container.appendChild(optimalCheck);
+    return container;
+}
+
+function addQColumn(table, step) {  
+    const nameRow = table.rows[1];
+    const qNameCell = document.createElement('th');
+    qNameCell.textContent = '$Q$';
+    nameRow.appendChild(qNameCell);
+    
+    for (let i = 0; i < table.rows.length - 3; i++) {
+        const row = table.rows[i + 2];
+        const qCell = document.createElement('td');
+        if (step.columnCoefficients[i].numerator < 0) {
+            qCell.textContent = `$${fractionToLatex(step.bcoefficients[i])}:(${fractionToLatex(step.columnCoefficients[i])}) = ${fractionToLatex(step.simplexRelations[i])}$`; 
+        } else {
+            qCell.textContent = `$${fractionToLatex(step.bcoefficients[i])}:${fractionToLatex(step.columnCoefficients[i])} = ${fractionToLatex(step.simplexRelations[i])}$`; 
+        }
+        row.appendChild(qCell);
+    }
 }

@@ -1,6 +1,7 @@
 package com.mg.lpcalc.simplex.solution;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
@@ -13,17 +14,22 @@ import java.util.List;
 public class SimplexSolutionBuilder {
     // todo добавить поле какой метод или отдельный класс для каждого метода
     private Answer answer = new Answer();
-    private SimplexTableDTO initialSimplexTable;
+    private Direction direction;
     private List<Constraint> constraints;
+    private SimplexTableDTO initialSimplexTable;
     private List<Integer> slackVariablesIndexes = new ArrayList<>();
     private List<Integer> constraintsIndexes = new ArrayList<>();
     private int[] slackBasis;
     private List<FindBasisSubStep> findBasisSubSteps = new ArrayList<>();
     private List<RemoveNegativeBStep> negativeBSteps = new ArrayList<>();
     private CalculateDeltasStep calculateDeltasStep;
+    private PivotStep pivotStep;
+    private List<Fraction> simplexRelations;
+    private Fraction targetQ;
 
-    public SimplexSolutionBuilder(List<Constraint> constraints) {
+    public SimplexSolutionBuilder(List<Constraint> constraints, Direction direction) {
         this.constraints = constraints;
+        this.direction = direction;
     }
 
     public void convertToLessOrEqual(List<Constraint> constraints, boolean constraintsIsChanged) {
@@ -98,5 +104,48 @@ public class SimplexSolutionBuilder {
 
     public void endCalculateDeltas() {
         this.calculateDeltasStep.getColumnCost().add(Fraction.ZERO);
+    }
+
+    public void addOptimalityCheckStep(boolean optimal) {
+        this.answer.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
+    }
+
+    public void saveSimplexRelations(List<Fraction> simplexRelations, Fraction targetQ) {
+        this.simplexRelations = simplexRelations;
+        this.targetQ = targetQ;
+    }
+
+    public void addPivotStep(int row, int column, SimplexTableDTO simplexTableBefore) {
+        Fraction[][] tableau = simplexTableBefore.getTableau();
+        Fraction pivotElement = tableau[row][column];
+        Fraction minimumDelta = tableau[simplexTableBefore.getNumConstraints()][column];
+        int lastBasisVariableIndex = simplexTableBefore.getBasis()[row];
+
+        List<Fraction> columnCoefficients = new ArrayList<>();
+        List<Fraction> bCoefficients = new ArrayList<>();
+        for (int i = 0; i < simplexTableBefore.getNumConstraints(); i++) {
+            columnCoefficients.add(tableau[i][column]);
+            bCoefficients.add(tableau[i][simplexTableBefore.getNumColumns() - 1]);
+        }
+
+        this.pivotStep = PivotStep.builder()
+                .simplexTableBefore(simplexTableBefore)
+                .pivotElement(pivotElement)
+                .minDelta(minimumDelta)
+                .targetQ(targetQ)
+                .column(column)
+                .row(row)
+                .lastBasisVariableIndex(lastBasisVariableIndex)
+                .simplexRelations(simplexRelations)
+                .bCoefficients(bCoefficients)
+                .columnCoefficients(columnCoefficients)
+                .build();
+    }
+
+    public void addPivotStepToAnswer(SimplexTableDTO simplexTableAfterDTO, boolean isOptimal) {
+        this.pivotStep.setSimplexTableAfter(simplexTableAfterDTO);
+        this.pivotStep.setCalculateDeltasStep(this.calculateDeltasStep);
+        this.pivotStep.setOptimalityCheckStep(new OptimalityCheckStep(isOptimal, direction));
+        this.answer.getPivotSteps().add(pivotStep);
     }
 }
