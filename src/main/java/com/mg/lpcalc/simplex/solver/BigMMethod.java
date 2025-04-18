@@ -4,6 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
+import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
@@ -34,7 +35,7 @@ public class BigMMethod implements SimplexMethod{
     }
 
     @Override
-    public Answer run() {
+    public Solution run() {
         makeFreeCoefficientsPositive();
         countAuxVariables();
 
@@ -69,8 +70,8 @@ public class BigMMethod implements SimplexMethod{
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        System.out.println(answer);
-        return answer;
+
+        return solutionBuilder.getSolution();
     }
 
     private void makeFreeCoefficientsPositive() {

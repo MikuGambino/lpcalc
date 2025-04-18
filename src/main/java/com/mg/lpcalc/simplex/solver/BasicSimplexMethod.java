@@ -4,6 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
+import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
@@ -36,7 +37,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         this.solutionBuilder = solutionBuilder;
     }
 
-    public Answer run() {
+    public Solution run() {
         // если есть неравенства с >=, умножаем уравнение на -1
         makeConstraintsLEQ();
 
@@ -52,12 +53,10 @@ public class BasicSimplexMethod implements SimplexMethod {
         findInitialBasis();
 
         if (simplexTable.isContainsNegativeB()) {
-            removeNegativeB();
-        }
-
-        if (simplexTable.isContainsNegativeB()) {
-            System.out.println("Нет решения");
-            return null;
+            boolean success = removeNegativeB();
+            if (!success) {
+                return solutionBuilder.getSolution();
+            }
         }
 
         simplexTable.calculateDeltas();
@@ -69,7 +68,7 @@ public class BasicSimplexMethod implements SimplexMethod {
             boolean success = simplexTable.pivot(direction);
             if (!success) {
                 simplexTable.checkUnboundedDirection(direction, objectiveFunc);
-                return null;
+                return solutionBuilder.getSolution();
             }
             simplexTable.calculateDeltas();
             simplexTable.print();
@@ -77,21 +76,26 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        return answer;
+        Solution solution = solutionBuilder.getSolution();
+        solution.setAnswer(answer);
+        return solution;
     }
 
-    private void removeNegativeB() {
+    private boolean removeNegativeB() {
         while (simplexTable.isContainsNegativeB()) {
             SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
             int row = this.simplexTable.findMaxModuloNegativeBRow();
             int column = this.simplexTable.finMaxModuloNegativeColumn(row);
             if (column == -1) {
-                break;
+                solutionBuilder.addUnsuccessfulNegativeBStep(row, new SimplexTableDTO(simplexTable));
+                return false;
             }
             this.simplexTable.setBasisVariable(column, row);
             this.simplexTable.gaussianElimination(row, column);
             solutionBuilder.addRemoveNegativeBStep(column, row, simplexTableBefore, simplexTable);
         }
+
+        return true;
     }
 
     public Fraction[] getCosts() {

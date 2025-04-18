@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 public class SimplexSolutionBuilder {
     // todo добавить поле какой метод или отдельный класс для каждого метода
-    private Answer answer = new Answer();
+    private Solution solution = new Solution();
     private Direction direction;
     private List<Constraint> constraints;
     private SimplexTableDTO initialSimplexTable;
@@ -34,7 +34,7 @@ public class SimplexSolutionBuilder {
 
     public void convertToLessOrEqual(List<Constraint> constraints, boolean constraintsIsChanged) {
         ConstraintTransformStep constraintTransformStep = new ConstraintTransformStep(constraints, constraintsIsChanged);
-        answer.setConvertToLessOrEqualStep(constraintTransformStep);
+        solution.setConvertToLessOrEqualStep(constraintTransformStep);
     }
 
     public void addSlackVariable(int slackIndex, int constraintIndex) {
@@ -45,7 +45,7 @@ public class SimplexSolutionBuilder {
     public void tableInitComplete(BasicSimplexTable simplexTable) {
         ConstraintToEqualityStep step = new ConstraintToEqualityStep(constraints, slackVariablesIndexes, constraintsIndexes);
         this.initialSimplexTable = new SimplexTableDTO(simplexTable);
-        answer.setConstraintToEqualityStep(step);
+        solution.setConstraintToEqualityStep(step);
     }
 
     public void setSlackBasis(int[] basis) {
@@ -66,7 +66,7 @@ public class SimplexSolutionBuilder {
     }
 
     public void basisFound() {
-        answer.setFindBasisStep(new FindBasisStep(initialSimplexTable, findBasisSubSteps));
+        solution.setFindBasisStep(new FindBasisStep(initialSimplexTable, findBasisSubSteps));
     }
 
     public void addRemoveNegativeBStep(int column, int row, SimplexTableDTO simplexTableBefore, BasicSimplexTable simplexTableAfter) {
@@ -75,13 +75,25 @@ public class SimplexSolutionBuilder {
         Fraction maxNegativeRowElement = simplexTableBefore.getTableau()[row][column];
         int oldBasis = simplexTableBefore.getBasis()[row];
         RemoveNegativeBStep step = new RemoveNegativeBStep(column, row, oldBasis, simplexTableBefore,
-                simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement);
-        answer.getRemoveNegativeBSteps().add(step);
+                simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement, true);
+        solution.getRemoveNegativeBSteps().add(step);
+    }
+
+    public void addUnsuccessfulNegativeBStep(int row, SimplexTableDTO simplexTableBefore) {
+        Fraction maxNegativeB = simplexTableBefore.getTableau()[row][simplexTableBefore.getNumColumns() - 1];
+        RemoveNegativeBStep step = RemoveNegativeBStep.builder()
+                .maxNegativeB(maxNegativeB)
+                .simplexTableBefore(simplexTableBefore)
+                .row(row)
+                .success(false)
+                .build();
+        solution.getRemoveNegativeBSteps().add(step);
+        solution.setAnswer(new Answer(AnswerType.NEGATIVE_B));
     }
 
     public void setSimplexTableWithDeltas(SimplexTableDTO simplexTableDTO) {
-        answer.setSimplexTableWithDeltas(simplexTableDTO);
-        answer.setCalculateDeltasStep(calculateDeltasStep);
+        solution.setSimplexTableWithDeltas(simplexTableDTO);
+        solution.setCalculateDeltasStep(calculateDeltasStep);
     }
 
     public void startCalculateDeltas() {
@@ -107,7 +119,7 @@ public class SimplexSolutionBuilder {
     }
 
     public void addOptimalityCheckStep(boolean optimal) {
-        this.answer.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
+        this.solution.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
     }
 
     public void saveSimplexRelations(List<Fraction> simplexRelations, Fraction targetQ) {
@@ -139,13 +151,35 @@ public class SimplexSolutionBuilder {
                 .simplexRelations(simplexRelations)
                 .bCoefficients(bCoefficients)
                 .columnCoefficients(columnCoefficients)
+                .success(true)
                 .build();
+    }
+
+    public void addUnsuccessfulPivotStep(int column, Direction direction, SimplexTableDTO simplexTable) {
+        Fraction[][] tableau = simplexTable.getTableau();
+        Fraction minimumDelta = tableau[simplexTable.getNumConstraints()][column];
+
+        PivotStep pivotStep = PivotStep.builder()
+                .column(column)
+                .success(false)
+                .direction(direction)
+                .minDelta(minimumDelta)
+                .simplexTableBefore(simplexTable)
+                .build();
+
+        this.solution.getPivotSteps().add(pivotStep);
+
+        if (Direction.MAX.equals(direction)) {
+            solution.setAnswer(new Answer(AnswerType.MAX_UNBOUNDED));
+        } else {
+            solution.setAnswer(new Answer(AnswerType.MIN_UNBOUNDED));
+        }
     }
 
     public void addPivotStepToAnswer(SimplexTableDTO simplexTableAfterDTO, boolean isOptimal) {
         this.pivotStep.setSimplexTableAfter(simplexTableAfterDTO);
         this.pivotStep.setCalculateDeltasStep(this.calculateDeltasStep);
         this.pivotStep.setOptimalityCheckStep(new OptimalityCheckStep(isOptimal, direction));
-        this.answer.getPivotSteps().add(pivotStep);
+        this.solution.getPivotSteps().add(pivotStep);
     }
 }

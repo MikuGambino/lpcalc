@@ -101,60 +101,17 @@ MAX
             <p>При следующих ограничениях:</p>
             <p id="constraintsInput" class="latex"></p>
         </div>
-        <div id="solution-container" hidden>
-            <h2>Решение базовым симлекс методом</h2>
-            <div>
-                <p class="subtitle">Шаг 1. Преобразование неравенств со знаком $\geq$.</p>
-                <p>Все ограничения должны быть со знаком $\leq$ или $=$.</p>
-                <p id="lessOrEqualDone" hidden>Условие выполнено.</p>
-                <div id="lessOrEqualTransform" hidden>
-                    <p>Меняем знаки у ограничений с $\geq$, путём умножения на $-1$:</p>
-                    <p id="lessOrEqualsConstraints" class="latex"></p>
-                </div>
-            </div>
+        <div id="solution-container">
 
-            <div>
-                <p class="subtitle">Шаг 2. Преобразование ограничений к равенствам.</p>
-                <p>Для каждого неравенства добавляется дополнительная переменная, которая называется балансовой.</p>
-                <p id="slackVariablesListP">Добавленные переменные: <span id="slackVariablesListSpan"></span>.</p>
-                <p id="noSlackVariablesTitle">Все ограничения являются равенствами, дополнительные переменные не нужны.</p>
-                <p id="equalityConstraints" class="latex"></p>
-                <p>Добавленные переменные выделены оранжевым цветом.</p>
-            </div>
-
-            <p class="subtitle">Шаг 3. Поиск первоначального базиса.</p>
-            <div id="findBasisStepContainer">
-                
-            </div>
-            
-            <p class="subtitle">Шаг 4. Исключение отрицательных свободных коэффициентов.</p>
-            <div id="removeNegativeBStepContainer">
-                
-            </div>
-
-            <p class="subtitle">Шаг 5. Расчёт дельт (оценок).</p>
-            <div id="deltaCalculatingStep">
-                
-            </div>
-
-            <p class="subtitle">Шаг 6. Проверка оптимальности.</p>
-            <div id="optimalityCheckStep">
-                
-            </div>
-
-            <p class="subtitle">Шаг 7. Итерации симплекс-алгоритма.</p>
-            <div id="simplexIterationsStep">
-                
-            </div>
         </div>
     </div>
 </body>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
+<script src="../js/common-input.js"></script>
 <script src="../js/simplex-solve.js"></script>
 <script src="../js/simplex-input.js"></script>
-<script src="../js/common-input.js"></script>
 <script src="../js/common-solve.js"></script>
 <script src="../js/popup.js"></script>
 <script src="../js/katex.js"></script>

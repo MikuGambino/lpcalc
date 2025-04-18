@@ -91,7 +91,7 @@ function addConstraint(constraintsContainer, currentLength, targetConstraintCoun
 
 let variableCountTextbox = document.getElementById("variableCount");
 variableCountTextbox.addEventListener('change', handleVariableCountChange);
-variableCountTextbox.addEventListener('change', variablesList);
+document.getElementById("variableCount").onchange = variablesList;
 window.addEventListener('load', () => handleVariableCountChange({target: variableCountTextbox}));
 window.addEventListener('load', () => variablesList());
 constraintCountTextbox.addEventListener('change', handleVariableCountChange);
@@ -194,8 +194,8 @@ function sendData() {
     })
     .then(response => response.json())
     .then(answer => {
-        printInput(data);
         console.log('Результат:', answer);
+        printInput(data);
         parseBasicSimplexAnswer(answer);
     })
     .catch(error => {
@@ -269,6 +269,7 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
         document.getElementById("constraintCount").dispatchEvent(changeEvent);
 
         document.getElementById("variableCount").value = lpProblem.numVars;
+
         document.getElementById("variableCount").dispatchEvent(changeEvent);
 
         for (let i = 0; i < lpProblem.numConstraints; i++) {

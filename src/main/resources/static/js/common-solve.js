@@ -18,3 +18,29 @@ function activateAccordions() {
         });
     });
 }
+
+function removeAnswerContainers() {
+    const answerContainers = document.querySelectorAll('div.answerContainer');
+
+    answerContainers.forEach(container => {
+    container.remove();
+    });
+}
+
+function createP(text, classname = '') {
+    let p = document.createElement('p');
+    p.innerText = text;
+    if (classname != '') {
+        p.className = classname;
+    }
+    return p;
+} 
+
+function createTextInnerHTML(text, classname = '') {
+    let p = document.createElement('p');
+    p.innerHTML = text;
+    if (classname != '') {
+        p.className = classname;
+    }
+    return p;
+}

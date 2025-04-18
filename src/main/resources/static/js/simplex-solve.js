@@ -15,55 +15,97 @@ function printInput(input) {
     document.getElementById('input-block').hidden = false;
 }
 
-function parseBasicSimplexAnswer(answer) {
-    parseConvertToLessOrEqual(answer.convertToLessOrEqualStep.constraints, answer.convertToLessOrEqualStep.constraintsIsChanged);
-    let constraintToEqualityStep = answer.constraintToEqualityStep;
-    parseConstraintToEqualityStep(constraintToEqualityStep.constraints, constraintToEqualityStep.constraintsIndexes, constraintToEqualityStep.slackVariablesIndexes);
-    parseFindBasisStep(answer.findBasisStep);
-    parseRemoveNegativeBSteps(answer.removeNegativeBSteps);
-    parseCalculatingDeltasStep(answer.simplexTableWithDeltas, answer.calculateDeltasStep);
-    parseCheckOptimalityStep(answer.optimalityCheckStep);
-    parsePivotIterationsStep(answer.pivotSteps);
-    activateAccordions();
-    document.getElementById('solution-container').hidden = false;
-}
+function parseBasicSimplexAnswer(solution) {
+    let solutionContainer = document.getElementById('solution-container');
+    solutionContainer.innerHTML = '';
+    let algoTitle = document.createElement('h2');
+    algoTitle.innerText = 'Решение базовым симлекс методом';
+    solutionContainer.appendChild(algoTitle);
 
-function parseConvertToLessOrEqual(constraints, isChanged) {
-    let doneTitle = document.getElementById('lessOrEqualDone');
-    let transformBlock = document.getElementById('lessOrEqualTransform');
-    if (!isChanged) {
-        doneTitle.hidden = false;
-        transformBlock.hidden = true;
-        return;
+    let inputBlock = document.getElementById('input-block');
+    removeAnswerContainers();
+
+    inputBlock.appendChild(parseAnswer(solution.answer));
+
+    let lessOrEqualContainer = parseConvertToLessOrEqual(solution.convertToLessOrEqualStep);
+    solutionContainer.appendChild(createP('Шаг 1. Преобразование неравенств со знаком $\\geq$.', 'subtitle'));
+    solutionContainer.appendChild(lessOrEqualContainer);
+
+    let toEqualStep = parseConstraintToEqualityStep(solution.constraintToEqualityStep);
+    solutionContainer.appendChild(createP('Шаг 2. Преобразование ограничений к равенствам.', 'subtitle'));
+    solutionContainer.appendChild(toEqualStep);
+
+    let findBasisStep = parseFindBasisStep(solution.findBasisStep);
+    solutionContainer.appendChild(createP('Шаг 3. Поиск первоначального базиса.', 'subtitle'));
+    solutionContainer.appendChild(findBasisStep);
+
+    let removeNegativeBStep = parseRemoveNegativeBSteps(solution.removeNegativeBSteps);
+    solutionContainer.appendChild(createP('Шаг 4. Исключение отрицательных свободных коэффициентов.', 'subtitle'));
+    solutionContainer.appendChild(removeNegativeBStep);
+
+    if (solution.answer.answerType != 'NEGATIVE_B') {
+        let deltaStep = parseCalculatingDeltasStep(solution.simplexTableWithDeltas, solution.calculateDeltasStep);
+        solutionContainer.appendChild(createP('Шаг 5. Расчёт дельт (оценок).', 'subtitle'));
+        solutionContainer.appendChild(deltaStep);
+
+        let checkOptimalityStep = parseCheckOptimalityStep(solution.optimalityCheckStep);
+        solutionContainer.appendChild(createP('Шаг 6. Проверка оптимальности.', 'subtitle'));
+        solutionContainer.appendChild(checkOptimalityStep);
+
+        let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps);
+        solutionContainer.appendChild(createP('Шаг 7. Итерации симплекс-алгоритма.', 'subtitle'));
+        solutionContainer.appendChild(simplexIterationsStep);
     }
 
-    doneTitle.hidden = true;
+    solutionContainer.appendChild(parseAnswer(solution.answer));
+    activateAccordions();
+    renderKatexElement('solution-container');
+    renderKatexElement('input-block');
+}
+
+function parseConvertToLessOrEqual(step) {
+    const { constraints, constraintsIsChanged } = step;
+    
+    let container = document.createElement('div');
+    container.id = 'lessOrEqualStep';
+
+    container.appendChild(createP('Все ограничения должны быть со знаком $\\leq$ или $=$.'));
+
+    if (!constraintsIsChanged) {
+        container.appendChild(createP('Условие выполнено.'));
+        return container;
+    }
+
+    container.appendChild(createP('Меняем знаки у ограничений с $\\geq$, путём умножения на $-1$:'));
     let constraintsLatex = '';
     for (let i = 0; i < constraints.length; i++) {
         let constraint = constraints[i];
         constraintsLatex += parseLHS(constraint.coefficients) + parseRHS(constraint.operator, constraint.rhs) + '\\\\';
     }
-    constraintsLatex = '\\begin{cases}' + constraintsLatex + '\\end{cases}';
-    updateMathFormula('lessOrEqualsConstraints', constraintsLatex);
-    transformBlock.hidden = false;
+
+    container.appendChild(createP('$\\begin{cases}' + constraintsLatex + '\\end{cases}$', 'latex'));
+    return container;
 }
 
-function parseConstraintToEqualityStep(constraints, constraintsIndexes, slackVariablesIndexes) {
-    document.getElementById('slackVariablesListP').hidden = false;
-    document.getElementById('noSlackVariablesTitle').hidden = true;
+function parseConstraintToEqualityStep(step) {
+    const { constraints, constraintsIndexes, slackVariablesIndexes } = step;
+
+    let container = document.createElement('div');
+    container.id = 'toEqualityStep';
+
+    container.appendChild(createP('Для каждого неравенства добавляется дополнительная переменная, которая называется балансовой.'));
+
     let constraintsLHS = [];
+    let slackVariables = 'Добавленные переменные: ';
 
     if (slackVariablesIndexes.length == 0) {
-        document.getElementById('slackVariablesListP').hidden = true;
-        document.getElementById('noSlackVariablesTitle').hidden = false;
+        container.appendChild(createP('Все ограничения являются равенствами, дополнительные переменные не нужны.'));
     } else if (slackVariablesIndexes.length == 1) {
-        document.getElementById('slackVariablesListSpan').innerHTML = parseValueWithIndex('x', slackVariablesIndexes[0]);
+        slackVariables += parseValueWithIndex('x', slackVariablesIndexes[0]);
     } else if (slackVariablesIndexes.length == 2) {
-        document.getElementById('slackVariablesListSpan').innerHTML = parseValueWithIndex('x', slackVariablesIndexes[0]) 
-        + ' и ' + parseValueWithIndex('x', slackVariablesIndexes[1]);
+        slackVariables += `${parseValueWithIndex('x', slackVariablesIndexes[0])} и ${parseValueWithIndex('x', slackVariablesIndexes[1])}`;
     } else {
-        document.getElementById('slackVariablesListSpan').innerHTML = parseValueWithIndex('x', slackVariablesIndexes[0]) 
-        + '...' + parseValueWithIndex('x', slackVariablesIndexes[slackVariablesIndexes.length - 1]);
+        slackVariables += `${parseValueWithIndex('x', slackVariablesIndexes[0])}...${parseValueWithIndex('x', slackVariablesIndexes[slackVariablesIndexes.length - 1])}`;
     }
     
     for (let i = 0; i < constraints.length; i++) {
@@ -81,66 +123,60 @@ function parseConstraintToEqualityStep(constraints, constraintsIndexes, slackVar
         let constraint = constraints[i];
         constraintsLatex += constraintsLHS[i] + parseRHS('EQ', constraint.rhs) + '\\\\';
     }
-    constraintsLatex = '\\begin{cases}' + constraintsLatex + '\\end{cases}';
-    updateMathFormula('equalityConstraints', constraintsLatex);
+    container.appendChild(createP('$\\begin{cases}' + constraintsLatex + '\\end{cases}$', 'latex'));
+    container.appendChild(createP('Добавленные переменные выделены оранжевым цветом.'));
+    return container;
 }
 
 function parseFindBasisStep(step) {
-    const container = document.getElementById('findBasisStepContainer');
-    container.innerHTML = '';
+    const container = document.createElement('div');
+    container.id = 'findBasisStepContainer';
 
     for(let i = 0; i < step.slackBasisTable.basis.length; i++) {
         let basisIndex = step.slackBasisTable.basis[i];
         if (basisIndex == -1) continue;
-        let slackBasisTitle = document.createElement('p');
-        console.log(basisIndex);
-        slackBasisTitle.innerText = `Ограничение ${i + 1} содержит балансовую переменную $x_${basisIndex + 1}$. Она входит в базис.`
-        container.appendChild(slackBasisTitle);
+        container.appendChild(createP(`Ограничение ${i + 1} содержит балансовую переменную $x_${basisIndex + 1}$. Она входит в базис.`));
     }
 
     parseSimplexTable(step.slackBasisTable, container);
 
     for (let i = 0; i < step.subSteps.length; i++) {
-        let hrHTML = document.createElement('hr');
-        container.appendChild(hrHTML);
-        let subStep = step.subSteps[i];
+        container.appendChild(document.createElement('hr'));
+        const { simplexTableBefore, simplexTableAfter, method, row, column, pivotElement } = step.subSteps[i];
         let beforeBasisAddingTitle = document.createElement('p');
         let afterBasisAddingTitle = document.createElement('p');
-        if (subStep.method == 'GAUSS') {
-            beforeBasisAddingTitle.innerText = `Для ограничения $${subStep.row + 1}$ найдём первый столбец, который ещё не входит в базис.\n` + 
-                                               `Таким столбцом является $${subStep.column + 1}$ столбец.\n` +
+        if (method == 'GAUSS') {
+            beforeBasisAddingTitle.innerText = `Для ограничения $${row + 1}$ найдём первый столбец, который ещё не входит в базис.\n` + 
+                                               `Таким столбцом является $${column + 1}$ столбец.\n` +
                                                `Для того, чтобы столбец стал базисным, необходимо преобразовать его в единичный столбец, ` + 
-                                               `где в строке $${subStep.row + 1}$ будет единица, а в остальных строках - нули.\n`;
+                                               `где в строке $${row + 1}$ будет единица, а в остальных строках - нули.\n`;
 
-            afterBasisAddingTitle.innerText = `Делим строку $${subStep.row + 1}$ на $${fractionToLatex(subStep.pivotElement)}$. Из остальных строк вычитаем строку $${subStep.row + 1}$, умноженную на соответствующий элемент в столбце $${subStep.column + 1}$.\n` +
-                                              `Базисной переменной для ограничения $${subStep.row + 1}$ становится $x_${subStep.column + 1}$.`;
-        } else if (subStep.method == 'SINGLE_NONZERO') {
-            beforeBasisAddingTitle.innerText = `Для ограничения $${subStep.row + 1}$ найдём столбец, в котором одно число является ненулевым.\n` + 
-                                               `Таким столбцом является $${subStep.column + 1}$ столбец.\n` +
+            afterBasisAddingTitle.innerText = `Делим строку $${row + 1}$ на $${fractionToLatex(pivotElement)}$. Из остальных строк вычитаем строку $${row + 1}$, умноженную на соответствующий элемент в столбце $${column + 1}$.\n` +
+                                              `Базисной переменной для ограничения $${row + 1}$ становится $x_${column + 1}$.`;
+        } else if (method == 'SINGLE_NONZERO') {
+            beforeBasisAddingTitle.innerText = `Для ограничения $${row + 1}$ найдём столбец, в котором одно число является ненулевым.\n` + 
+                                               `Таким столбцом является $${column + 1}$ столбец.\n` +
                                                `Для того, чтобы столбец стал базисным, необходимо преобразовать его в единичный столбец, ` + 
-                                               `где в строке $${subStep.row + 1}$ будет единица, а в остальных строках - нули.\n`;
+                                               `где в строке $${row + 1}$ будет единица, а в остальных строках - нули.\n`;
         
-            afterBasisAddingTitle.innerText = `Делим строку $${subStep.row + 1}$ на $${fractionToLatex(subStep.pivotElement)}$.\n` +
-                                              `Базисной переменной для ограничения $${subStep.row + 1}$ становится $x_${subStep.column + 1}$.`;
-        } else if (subStep.method == 'UNIT_COLUMN') {
-            beforeBasisAddingTitle.innerText = `Для ограничения $${subStep.row + 1}$ найдём столбец, в котором одно число является $1$, а другие равны $0$.\n` +
-                                               `Таким столбцом является $${subStep.column + 1}$ столбец.\n`;
+            afterBasisAddingTitle.innerText = `Делим строку $${row + 1}$ на $${fractionToLatex(pivotElement)}$.\n` +
+                                              `Базисной переменной для ограничения $${row + 1}$ становится $x_${column + 1}$.`;
+        } else if (method == 'UNIT_COLUMN') {
+            beforeBasisAddingTitle.innerText = `Для ограничения $${row + 1}$ найдём столбец, в котором одно число является $1$, а другие равны $0$.\n` +
+                                               `Таким столбцом является $${column + 1}$ столбец.\n`;
 
-            afterBasisAddingTitle.innerText = `Базисной переменной для ограничения $${subStep.row + 1}$ становится $x_${subStep.column + 1}$.`;
+            afterBasisAddingTitle.innerText = `Базисной переменной для ограничения $${row + 1}$ становится $x_${column + 1}$.`;
         }
 
         container.appendChild(beforeBasisAddingTitle);
-        let beforeTable = parseSimplexTable(subStep.simplexTableBefore, container);
-        highlightRowColumnAndIntersection(beforeTable, subStep.row + 2, subStep.column + 1);
+        let beforeTable = parseSimplexTable(simplexTableBefore, container);
+        highlightRowColumnAndIntersection(beforeTable, row + 2, column + 1);
         container.appendChild(afterBasisAddingTitle);
-        parseSimplexTable(subStep.simplexTableAfter, container);
+        parseSimplexTable(simplexTableAfter, container);
     }
 
-    let basisFoundP = document.createElement('p');
-    basisFoundP.innerText = 'Базиз успешно найден.';
-    container.appendChild(basisFoundP);
-    
-    renderKatexElement('findBasisStepContainer');
+    container.appendChild(createP('Базиз успешно найден.'));
+    return container;
 }
 
 function parseSimplexTable(simplexTable, container, withDeltas = false) {
@@ -226,51 +262,57 @@ function highlightRowColumnAndIntersection(table, rowIndex, columnIndex) {
 }
 
 function parseRemoveNegativeBSteps(steps) {
-    let container = document.getElementById('removeNegativeBStepContainer');
-    container.innerHTML = '';
+    let container = document.createElement('div');
+    container.id = 'removeNegativeBStepContainer';
 
     if (steps.length == 0) {
-        let noNegativeBTitle = document.createElement('p');
-        noNegativeBTitle.innerText = 'Отрицательных свободных коэффициентов нет.'
-        container.appendChild(noNegativeBTitle);
+        container.appendChild(createP('Отрицательных свободных коэффициентов нет.'));
     }
 
     for (let i = 0; i < steps.length; i++) {
         if (i != 0) {
-            let hrHTML = document.createElement('hr');
-            container.appendChild(hrHTML);
+            container.appendChild(document.createElement('hr'));
         }
-        let step = steps[i];
+        const { success, simplexTableBefore, simplexTableAfter, row, column, oldBasis, maxNegativeRowElement, maxNegativeB } = steps[i];
+
         let beforeSimplexTableP = document.createElement('p');
         beforeSimplexTableP.innerText = 'В столбце $b$ присутствуют отрицательные значения.'
         container.appendChild(beforeSimplexTableP);
 
-        let beforeTable = parseSimplexTable(step.simplexTableBefore, container);
-        highlightRowColumnAndIntersection(beforeTable, step.row + 2, step.column + 1);
+        let beforeTable = parseSimplexTable(simplexTableBefore, container);
+        highlightRowColumnAndIntersection(beforeTable, row + 2, column + 1);
 
         let afterSimplexTableP = document.createElement('p');
-        afterSimplexTableP.innerText = `Максимальный по модулю свободный коэффициент среди отрицательных $${fractionToLatex(step.maxNegativeB)}$ находится в строке $${step.row + 1}$.\n` +
-                                       `Максимальное по модулю число среди отрицательных в строке $${step.row + 1} = ${fractionToLatex(step.maxNegativeRowElement)}$.\n` +
-                                       `Заменяем базисную переменную $x_${step.oldBasis + 1}$ на $x_${step.column + 1}$.\n` + 
-                                       `Делим строку $${step.row + 1}$ на $${fractionToLatex(step.maxNegativeRowElement)}$. Из остальных строк вычитаем строку $${step.row + 1}$, умноженную на соответствующий элемент в столбце $${step.column + 1}$.`
+
+        if (!success) {
+            afterSimplexTableP.innerText = `Максимальный по модулю свободный коэффициент среди отрицательных $${fractionToLatex(maxNegativeB)}$ находится в строке $${row + 1}$.\n` + 
+                                           `В строке $${row + 1}$ отсутствуют отрицательные значения. Решения задачи не существует.`;
+            
+            container.appendChild(afterSimplexTableP);
+            return container;
+        }
+
+        afterSimplexTableP.innerText = `Максимальный по модулю свободный коэффициент среди отрицательных $${fractionToLatex(maxNegativeB)}$ находится в строке $${row + 1}$.\n` +
+                                       `Максимальное по модулю число среди отрицательных в строке $${row + 1} = ${fractionToLatex(maxNegativeRowElement)}$.\n` +
+                                       `Заменяем базисную переменную $x_${oldBasis + 1}$ на $x_${column + 1}$.\n` + 
+                                       `Делим строку $${row + 1}$ на $${fractionToLatex(maxNegativeRowElement)}$. Из остальных строк вычитаем строку $${row + 1}$, умноженную на соответствующий элемент в столбце $${column + 1}$.`
         container.appendChild(afterSimplexTableP);
 
-        parseSimplexTable(step.simplexTableAfter, container);
+        parseSimplexTable(simplexTableAfter, container);
     }
 
-    renderKatexElement('removeNegativeBStepContainer');
+    return container;
 }
 
 function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
-    let container = document.getElementById('deltaCalculatingStep');
-    container.innerHTML = '';
+    let container = document.createElement('div');
+    container.id = 'deltaCalculatingStep';
 
     let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, simplexTable.tableau[simplexTable.tableau.length - 1], simplexTable.basis);
     container.appendChild(deltasAccordion);
     
     parseSimplexTable(simplexTable, container, true);
-
-    renderKatexElement('deltaCalculatingStep');
+    return container;
 }
 
 function parseDeltasCalculationsAccordion(step, deltas, basis) {
@@ -306,19 +348,25 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
         let p = document.createElement('p');
         p.innerText = `$\\Delta_${i + 1} = `;
         
-        for (let j = 0; j < step.varLabels.length; j += 2) {
+        for (let j = 0; j < step.varLabels.length - 1; j += 2) {
             p.innerText += step.varLabels[i][j] + " \\cdot " + step.varLabels[i][j + 1];
-            if (j + 2 < step.varLabels.length) {
+            if (j + 2 < step.varLabels.length - 1) {
                 p.innerText += " + ";
             }
         }
 
         p.innerText += ' - C_' + (i + 1) + " = ";
 
-        for (let j = 0; j < step.varLabels.length; j += 2) {
-            p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot " + fractionToLatex(step.varValues[i][j + 1]);
-            if (j + 2 < step.varValues.length) {
-                p.innerText += " + ";
+        for (let j = 0; j < step.varLabels.length - 1; j += 2) {
+            if (j != 0) {
+                if (step.varValues[i][j].numerator >= 0) {
+                    p.innerText += " + ";
+                }
+            }
+            if (step.varValues[i][j + 1].numerator >= 0) {
+                p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot " + fractionToLatex(step.varValues[i][j + 1]);
+            } else {
+                p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot (" + fractionToLatex(step.varValues[i][j + 1]) + ")";
             }
         }
 
@@ -330,11 +378,13 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
 }
 
 function parseCheckOptimalityStep(step) {
-    let container = document.getElementById('optimalityCheckStep');
-    container.innerHTML = '';
+    let container = document.createElement('div');
+    container.id = 'optimalityCheckStep';
 
     let optimality = parseCheckOptimality(step);
     container.appendChild(optimality);
+
+    return container;
 }
 
 function parseCheckOptimality(step) {
@@ -365,22 +415,23 @@ function parseCheckOptimality(step) {
 }
 
 function parsePivotIterationsStep(pivotSteps) {
-    let container = document.getElementById('simplexIterationsStep');
+    let container = document.createElement('div');
     container.innerHTML = '';
 
     for (let i = 0; i < pivotSteps.length; i++) {
-        let iterationTitle = document.createElement('p');
-        iterationTitle.className = 'subtitle';
-        iterationTitle.innerText = `Итерация ${i + 1}.`;
         let step = pivotSteps[i];
-        let newSimplexTable = step.simplexTableAfter;
-        let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, newSimplexTable.tableau[newSimplexTable.tableau.length - 1], newSimplexTable.basis);
-        let optimalCheck = parseCheckOptimality(step.optimalityCheckStep);
-        container.appendChild(iterationTitle);
-        container.appendChild(parsePivotIteration(step, deltasAccordion, optimalCheck));
+        container.appendChild(createP(`Итерация ${i + 1}.`, 'subtitle'));
+        if (step.success) {
+            let newSimplexTable = step.simplexTableAfter;
+            let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, newSimplexTable.tableau[newSimplexTable.tableau.length - 1], newSimplexTable.basis);
+            let optimalCheck = parseCheckOptimality(step.optimalityCheckStep);
+            container.appendChild(parsePivotIteration(step, deltasAccordion, optimalCheck));
+        } else {
+            container.appendChild(parsePivotIteration(step, null, null));
+        }
     }
 
-    renderKatexElement('simplexIterationsStep');
+    return container;
 }
 
 function parsePivotIteration(step, deltasAccordion, optimalCheck) {
@@ -389,9 +440,29 @@ function parsePivotIteration(step, deltasAccordion, optimalCheck) {
     let beforeTableP = document.createElement('p');
     let afterTableP = document.createElement('p');
 
+    if (step.success == false) {
+        parseSimplexTable(step.simplexTableBefore, container, true);
+        if (step.direction == 'MAX') {
+            beforeTableP.innerText += `Определяем стобец, в котором находится минимальная дельта.\n` + 
+            `Минимальная дельта: $${fractionToLatex(step.minDelta)}$. Разрешающий столбец: $${step.column + 1}$.\n` + 
+            `Все значения столбца $${step.column + 1}$ неположительны.\n` + 
+            `На позиции $${step.column + 1}$ в строке стоимостей $(C)$ стоит положительный элемент.\n` + 
+            `Следовательно, функция неограниченно возрастает.`; 
+        } else {
+            beforeTableP.innerText += `Определяем стобец, в котором находится минимальная дельта.\n` + 
+            `Минимальная дельта: $${fractionToLatex(step.minDelta)}$. Разрешающий столбец: $${step.column + 1}$.\n` + 
+            `Все значения столбца $${step.column + 1}$ неположительны.\n` + 
+            `На позиции $${step.column + 1}$ в строке стоимостей $(С)$ стоит отрицательный элемент.\n` + 
+            `Следовательно, функция неограниченно убывает.`;
+        }
+        
+        container.appendChild(beforeTableP);
+        return container;
+    }
+
     beforeTableP.innerText += 'Определяем стобец, в котором находится минимальная дельта.\n' + 
                               `Минимальная дельта: $${fractionToLatex(step.minDelta)}$. Разрешающий столбец: $${step.column + 1}$.\n` + 
-                              `Находим симплекс-отношения ($Q$), путём деления свободных коэффициентов ($b$) на соответствующие значения столбца $${step.column + 1}$.\n` +
+                              `Находим симплекс-отношения ($Q$), путём деления свободных коэффициентов ($b$) на соответствующие неотрицательные значения столбца $${step.column + 1}$.\n` +
                               'В найденном столбце ищем минимальное неотрицательное значение сиплекс-отношения ($Q$).\n' +
                               `Минимальное значение симплекс-отношения $Q_{min}=${fractionToLatex(step.targetQ)}$. Разрешающая строка: $${step.row + 1}$.\n` +
                               `На пересечении найденных столбца и строки находится разрешающий элемент: $${fractionToLatex(step.pivotElement)}$`;
@@ -406,8 +477,8 @@ function parsePivotIteration(step, deltasAccordion, optimalCheck) {
                              `Переменная $x_${step.lastBasisVariableIndex + 1}$ выводится из базиса.`;
     
     container.appendChild(afterTableP);
+    parseSimplexTable(step.simplexTableAfter, container, true);
     container.appendChild(deltasAccordion);
-    let afterTable = parseSimplexTable(step.simplexTableAfter, container, true);
     container.appendChild(optimalCheck);
     return container;
 }
@@ -428,4 +499,32 @@ function addQColumn(table, step) {
         }
         row.appendChild(qCell);
     }
+}
+
+function parseAnswer(answer) {
+    let container = document.createElement('div');
+    container.className = 'answerContainer';
+    let answerP = document.createElement('p');
+    let titleP = document.createElement('p');
+    titleP.className = 'subtitle';
+    titleP.innerText = 'Ответ';
+
+    if (answer.answerType == 'SUCCESS') {
+        answerP.innerText = '$';
+        for (let i = 0; i < answer.variablesValues.length; i++) {
+            answerP.innerText += `x_${i + 1} = ${fractionToLatex(answer.variablesValues[i])},`;
+        }
+    
+        answerP.innerText += `F = ${fractionToLatex(answer.objectiveValue)}$`;
+    } else if (answer.answerType == 'NEGATIVE_B') {
+        answerP.innerText = 'Решения задачи не существует.';
+    } else if (answer.answerType == 'MAX_UNBOUNDED') {
+        answerP.innerText = 'Функция неограниченно возрастает. Оптимального решения нет.';
+    } else if (answer.answerType == 'MIN_UNBOUNDED') {
+        answerP.innerText = 'Функция неограниченно убывает. Оптимального решения нет.';
+    }
+
+    container.appendChild(titleP);
+    container.appendChild(answerP);
+    return container;
 }

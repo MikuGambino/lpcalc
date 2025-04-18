@@ -1,6 +1,7 @@
 package com.mg.lpcalc.simplex.model.solution;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.model.enums.Direction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,6 @@ public class PivotStep {
     private List<Fraction> simplexRelations;
     private List<Fraction> bCoefficients;
     private List<Fraction> columnCoefficients;
+    private boolean success;
+    private Direction direction;
 }

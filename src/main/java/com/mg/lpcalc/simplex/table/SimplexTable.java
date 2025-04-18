@@ -2,9 +2,10 @@ package com.mg.lpcalc.simplex.table;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
-import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
+import com.mg.lpcalc.simplex.model.solution.Answer;
+import com.mg.lpcalc.simplex.model.solution.AnswerType;
 import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import lombok.Data;
@@ -29,8 +30,12 @@ public abstract class SimplexTable {
 
     public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
         int pivotColumn = findPivotColumn(direction);
-        if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) System.out.println("Убывает");
-        if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) System.out.println("Возрастает");
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) {
+            solutionBuilder.addUnsuccessfulPivotStep(pivotColumn, Direction.MIN, new SimplexTableDTO(this));
+        }
+        if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) {
+            solutionBuilder.addUnsuccessfulPivotStep(pivotColumn, Direction.MAX, new SimplexTableDTO(this));
+        }
     }
 
     // Возвращает индекс Fraction.ONE если единичный вектор существует
@@ -238,7 +243,7 @@ public abstract class SimplexTable {
         }
 
         Fraction objectiveValue = tableau[numConstraints][numColumns - 1];
-        return new Answer();
+        return new Answer(AnswerType.SUCCESS, variablesValues, objectiveValue);
     }
 
     public void checkIndexes(int row, int column) {

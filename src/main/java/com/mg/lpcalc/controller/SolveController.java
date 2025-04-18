@@ -3,7 +3,7 @@ package com.mg.lpcalc.controller;
 import com.mg.lpcalc.graphical.solver.GraphicalSolver;
 import com.mg.lpcalc.graphical.solver.model.converter.GraphicalOptimizationProblemConverter;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
-import com.mg.lpcalc.simplex.model.solution.Answer;
+import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solver.SimplexSolver;
 import com.mg.lpcalc.simplex.model.converter.SimplexOptimizationProblemConverter;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,10 @@ public class SolveController {
     }
 
     @PostMapping("/simplex")
-    public Answer simplexSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
+    public Solution simplexSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
         SimplexSolver simplexSolver = new SimplexSolver(simplexConverter.convert(optimizationProblemDTO));
-        return simplexSolver.solve();
+        Solution solution = simplexSolver.solve();
+        System.out.println(solution);
+        return solution;
     }
 }
