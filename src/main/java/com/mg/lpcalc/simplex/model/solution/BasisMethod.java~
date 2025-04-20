@@ -1,4 +1,0 @@
-package com.mg.lpcalc.simplex.model.solution;
-
-public enum BasisMethod {
-}
