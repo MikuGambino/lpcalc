@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 public class SimplexSolutionBuilder {
     // todo добавить поле какой метод или отдельный класс для каждого метода
-    private Solution solution = new Solution();
+    private BasicSimplexSolution basicSimplexSolution = new BasicSimplexSolution();
     private Direction direction;
     private List<Constraint> constraints;
     private SimplexTableDTO initialSimplexTable;
@@ -34,9 +34,10 @@ public class SimplexSolutionBuilder {
 
     public void convertToLessOrEqual(List<Constraint> constraints, boolean constraintsIsChanged) {
         ConstraintTransformStep constraintTransformStep = new ConstraintTransformStep(constraints, constraintsIsChanged);
-        solution.setConvertToLessOrEqualStep(constraintTransformStep);
+        basicSimplexSolution.setConvertToLessOrEqualStep(constraintTransformStep);
     }
 
+    // todo переделать как в BigM
     public void addSlackVariable(int slackIndex, int constraintIndex) {
         slackVariablesIndexes.add(slackIndex);
         constraintsIndexes.add(constraintIndex);
@@ -45,7 +46,7 @@ public class SimplexSolutionBuilder {
     public void tableInitComplete(BasicSimplexTable simplexTable) {
         ConstraintToEqualityStep step = new ConstraintToEqualityStep(constraints, slackVariablesIndexes, constraintsIndexes);
         this.initialSimplexTable = new SimplexTableDTO(simplexTable);
-        solution.setConstraintToEqualityStep(step);
+        basicSimplexSolution.setConstraintToEqualityStep(step);
     }
 
     public void setSlackBasis(int[] basis) {
@@ -66,7 +67,7 @@ public class SimplexSolutionBuilder {
     }
 
     public void basisFound() {
-        solution.setFindBasisStep(new FindBasisStep(initialSimplexTable, findBasisSubSteps));
+        basicSimplexSolution.setFindBasisStep(new FindBasisStep(initialSimplexTable, findBasisSubSteps));
     }
 
     public void addRemoveNegativeBStep(int column, int row, SimplexTableDTO simplexTableBefore, BasicSimplexTable simplexTableAfter) {
@@ -76,7 +77,7 @@ public class SimplexSolutionBuilder {
         int oldBasis = simplexTableBefore.getBasis()[row];
         RemoveNegativeBStep step = new RemoveNegativeBStep(column, row, oldBasis, simplexTableBefore,
                 simplexTableAfterDTO, maxNegativeB, maxNegativeRowElement, true);
-        solution.getRemoveNegativeBSteps().add(step);
+        basicSimplexSolution.getRemoveNegativeBSteps().add(step);
     }
 
     public void addUnsuccessfulNegativeBStep(int row, SimplexTableDTO simplexTableBefore) {
@@ -87,13 +88,13 @@ public class SimplexSolutionBuilder {
                 .row(row)
                 .success(false)
                 .build();
-        solution.getRemoveNegativeBSteps().add(step);
-        solution.setAnswer(new Answer(AnswerType.NEGATIVE_B));
+        basicSimplexSolution.getRemoveNegativeBSteps().add(step);
+        basicSimplexSolution.setAnswer(new Answer(AnswerType.NEGATIVE_B));
     }
 
     public void setSimplexTableWithDeltas(SimplexTableDTO simplexTableDTO) {
-        solution.setSimplexTableWithDeltas(simplexTableDTO);
-        solution.setCalculateDeltasStep(calculateDeltasStep);
+        basicSimplexSolution.setSimplexTableWithDeltas(simplexTableDTO);
+        basicSimplexSolution.setCalculateDeltasStep(calculateDeltasStep);
     }
 
     public void startCalculateDeltas() {
@@ -119,7 +120,7 @@ public class SimplexSolutionBuilder {
     }
 
     public void addOptimalityCheckStep(boolean optimal) {
-        this.solution.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
+        this.basicSimplexSolution.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
     }
 
     public void saveSimplexRelations(List<Fraction> simplexRelations, Fraction targetQ) {
@@ -167,12 +168,12 @@ public class SimplexSolutionBuilder {
                 .simplexTableBefore(simplexTable)
                 .build();
 
-        this.solution.getPivotSteps().add(pivotStep);
+        this.basicSimplexSolution.getPivotSteps().add(pivotStep);
 
         if (Direction.MAX.equals(direction)) {
-            solution.setAnswer(new Answer(AnswerType.MAX_UNBOUNDED));
+            basicSimplexSolution.setAnswer(new Answer(AnswerType.MAX_UNBOUNDED));
         } else {
-            solution.setAnswer(new Answer(AnswerType.MIN_UNBOUNDED));
+            basicSimplexSolution.setAnswer(new Answer(AnswerType.MIN_UNBOUNDED));
         }
     }
 
@@ -180,6 +181,6 @@ public class SimplexSolutionBuilder {
         this.pivotStep.setSimplexTableAfter(simplexTableAfterDTO);
         this.pivotStep.setCalculateDeltasStep(this.calculateDeltasStep);
         this.pivotStep.setOptimalityCheckStep(new OptimalityCheckStep(isOptimal, direction));
-        this.solution.getPivotSteps().add(pivotStep);
+        this.basicSimplexSolution.getPivotSteps().add(pivotStep);
     }
 }

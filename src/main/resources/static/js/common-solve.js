@@ -1,8 +1,3 @@
-
-function parseValueWithIndex(value, index) {
-    return value + '<sub>' + index + '</sub>';
-}
-
 function activateAccordions() {
     document.querySelectorAll('.accordion-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
@@ -35,12 +30,3 @@ function createP(text, classname = '') {
     }
     return p;
 } 
-
-function createTextInnerHTML(text, classname = '') {
-    let p = document.createElement('p');
-    p.innerHTML = text;
-    if (classname != '') {
-        p.className = classname;
-    }
-    return p;
-}

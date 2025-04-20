@@ -3,13 +3,10 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
-import com.mg.lpcalc.simplex.model.solution.Answer;
-import com.mg.lpcalc.simplex.model.solution.Solution;
+import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
-import com.mg.lpcalc.simplex.model.solution.BasisMethod;
-import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 
@@ -55,7 +52,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         if (simplexTable.isContainsNegativeB()) {
             boolean success = removeNegativeB();
             if (!success) {
-                return solutionBuilder.getSolution();
+                return solutionBuilder.getBasicSimplexSolution();
             }
         }
 
@@ -68,7 +65,7 @@ public class BasicSimplexMethod implements SimplexMethod {
             boolean success = simplexTable.pivot(direction);
             if (!success) {
                 simplexTable.checkUnboundedDirection(direction, objectiveFunc);
-                return solutionBuilder.getSolution();
+                return solutionBuilder.getBasicSimplexSolution();
             }
             simplexTable.calculateDeltas();
             simplexTable.print();
@@ -76,9 +73,9 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        Solution solution = solutionBuilder.getSolution();
-        solution.setAnswer(answer);
-        return solution;
+        BasicSimplexSolution basicSimplexSolution = solutionBuilder.getBasicSimplexSolution();
+        basicSimplexSolution.setAnswer(answer);
+        return basicSimplexSolution;
     }
 
     private boolean removeNegativeB() {

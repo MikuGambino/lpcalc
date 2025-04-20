@@ -7,7 +7,6 @@ import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.solution.BasicSimplexSolution;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
@@ -37,7 +36,7 @@ public class BigMMethod implements SimplexMethod {
     }
 
     @Override
-    public Solution run() {
+    public BasicSimplexSolution run() {
         makeFreeCoefficientsPositive();
         countAuxVariables();
 
@@ -74,7 +73,7 @@ public class BigMMethod implements SimplexMethod {
 
         Answer answer = simplexTable.getFinalAnswer();
 
-        return solutionBuilder.getSolution();
+        return null;
 //        return solutionBuilder.getBasicSimplexSolution();
     }
 

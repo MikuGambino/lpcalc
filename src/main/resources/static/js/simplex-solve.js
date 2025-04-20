@@ -101,12 +101,14 @@ function parseConstraintToEqualityStep(step) {
     if (slackVariablesIndexes.length == 0) {
         container.appendChild(createP('Все ограничения являются равенствами, дополнительные переменные не нужны.'));
     } else if (slackVariablesIndexes.length == 1) {
-        slackVariables += parseValueWithIndex('x', slackVariablesIndexes[0]);
+        slackVariables += `$x_${slackVariablesIndexes[0]}$.`;
     } else if (slackVariablesIndexes.length == 2) {
-        slackVariables += `${parseValueWithIndex('x', slackVariablesIndexes[0])} и ${parseValueWithIndex('x', slackVariablesIndexes[1])}`;
+        slackVariables += `$x_${slackVariablesIndexes[0]}$ и $x_${slackVariablesIndexes[1]}$.`;
     } else {
-        slackVariables += `${parseValueWithIndex('x', slackVariablesIndexes[0])}...${parseValueWithIndex('x', slackVariablesIndexes[slackVariablesIndexes.length - 1])}`;
+        slackVariables += `$x_${slackVariablesIndexes[0]}$...$x_${slackVariablesIndexes[slackVariablesIndexes.length - 1]}$.`;
     }
+
+    container.appendChild(createP(slackVariables));
     
     for (let i = 0; i < constraints.length; i++) {
         let constraint = constraints[i];

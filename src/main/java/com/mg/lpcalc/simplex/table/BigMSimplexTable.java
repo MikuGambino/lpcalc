@@ -4,8 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
-import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,9 +13,12 @@ public class BigMSimplexTable extends SimplexTable {
 
     private Fraction[] mValues;
     private Direction direction;
+    private SimplexSolutionBuilderBigM builderBigM;
 
     public BigMSimplexTable(int numSlack, int numAux, int numVars, int numConstraints, Fraction[] costs,
-                            List<Constraint> constraints, Direction direction) {
+                            List<Constraint> constraints, Direction direction, SimplexSolutionBuilderBigM builder) {
+        this.builderBigM = builder;
+        this.solutionBuilder = builderBigM.getBuilder();
         this.costs = costs;
         this.numSlack = numSlack;
         this.direction = direction;
@@ -47,12 +49,15 @@ public class BigMSimplexTable extends SimplexTable {
 
             // добавляем переменные балансировки
             if (constraint.getOperator().equals(Operator.LEQ) || constraint.getOperator().equals(Operator.GEQ)) {
+                Fraction variable;
                 if (constraint.getOperator().equals(Operator.LEQ)) {
-                    tableau[i][numVars + curSlackCount] = Fraction.ONE;
+                    variable = Fraction.ONE;
                 } else {
-                    tableau[i][numVars + curSlackCount] = Fraction.ONE.negate();
+                    variable = Fraction.ONE.negate();
                 }
+                tableau[i][numVars + curSlackCount] = variable;
                 basis[i] = numVars + curSlackCount;
+                builderBigM.addSlackVariable(numVars + curSlackCount + 1, i, variable);
                 curSlackCount++;
             }
 
@@ -66,9 +71,12 @@ public class BigMSimplexTable extends SimplexTable {
             if (!constraint.getOperator().equals(Operator.LEQ)) {
                 tableau[i][numVars + curSlackCount + curAuxCount] = Fraction.ONE;
                 basis[i] = numVars + curSlackCount + curAuxCount;
+                builderBigM.addArtificialVariable(curAuxCount + 1, i);
                 curAuxCount++;
             }
         }
+
+        builderBigM.tableInit();
     }
 
     public void calculateDeltas() {
@@ -168,7 +176,7 @@ public class BigMSimplexTable extends SimplexTable {
         System.out.println(Arrays.toString(mValues));
     }
 
-    public boolean pivot(Direction direction, SimplexSolutionBuilder solutionBuilder) {
+    public boolean pivot(Direction direction, SimplexSolutionBuilderBigM solutionBuilder) {
         int pivotColumn = findPivotColumn(direction);
         int pivotRow = findPivotRow(pivotColumn);
         if (pivotRow == -1) {
