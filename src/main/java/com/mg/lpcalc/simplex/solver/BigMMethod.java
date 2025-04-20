@@ -48,7 +48,7 @@ public class BigMMethod implements SimplexMethod {
                 numConstraints,
                 getCosts(),
                 constraints,
-                direction,
+                objectiveFunc,
                 solutionBuilder
         );
 

@@ -9,6 +9,10 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 1. Преобразование ограничений к равенствам и добавление искуственных переменных.', 'subtitle'));
     solutionContainer.appendChild(addSlackAndArtStep);
 
+    let modifyObjectiveFuncStep = parseModifyObjectiveFuncStep(solution.modifyObjectiveFuncStep);
+    solutionContainer.appendChild(createP('Шаг 2. Модификация целевой функции.', 'subtitle'));
+    solutionContainer.appendChild(modifyObjectiveFuncStep);
+
     activateAccordions();
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
@@ -60,5 +64,34 @@ function parseAddSlackAndArtVariables(step) {
     }
     container.appendChild(createP('$\\begin{cases}' + constraintsLatex + '\\end{cases}$', 'latex'));
     container.appendChild(createP('Добавленные переменные выделены оранжевым цветом.'));
+    return container;
+}
+
+function parseModifyObjectiveFuncStep(step) {
+    const { artVariablesCount, objectiveFunc } = step;
+
+    let container = document.createElement('div');
+    container.id = 'modifyObjectiveFuncStep';
+
+    if (artVariablesCount == 0) {
+        container.appendChild(createP('Искуственные переменные не были добавлены. Модификация не нужна.'));
+        return container;
+    }
+
+    let objectiveLatex = '$F = ' + parseLHS(objectiveFunc.coefficients);
+    let sign;
+    if (objectiveFunc.direction == 'MAX') {
+        sign = '-';
+        container.appendChild(createP('В целевую функцию добавляем искусственные пременные с коэффициентом $-M$, где $M$ — очень большое число.'));
+    } else {
+        container.appendChild(createP('В целевую функцию добавляем искусственные пременные с коэффициентом $M$, где $M$ — очень большое число.'));
+        sign = '+';
+    }
+
+    for (let i = 0; i < artVariablesCount; i++) {
+        objectiveLatex += sign + 'Mu_' + (i + 1) + '$';
+    }
+
+    container.appendChild(createP(objectiveLatex, 'latex'));
     return container;
 }

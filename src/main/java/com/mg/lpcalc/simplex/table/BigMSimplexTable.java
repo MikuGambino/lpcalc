@@ -4,6 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
 
 import java.util.Arrays;
@@ -16,12 +17,12 @@ public class BigMSimplexTable extends SimplexTable {
     private SimplexSolutionBuilderBigM builderBigM;
 
     public BigMSimplexTable(int numSlack, int numAux, int numVars, int numConstraints, Fraction[] costs,
-                            List<Constraint> constraints, Direction direction, SimplexSolutionBuilderBigM builder) {
+                            List<Constraint> constraints, ObjectiveFunc objectiveFunc, SimplexSolutionBuilderBigM builder) {
         this.builderBigM = builder;
         this.solutionBuilder = builderBigM.getBuilder();
         this.costs = costs;
         this.numSlack = numSlack;
-        this.direction = direction;
+        this.direction = objectiveFunc.getDirection();
         this.numColumns = numVars + numSlack + numAux + 1;
         this.basis = new int[numConstraints];
         this.mValues = new Fraction[numColumns];
@@ -32,7 +33,7 @@ public class BigMSimplexTable extends SimplexTable {
         this.numVars = numVars;
         this.numConstraints = numConstraints;
         int curSlackCount = 0;
-        int curAuxCount = 0;
+        int curArtVariables = 0;
 
         // +1 строка для целевой функции, +1 столбец для правой части (RHS)
         this.tableau = new Fraction[numConstraints + 1][numVars + numSlack + numAux + 1];
@@ -69,14 +70,14 @@ public class BigMSimplexTable extends SimplexTable {
         for (int i = 0; i < numConstraints; i++) {
             Constraint constraint = constraints.get(i);
             if (!constraint.getOperator().equals(Operator.LEQ)) {
-                tableau[i][numVars + curSlackCount + curAuxCount] = Fraction.ONE;
-                basis[i] = numVars + curSlackCount + curAuxCount;
-                builderBigM.addArtificialVariable(curAuxCount + 1, i);
-                curAuxCount++;
+                tableau[i][numVars + curSlackCount + curArtVariables] = Fraction.ONE;
+                basis[i] = numVars + curSlackCount + curArtVariables;
+                builderBigM.addArtificialVariable(curArtVariables + 1, i);
+                curArtVariables++;
             }
         }
 
-        builderBigM.tableInit();
+        builderBigM.tableInitialized(curArtVariables, objectiveFunc);
     }
 
     public void calculateDeltas() {

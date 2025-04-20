@@ -3,10 +3,11 @@ package com.mg.lpcalc.simplex.solution;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.solution.BigMSolution;
+import com.mg.lpcalc.simplex.model.solution.ModifyObjectiveFuncStep;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,7 +30,8 @@ public class SimplexSolutionBuilderBigM {
         solution.getAddArtAndSlackVariablesStep().getArtConstraintIndexes().add(constraintIndex);
     }
 
-    public void tableInit() {
+    public void tableInitialized(int artVariablesCount, ObjectiveFunc objectiveFunc) {
         solution.getAddArtAndSlackVariablesStep().setConstraints(builder.getConstraints());
+        solution.setModifyObjectiveFuncStep(new ModifyObjectiveFuncStep(objectiveFunc, artVariablesCount));
     }
 }

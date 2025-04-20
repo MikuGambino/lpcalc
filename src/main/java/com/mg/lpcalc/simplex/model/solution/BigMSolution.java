@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BigMSolution implements Solution {
     private AddArtAndSlackVariablesStep addArtAndSlackVariablesStep = new AddArtAndSlackVariablesStep();
-
+    private ModifyObjectiveFuncStep modifyObjectiveFuncStep;
 }
