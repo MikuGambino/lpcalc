@@ -100,7 +100,7 @@ public class BigMMethod implements SimplexMethod {
     }
 
     public Fraction[] getCosts() {
-        Fraction[] costs = new Fraction[numVars + numSlacks];
+        Fraction[] costs = new Fraction[numVars + numSlacks + numAuxVars + 1];
         for (int i = 0; i < numVars; i++) {
             costs[i] = objectiveFunc.getCoefficients().get(i);
         }

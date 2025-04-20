@@ -6,6 +6,8 @@ import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.solution.BigMSolution;
 import com.mg.lpcalc.simplex.model.solution.ModifyObjectiveFuncStep;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
+import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 import lombok.Data;
 
 import java.util.List;
@@ -30,8 +32,10 @@ public class SimplexSolutionBuilderBigM {
         solution.getAddArtAndSlackVariablesStep().getArtConstraintIndexes().add(constraintIndex);
     }
 
-    public void tableInitialized(int artVariablesCount, ObjectiveFunc objectiveFunc) {
+    public void tableInitialized(ObjectiveFunc objectiveFunc, BigMSimplexTable simplexTable) {
         solution.getAddArtAndSlackVariablesStep().setConstraints(builder.getConstraints());
-        solution.setModifyObjectiveFuncStep(new ModifyObjectiveFuncStep(objectiveFunc, artVariablesCount));
+        solution.setObjectiveFunc(objectiveFunc);
+        SimplexTableDTO simplexTableDTO = new SimplexTableDTO(simplexTable);
+        solution.setInitialSimplexTable(simplexTableDTO);
     }
 }

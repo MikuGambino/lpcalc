@@ -9,9 +9,13 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 1. Преобразование ограничений к равенствам и добавление искуственных переменных.', 'subtitle'));
     solutionContainer.appendChild(addSlackAndArtStep);
 
-    let modifyObjectiveFuncStep = parseModifyObjectiveFuncStep(solution.modifyObjectiveFuncStep);
+    let modifyObjectiveFuncStep = parseModifyObjectiveFuncStep(solution.objectiveFunc, solution.initialSimplexTable);
     solutionContainer.appendChild(createP('Шаг 2. Модификация целевой функции.', 'subtitle'));
     solutionContainer.appendChild(modifyObjectiveFuncStep);
+
+    let findBasisStep = parseFindBasisStepBigM(solution.initialSimplexTable, solution.objectiveFunc);
+    solutionContainer.appendChild(createP('Шаг 3. Поиск первоначального базиса.', 'subtitle'));
+    solutionContainer.appendChild(findBasisStep);
 
     activateAccordions();
     renderKatexElement('solution-container');
@@ -67,8 +71,8 @@ function parseAddSlackAndArtVariables(step) {
     return container;
 }
 
-function parseModifyObjectiveFuncStep(step) {
-    const { artVariablesCount, objectiveFunc } = step;
+function parseModifyObjectiveFuncStep(objectiveFunc, initialTable) {
+    let artVariablesCount = initialTable.numColumns - initialTable.numSlack - initialTable.numVars - 1;
 
     let container = document.createElement('div');
     container.id = 'modifyObjectiveFuncStep';
@@ -94,4 +98,51 @@ function parseModifyObjectiveFuncStep(step) {
 
     container.appendChild(createP(objectiveLatex, 'latex'));
     return container;
+}
+
+function parseFindBasisStepBigM(table, objectiveFunc) {
+    let container = document.createElement('div');
+    container.id = 'findBasisStep';
+    
+    let artVariablesMinNumber = table.numSlack + table.numVars;
+    
+    for (let i = 0; i < table.basis.length; i++) {
+        let basisVarIdx = table.basis[i];
+        if (basisVarIdx >= artVariablesMinNumber) {
+            container.appendChild(createP(`Ограничение ${i + 1} содержит искусственную переменную $u_${basisVarIdx-artVariablesMinNumber+1}$. Она входит в базис.`));
+        } else {
+            container.appendChild(createP(`Ограничение ${i + 1} содержит положительную балансовую переменную $x_${basisVarIdx+1}$. Она входит в базис.`));
+        }
+    }
+
+    let simplexTableHTML = parseSimplexTable(table, container);
+    modifySimplexTableBigM(simplexTableHTML, table, objectiveFunc);
+    container.appendChild(createP('Базиз успешно найден.'));
+    return container;
+}
+
+function modifySimplexTableBigM(tableHTML, simplexTable, objectiveFunc, withQ = 0) {
+    let artVariablesMinNumber = simplexTable.numSlack + simplexTable.numVars;
+    let basis = simplexTable.basis;
+
+    const secondRow = tableHTML.rows[1];
+    if (secondRow) {
+        for (let i = 1; i < secondRow.cells.length - 1 - withQ; i++) {
+            if (i > artVariablesMinNumber) {
+                secondRow.cells[i].textContent = `$u_${i - artVariablesMinNumber}$`;
+                if (objectiveFunc.direction == 'MAX') {
+                    tableHTML.rows[0].cells[i].textContent = '$-M$'; 
+                } else {
+                    tableHTML.rows[0].cells[i].textContent = '$M$'; 
+                }
+            }
+        }
+    }
+    
+    const rows = tableHTML.rows;
+    for (let i = 2; i < rows.length; i++) {
+        if (basis[i - 2] >= artVariablesMinNumber) {
+            rows[i].cells[0].textContent = `$u_${basis[i - 2] - artVariablesMinNumber + 1}$`;
+        }
+    }
 }

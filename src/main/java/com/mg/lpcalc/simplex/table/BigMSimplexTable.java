@@ -77,7 +77,7 @@ public class BigMSimplexTable extends SimplexTable {
             }
         }
 
-        builderBigM.tableInitialized(curArtVariables, objectiveFunc);
+        builderBigM.tableInitialized(objectiveFunc, this);
     }
 
     public void calculateDeltas() {
