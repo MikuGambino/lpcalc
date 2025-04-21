@@ -27,6 +27,9 @@ public abstract class SimplexTable {
     protected SimplexSolutionBuilder solutionBuilder;
 
     public abstract int findPivotColumn(Direction direction);
+    public abstract void print();
+    public abstract boolean isOptimal(Direction direction);
+    public abstract void calculateDeltas();
 
     public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
         int pivotColumn = findPivotColumn(direction);
@@ -65,7 +68,7 @@ public abstract class SimplexTable {
         return null;
     }
 
-    // Возвращает индекс ненулевое число если вектор с единственным ненулевым числом существует
+    // Возвращает индекс ненулевого числа, если вектор с единственным ненулевым числом существует
     public RowColumnPair findNonBasisColumnWithSingleNonZeroElement() {
         for (int i = 0; i < numVars + numSlack; i++) {
             boolean isCorrectVector = true;
@@ -107,8 +110,8 @@ public abstract class SimplexTable {
     public int findFirstNonBasisColumn() {
         for (int i = 0; i < numVars + numSlack; i++) {
             boolean basisFound = false;
-            for (int j = 0; j < basis.length; j++) {
-                if (basis[j] == i) {
+            for (int k : basis) {
+                if (k == i) {
                     basisFound = true;
                     break;
                 }
@@ -185,7 +188,6 @@ public abstract class SimplexTable {
 
         return column;
     }
-
 
     public int findPivotRow(int column) {
         List<Fraction> simplexRatioList = new ArrayList<>();
@@ -270,6 +272,20 @@ public abstract class SimplexTable {
                                 .map(fraction -> fraction != null ? new Fraction(fraction) : null)
                                 .toArray(Fraction[]::new))
                 .toArray(Fraction[][]::new);
+    }
+
+    public boolean pivot(Direction direction) {
+        int pivotColumn = findPivotColumn(direction);
+        int pivotRow = findPivotRow(pivotColumn);
+        if (pivotRow == -1) {
+            return false;
+        }
+
+        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(this);
+        gaussianElimination(pivotRow, pivotColumn);
+        setBasisVariable(pivotColumn, pivotRow);
+        solutionBuilder.addPivotStep(pivotRow, pivotColumn, simplexTableBefore);
+        return true;
     }
 }
 

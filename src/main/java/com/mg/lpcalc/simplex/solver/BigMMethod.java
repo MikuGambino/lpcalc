@@ -23,7 +23,7 @@ public class BigMMethod implements SimplexMethod {
     private int numVars;
     private int numConstraints;
     private int numSlacks;
-    private int numAuxVars;
+    private int numArtVars;
     private BigMSimplexSolutionBuilder solutionBuilder;
 
     public BigMMethod(List<Constraint> constraints, ObjectiveFunc objectiveFunc, Direction direction,
@@ -43,7 +43,7 @@ public class BigMMethod implements SimplexMethod {
 
         this.simplexTable = new BigMSimplexTable(
                 numSlacks,
-                numAuxVars,
+                numArtVars,
                 numVars,
                 numConstraints,
                 getCosts(),
@@ -52,12 +52,9 @@ public class BigMMethod implements SimplexMethod {
                 solutionBuilder
         );
 
-        simplexTable.print();
         simplexTable.calculateDeltas();
         solutionBuilder.setSimplexTableWithDeltas(new SimplexTableDTO(simplexTable));
-        simplexTable.print();
 
-        System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
         solutionBuilder.addOptimalityCheckStep(simplexTable.isOptimal(direction));
         while (!simplexTable.isOptimal(direction)) {
             SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
@@ -73,7 +70,6 @@ public class BigMMethod implements SimplexMethod {
         }
 
         if (simplexTable.solutionContainsArtVariables()) {
-            System.out.println("Решение содержит искусственные переменные.\nРешения нет");
             solutionBuilder.answerHasArtVars();
             return solutionBuilder.getSolution();
         }
@@ -100,13 +96,13 @@ public class BigMMethod implements SimplexMethod {
 
     private void countAuxVariables() {
         for (Constraint constraint : constraints) {
-            if (!constraint.getOperator().equals(Operator.LEQ)) numAuxVars++;
+            if (!constraint.getOperator().equals(Operator.LEQ)) numArtVars++;
             if (!constraint.getOperator().equals(Operator.EQ)) numSlacks++;
         }
     }
 
     public Fraction[] getCosts() {
-        Fraction[] costs = new Fraction[numVars + numSlacks + numAuxVars + 1];
+        Fraction[] costs = new Fraction[numVars + numSlacks + numArtVars + 1];
         for (int i = 0; i < numVars; i++) {
             costs[i] = objectiveFunc.getCoefficients().get(i);
         }

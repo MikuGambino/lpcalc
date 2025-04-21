@@ -71,7 +71,6 @@ public class BasicSimplexMethod implements SimplexMethod {
                 return solutionBuilder.getSolution();
             }
             simplexTable.calculateDeltas();
-            simplexTable.print();
             solutionBuilder.addPivotStepToAnswer(new SimplexTableDTO(simplexTable), simplexTable.isOptimal(direction));
         }
 
@@ -139,7 +138,6 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         solutionBuilder.basisFound();
-        simplexTable.print();
     }
 
     private boolean tryFindBasisUsingUnitVectors() {

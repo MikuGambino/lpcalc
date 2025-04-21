@@ -4,7 +4,6 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
-import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.Arrays;
@@ -55,6 +54,7 @@ public class BasicSimplexTable extends SimplexTable {
         solutionBuilder.tableInitComplete(this);
     }
 
+    @Override
     public void print() {
         for (Fraction[] fractions : tableau) {
             System.out.println(Arrays.toString(fractions));
@@ -66,6 +66,7 @@ public class BasicSimplexTable extends SimplexTable {
         System.out.println();
     }
 
+    @Override
     public int findPivotColumn(Direction direction) {
         int columnIdx = 0;
         Fraction targetDelta = tableau[numConstraints][columnIdx];
@@ -82,6 +83,7 @@ public class BasicSimplexTable extends SimplexTable {
         return columnIdx;
     }
 
+    @Override
     public boolean isOptimal(Direction direction) {
         boolean planIsOptimal = true;
         for (int i = 0; i < numColumns - 1; i++) {
@@ -93,6 +95,7 @@ public class BasicSimplexTable extends SimplexTable {
         return planIsOptimal;
     }
 
+    @Override
     public void calculateDeltas() {
         solutionBuilder.startCalculateDeltas();
         for (int i = 0; i < numColumns; i++) {
@@ -111,21 +114,5 @@ public class BasicSimplexTable extends SimplexTable {
             tableau[numConstraints][i] = delta;
         }
         solutionBuilder.endCalculateDeltas();
-    }
-
-    // todo mb перенести обратно в SimplexTable
-    public boolean pivot(Direction direction) {
-        int pivotColumn = findPivotColumn(direction);
-        int pivotRow = findPivotRow(pivotColumn);
-        if (pivotRow == -1) {
-            System.out.println("Целевая функция не ограничена и решения не существует");
-            return false;
-        }
-
-        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(this);
-        gaussianElimination(pivotRow, pivotColumn);
-        setBasisVariable(pivotColumn, pivotRow);
-        solutionBuilder.addPivotStep(pivotRow, pivotColumn, simplexTableBefore);
-        return true;
     }
 }

@@ -5,9 +5,7 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -82,6 +80,7 @@ public class BigMSimplexTable extends SimplexTable {
         builderBigM.tableInitialized(objectiveFunc, this);
     }
 
+    @Override
     public void calculateDeltas() {
         builderBigM.startCalculateDeltas();
         Fraction mValue = direction.equals(Direction.MAX) ? Fraction.ONE.negate() : Fraction.ONE;
@@ -121,6 +120,7 @@ public class BigMSimplexTable extends SimplexTable {
         return variable >= numSlack + numVars;
     }
 
+    @Override
     public boolean isOptimal(Direction direction) {
         for (int i = 0; i < numColumns - 1; i++) {
             if (tableau[numConstraints][i].equals(Fraction.ZERO)) continue;
@@ -131,6 +131,7 @@ public class BigMSimplexTable extends SimplexTable {
         return true;
     }
 
+    @Override
     public int findPivotColumn(Direction direction) {
         int columnIdx = 0;
 
@@ -177,6 +178,7 @@ public class BigMSimplexTable extends SimplexTable {
         return false;
     }
 
+    @Override
     public void print() {
         for (Fraction[] fractions : tableau) {
             System.out.println(Arrays.toString(fractions));
@@ -187,21 +189,6 @@ public class BigMSimplexTable extends SimplexTable {
         }
         System.out.println();
         System.out.println(Arrays.toString(mValues));
-    }
-
-    public boolean pivot(Direction direction) {
-        int pivotColumn = findPivotColumn(direction);
-        int pivotRow = findPivotRow(pivotColumn);
-        if (pivotRow == -1) {
-            System.out.println("Целевая функция не ограничена и решения не существует");
-            return false;
-        }
-
-        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(this);
-        gaussianElimination(pivotRow, pivotColumn);
-        setBasisVariable(pivotColumn, pivotRow);
-        solutionBuilder.addPivotStep(pivotRow, pivotColumn, simplexTableBefore);
-        return true;
     }
 
     public Fraction[] getMValues() {
