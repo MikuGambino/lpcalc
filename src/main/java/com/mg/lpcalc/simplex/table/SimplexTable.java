@@ -26,7 +26,7 @@ public abstract class SimplexTable {
     protected int[] basis;
     protected SimplexSolutionBuilder solutionBuilder;
 
-    public abstract int findPivotColumn(Direction direction);
+    protected abstract int findPivotColumn(Direction direction);
     public abstract void print();
     public abstract boolean isOptimal(Direction direction);
     public abstract void calculateDeltas();
@@ -189,7 +189,7 @@ public abstract class SimplexTable {
         return column;
     }
 
-    public int findPivotRow(int column) {
+    private int findPivotRow(int column) {
         List<Fraction> simplexRatioList = new ArrayList<>();
         for (int i = 0; i < numConstraints; i++) {
             Fraction freeCoefficient = tableau[i][numColumns - 1];
@@ -223,7 +223,7 @@ public abstract class SimplexTable {
         this.basis[position] = variable;
     }
 
-    public int getVariablePosition(int num) {
+    private int getVariablePosition(int num) {
         for (int i = 0; i < basis.length; i++) {
             if (basis[i] == num) {
                 return i;
@@ -248,7 +248,7 @@ public abstract class SimplexTable {
         return new Answer(AnswerType.SUCCESS, variablesValues, objectiveValue);
     }
 
-    public void checkIndexes(int row, int column) {
+    private void checkIndexes(int row, int column) {
         if (row < 0 || row >= tableau.length) {
             throw new IndexOutOfBoundsException("Индекс строки вне допустимого диапазона: " + row);
         }

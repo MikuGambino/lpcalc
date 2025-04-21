@@ -39,7 +39,7 @@ public class BigMMethod implements SimplexMethod {
     @Override
     public Solution run() {
         makeFreeCoefficientsPositive();
-        countAuxVariables();
+        countArtVariables();
 
         this.simplexTable = new BigMSimplexTable(
                 numSlacks,
@@ -94,14 +94,14 @@ public class BigMMethod implements SimplexMethod {
         }
     }
 
-    private void countAuxVariables() {
+    private void countArtVariables() {
         for (Constraint constraint : constraints) {
             if (!constraint.getOperator().equals(Operator.LEQ)) numArtVars++;
             if (!constraint.getOperator().equals(Operator.EQ)) numSlacks++;
         }
     }
 
-    public Fraction[] getCosts() {
+    private Fraction[] getCosts() {
         Fraction[] costs = new Fraction[numVars + numSlacks + numArtVars + 1];
         for (int i = 0; i < numVars; i++) {
             costs[i] = objectiveFunc.getCoefficients().get(i);

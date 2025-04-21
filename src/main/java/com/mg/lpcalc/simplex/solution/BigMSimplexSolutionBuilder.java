@@ -48,14 +48,17 @@ public class BigMSimplexSolutionBuilder {
         FractionM fractionM1 = new FractionM(var1Value);
         FractionM fractionM2 = new FractionM(var2Value);
 
-        this.calculateDeltasStep.getVarLabels().get(calculateDeltasStep.getVarLabels().size() - 1).addAll(List.of(var1Label, var2Label));
-        this.calculateDeltasStep.getVarValues().get(calculateDeltasStep.getVarValues().size() - 1).addAll(List.of(fractionM1, fractionM2));
+        addToCalcDeltasStep(var1Label, var2Label, fractionM1, fractionM2);
     }
 
     public void addDeltasProductWithM(String var1Label, String var2Label, Fraction mValue, Fraction var2Value) {
         FractionM fractionM1 = new FractionM(Fraction.ZERO, mValue);
         FractionM fractionM2 = new FractionM(var2Value);
 
+        addToCalcDeltasStep(var1Label, var2Label, fractionM1, fractionM2);
+    }
+
+    private void addToCalcDeltasStep(String var1Label, String var2Label, FractionM fractionM1, FractionM fractionM2) {
         this.calculateDeltasStep.getVarLabels().get(calculateDeltasStep.getVarLabels().size() - 1).addAll(List.of(var1Label, var2Label));
         this.calculateDeltasStep.getVarValues().get(calculateDeltasStep.getVarValues().size() - 1).addAll(List.of(fractionM1, fractionM2));
     }

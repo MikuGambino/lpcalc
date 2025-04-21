@@ -12,7 +12,7 @@ import java.util.List;
 public class BasicSimplexSolution implements Solution {
     private Answer answer;
     private ConstraintTransformStep convertToLessOrEqualStep;
-    private ConstraintToEqualityStep constraintToEqualityStep;
+    private ConstraintToEqualityStep constraintToEqualityStep = new ConstraintToEqualityStep();
     private FindBasisStep findBasisStep;
     private List<RemoveNegativeBStep> removeNegativeBSteps = new ArrayList<>();
     private CalculateDeltasStep calculateDeltasStep;

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RowColumnPair {
-    int row;
-    int column;
+    private int row;
+    private int column;
 }

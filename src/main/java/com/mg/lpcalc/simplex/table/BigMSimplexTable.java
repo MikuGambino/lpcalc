@@ -132,7 +132,7 @@ public class BigMSimplexTable extends SimplexTable {
     }
 
     @Override
-    public int findPivotColumn(Direction direction) {
+    protected int findPivotColumn(Direction direction) {
         int columnIdx = 0;
 
         for (int i = 0; i < numColumns - 1; i++) {

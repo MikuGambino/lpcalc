@@ -97,7 +97,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         return true;
     }
 
-    public Fraction[] getCosts() {
+    private Fraction[] getCosts() {
         Fraction[] costs = new Fraction[numVars + numSlacks + 1];
         for (int i = 0; i < numVars; i++) {
             costs[i] = objectiveFunc.getCoefficients().get(i);
@@ -110,7 +110,7 @@ public class BasicSimplexMethod implements SimplexMethod {
     }
 
     // подсчёт количества неравенств
-    public int countSlacks() {
+    private int countSlacks() {
         int num = 0;
         for (Constraint constraint : constraints) {
             if (!constraint.getOperator().equals(Operator.EQ)) {

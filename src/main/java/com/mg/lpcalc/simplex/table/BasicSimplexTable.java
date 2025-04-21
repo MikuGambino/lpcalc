@@ -67,7 +67,7 @@ public class BasicSimplexTable extends SimplexTable {
     }
 
     @Override
-    public int findPivotColumn(Direction direction) {
+    protected int findPivotColumn(Direction direction) {
         int columnIdx = 0;
         Fraction targetDelta = tableau[numConstraints][columnIdx];
 

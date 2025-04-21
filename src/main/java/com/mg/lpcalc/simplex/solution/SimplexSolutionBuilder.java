@@ -17,8 +17,6 @@ public class SimplexSolutionBuilder {
     private Direction direction;
     private List<Constraint> constraints;
     private SimplexTableDTO initialSimplexTable;
-    private List<Integer> slackVariablesIndexes = new ArrayList<>();
-    private List<Integer> constraintsIndexes = new ArrayList<>();
     private int[] slackBasis;
     private List<FindBasisSubStep> findBasisSubSteps = new ArrayList<>();
     private List<RemoveNegativeBStep> negativeBSteps = new ArrayList<>();
@@ -38,16 +36,14 @@ public class SimplexSolutionBuilder {
         solution.setConvertToLessOrEqualStep(constraintTransformStep);
     }
 
-    // todo переделать как в BigM
     public void addSlackVariable(int slackIndex, int constraintIndex) {
-        slackVariablesIndexes.add(slackIndex);
-        constraintsIndexes.add(constraintIndex);
+        solution.getConstraintToEqualityStep().getSlackVariablesIndexes().add(slackIndex);
+        solution.getConstraintToEqualityStep().getConstraintsIndexes().add(constraintIndex);
     }
 
     public void tableInitComplete(BasicSimplexTable simplexTable) {
-        ConstraintToEqualityStep step = new ConstraintToEqualityStep(constraints, slackVariablesIndexes, constraintsIndexes);
-        this.initialSimplexTable = new SimplexTableDTO(simplexTable);
-        solution.setConstraintToEqualityStep(step);
+        solution.getConstraintToEqualityStep().setConstraints(constraints);
+        initialSimplexTable = new SimplexTableDTO(simplexTable);
     }
 
     public void setSlackBasis(int[] basis) {
