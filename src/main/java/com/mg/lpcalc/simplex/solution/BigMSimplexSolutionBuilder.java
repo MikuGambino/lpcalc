@@ -5,6 +5,7 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.solution.*;
+import com.mg.lpcalc.simplex.model.solution.bigm.BigMSolution;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 import lombok.Data;
 

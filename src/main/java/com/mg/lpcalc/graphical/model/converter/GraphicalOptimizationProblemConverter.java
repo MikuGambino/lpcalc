@@ -1,8 +1,8 @@
-package com.mg.lpcalc.graphical.solver.model.converter;
+package com.mg.lpcalc.graphical.model.converter;
 
-import com.mg.lpcalc.graphical.solver.model.Constraint;
-import com.mg.lpcalc.graphical.solver.model.ObjectiveFunc;
-import com.mg.lpcalc.graphical.solver.model.OptimizationProblem;
+import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
+import com.mg.lpcalc.graphical.model.OptimizationProblem;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
 import org.springframework.core.convert.converter.Converter;

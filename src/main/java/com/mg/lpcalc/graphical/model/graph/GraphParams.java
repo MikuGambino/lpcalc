@@ -1,5 +1,6 @@
-package com.mg.lpcalc.graphical.graph;
+package com.mg.lpcalc.graphical.model.graph;
 
+import com.mg.lpcalc.graphical.graph.ViewBoxParams;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

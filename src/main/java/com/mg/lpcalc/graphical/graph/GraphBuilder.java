@@ -1,9 +1,9 @@
 package com.mg.lpcalc.graphical.graph;
 
-import com.mg.lpcalc.graphical.graph.model.*;
-import com.mg.lpcalc.graphical.solver.model.Constraint;
-import com.mg.lpcalc.graphical.solver.model.ObjectiveFunc;
-import com.mg.lpcalc.graphical.solver.model.Point;
+import com.mg.lpcalc.graphical.model.graph.*;
+import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
+import com.mg.lpcalc.graphical.model.Point;
 
 import java.util.ArrayList;
 import java.util.Comparator;

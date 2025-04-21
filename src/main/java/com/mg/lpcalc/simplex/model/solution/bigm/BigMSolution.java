@@ -1,6 +1,7 @@
-package com.mg.lpcalc.simplex.model.solution;
+package com.mg.lpcalc.simplex.model.solution.bigm;
 
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.model.solution.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

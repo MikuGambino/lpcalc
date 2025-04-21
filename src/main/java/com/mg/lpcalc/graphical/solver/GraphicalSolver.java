@@ -1,10 +1,10 @@
 package com.mg.lpcalc.graphical.solver;
 
 import com.mg.lpcalc.graphical.solution.GraphicalSolutionBuilder;
-import com.mg.lpcalc.graphical.solver.model.Constraint;
-import com.mg.lpcalc.graphical.solver.model.ObjectiveFunc;
-import com.mg.lpcalc.graphical.solver.model.OptimizationProblem;
-import com.mg.lpcalc.graphical.solver.model.Point;
+import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
+import com.mg.lpcalc.graphical.model.OptimizationProblem;
+import com.mg.lpcalc.graphical.model.Point;
 import com.mg.lpcalc.model.enums.Operator;
 
 import java.util.AbstractMap;

@@ -1,10 +1,9 @@
-package com.mg.lpcalc.graphical.solver.model;
+package com.mg.lpcalc.graphical.model;
 
 import com.mg.lpcalc.model.enums.Operator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder

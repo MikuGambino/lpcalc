@@ -1,4 +1,4 @@
-package com.mg.lpcalc.graphical.solver.model;
+package com.mg.lpcalc.graphical.model;
 
 import lombok.Builder;
 import lombok.Data;

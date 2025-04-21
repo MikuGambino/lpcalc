@@ -4,6 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.solution.*;
+import com.mg.lpcalc.simplex.model.solution.basic.*;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 import lombok.Getter;
 

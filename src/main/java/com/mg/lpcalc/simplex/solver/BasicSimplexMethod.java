@@ -7,6 +7,8 @@ import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
+import com.mg.lpcalc.simplex.model.solution.basic.BasicSimplexSolution;
+import com.mg.lpcalc.simplex.model.solution.basic.BasisMethod;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 

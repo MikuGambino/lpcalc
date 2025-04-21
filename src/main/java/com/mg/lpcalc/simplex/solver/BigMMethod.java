@@ -6,14 +6,13 @@ import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.model.solution.BigMSolution;
+import com.mg.lpcalc.simplex.model.solution.bigm.BigMSolution;
 import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BigMMethod implements SimplexMethod {

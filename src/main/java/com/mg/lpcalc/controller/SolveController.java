@@ -1,9 +1,8 @@
 package com.mg.lpcalc.controller;
 
 import com.mg.lpcalc.graphical.solver.GraphicalSolver;
-import com.mg.lpcalc.graphical.solver.model.converter.GraphicalOptimizationProblemConverter;
+import com.mg.lpcalc.graphical.model.converter.GraphicalOptimizationProblemConverter;
 import com.mg.lpcalc.model.OptimizationProblemDTO;
-import com.mg.lpcalc.simplex.model.solution.BasicSimplexSolution;
 import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solver.SimplexSolver;
 import com.mg.lpcalc.simplex.model.converter.SimplexOptimizationProblemConverter;

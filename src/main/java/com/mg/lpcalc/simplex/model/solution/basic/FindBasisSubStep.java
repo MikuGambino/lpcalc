@@ -1,6 +1,7 @@
-package com.mg.lpcalc.simplex.model.solution;
+package com.mg.lpcalc.simplex.model.solution.basic;
 
 import com.mg.lpcalc.model.Fraction;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

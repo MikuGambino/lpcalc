@@ -1,4 +1,4 @@
-package com.mg.lpcalc.simplex.model.solution;
+package com.mg.lpcalc.simplex.model.solution.bigm;
 
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.simplex.model.Constraint;
@@ -12,8 +12,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConstraintToEqualityStep {
+public class AddArtAndSlackVariablesStep {
     private List<Constraint> constraints = new ArrayList<>();
     private List<Integer> slackVariablesIndexes = new ArrayList<>();
-    private List<Integer> constraintsIndexes = new ArrayList<>();
+    private List<Integer> slackConstraintIndexes = new ArrayList<>();
+    private List<Fraction> slackVariables = new ArrayList<>();
+    private List<Integer> artVariablesIndexes = new ArrayList<>();
+    private List<Integer> artConstraintIndexes = new ArrayList<>();
 }

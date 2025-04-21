@@ -1,6 +1,5 @@
-package com.mg.lpcalc.graphical.solver.model;
+package com.mg.lpcalc.graphical.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mg.lpcalc.model.enums.Direction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

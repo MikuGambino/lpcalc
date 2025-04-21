@@ -1,7 +1,7 @@
-package com.mg.lpcalc.graphical.graph.model;
+package com.mg.lpcalc.graphical.model.graph;
 
 import com.mg.lpcalc.graphical.graph.SVGCode;
-import com.mg.lpcalc.graphical.solver.model.Point;
+import com.mg.lpcalc.graphical.model.Point;
 import lombok.Data;
 
 import java.util.List;

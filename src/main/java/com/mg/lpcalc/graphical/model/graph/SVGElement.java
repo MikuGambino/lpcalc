@@ -1,4 +1,4 @@
-package com.mg.lpcalc.graphical.graph.model;
+package com.mg.lpcalc.graphical.model.graph;
 
 public interface SVGElement {
     String toSVG();
