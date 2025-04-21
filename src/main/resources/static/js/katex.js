@@ -48,10 +48,18 @@ function mFractionToLatex(fraction) {
             return "-M";
         }
         return fractionToLatex(fraction.m) + "M";
-    } else if (fraction.m.positive){
-        return fractionToLatex(fraction.core) + "+" + fractionToLatex(fraction.m) + "M";
+    } else if (fraction.m.numerator > 0) {
+        let fractionM = fractionToLatex(fraction.m) + "M";
+        if (fraction.m.numerator == 1) {
+            fractionM = 'M';
+        }
+        return fractionToLatex(fraction.core) + "+" + fractionM;
     } else {
-        return fractionToLatex(fraction.core) + "" + fractionToLatex(fraction.m) + "M";
+        let fractionM = fractionToLatex(fraction.m) + "M";
+        if (fraction.m.numerator == -1) {
+            fractionM = '-M';
+        }
+        return fractionToLatex(fraction.core) + "" + fractionM;
     }
 }
 

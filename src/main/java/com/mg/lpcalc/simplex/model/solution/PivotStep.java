@@ -19,7 +19,7 @@ public class PivotStep {
     private CalculateDeltasStep calculateDeltasStep;
     private OptimalityCheckStep optimalityCheckStep;
     private Fraction pivotElement;
-    private Fraction minDelta;
+    private FractionM minDelta;
     private Fraction targetQ;
     private int column;
     private int row;

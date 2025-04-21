@@ -5,6 +5,7 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 import lombok.Getter;
 
@@ -82,6 +83,7 @@ public class BigMSimplexTable extends SimplexTable {
     }
 
     public void calculateDeltas() {
+        builderBigM.startCalculateDeltas();
         Fraction mValue = direction.equals(Direction.MAX) ? Fraction.ONE.negate() : Fraction.ONE;
         for (int i = 0; i < numColumns; i++) {
             builderBigM.startDeltaColumnCalculating();
@@ -187,7 +189,7 @@ public class BigMSimplexTable extends SimplexTable {
         System.out.println(Arrays.toString(mValues));
     }
 
-    public boolean pivot(Direction direction, BigMSimplexSolutionBuilder solutionBuilder) {
+    public boolean pivot(Direction direction) {
         int pivotColumn = findPivotColumn(direction);
         int pivotRow = findPivotRow(pivotColumn);
         if (pivotRow == -1) {
@@ -195,8 +197,10 @@ public class BigMSimplexTable extends SimplexTable {
             return false;
         }
 
+        SimplexTableDTO simplexTableBefore = new SimplexTableDTO(this);
         gaussianElimination(pivotRow, pivotColumn);
         setBasisVariable(pivotColumn, pivotRow);
+        solutionBuilder.addPivotStep(pivotRow, pivotColumn, simplexTableBefore);
         return true;
     }
 

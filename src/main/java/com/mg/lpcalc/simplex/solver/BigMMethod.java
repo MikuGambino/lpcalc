@@ -6,6 +6,7 @@ import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.model.solution.BigMSolution;
 import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
@@ -60,24 +61,28 @@ public class BigMMethod implements SimplexMethod {
         System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
         solutionBuilder.addOptimalityCheckStep(simplexTable.isOptimal(direction));
         while (!simplexTable.isOptimal(direction)) {
-            boolean success = simplexTable.pivot(direction, solutionBuilder);
+            SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
+            boolean success = simplexTable.pivot(direction);
             if (!success) {
                 simplexTable.checkUnboundedDirection(direction, objectiveFunc);
-                return null;
+                solutionBuilder.addUnsuccessfulPivotStep(new SimplexTableDTO(simplexTable));
+                return solutionBuilder.getSolution();
             }
             simplexTable.calculateDeltas();
-            simplexTable.print();
+            SimplexTableDTO simplexTableAfter = new SimplexTableDTO(simplexTable);
+            solutionBuilder.addPivotStepToAnswer(simplexTableBefore, simplexTableAfter, simplexTable.isOptimal(direction));
         }
 
         if (simplexTable.solutionContainsArtVariables()) {
             System.out.println("Решение содержит искусственные переменные.\nРешения нет");
-            return null;
+            solutionBuilder.answerHasArtVars();
+            return solutionBuilder.getSolution();
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-
-        return solutionBuilder.getSolution();
-//        return solutionBuilder.getBasicSimplexSolution();
+        BigMSolution solution = solutionBuilder.getSolution();
+        solution.setAnswer(answer);
+        return solution;
     }
 
     private void makeFreeCoefficientsPositive() {

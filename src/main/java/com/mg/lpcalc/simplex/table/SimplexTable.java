@@ -31,10 +31,10 @@ public abstract class SimplexTable {
     public void checkUnboundedDirection(Direction direction, ObjectiveFunc objectiveFunc) {
         int pivotColumn = findPivotColumn(direction);
         if (objectiveFunc.getCoefficients().get(pivotColumn).isNegative()) {
-            solutionBuilder.addUnsuccessfulPivotStep(pivotColumn, Direction.MIN, new SimplexTableDTO(this));
+            solutionBuilder.createUnsuccessfulPivotStep(pivotColumn, Direction.MIN, new SimplexTableDTO(this));
         }
         if (objectiveFunc.getCoefficients().get(pivotColumn).isPositive()) {
-            solutionBuilder.addUnsuccessfulPivotStep(pivotColumn, Direction.MAX, new SimplexTableDTO(this));
+            solutionBuilder.createUnsuccessfulPivotStep(pivotColumn, Direction.MAX, new SimplexTableDTO(this));
         }
     }
 

@@ -52,7 +52,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         if (simplexTable.isContainsNegativeB()) {
             boolean success = removeNegativeB();
             if (!success) {
-                return solutionBuilder.getBasicSimplexSolution();
+                return solutionBuilder.getSolution();
             }
         }
 
@@ -65,7 +65,8 @@ public class BasicSimplexMethod implements SimplexMethod {
             boolean success = simplexTable.pivot(direction);
             if (!success) {
                 simplexTable.checkUnboundedDirection(direction, objectiveFunc);
-                return solutionBuilder.getBasicSimplexSolution();
+                solutionBuilder.addUnsuccessfulPivotStep();
+                return solutionBuilder.getSolution();
             }
             simplexTable.calculateDeltas();
             simplexTable.print();
@@ -73,7 +74,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        BasicSimplexSolution basicSimplexSolution = solutionBuilder.getBasicSimplexSolution();
+        BasicSimplexSolution basicSimplexSolution = solutionBuilder.getSolution();
         basicSimplexSolution.setAnswer(answer);
         return basicSimplexSolution;
     }

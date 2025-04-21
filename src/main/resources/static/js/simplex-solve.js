@@ -52,7 +52,7 @@ function parseBasicSimplexAnswer(solution) {
         solutionContainer.appendChild(createP('Шаг 6. Проверка оптимальности.', 'subtitle'));
         solutionContainer.appendChild(checkOptimalityStep);
 
-        let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps);
+        let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
         solutionContainer.appendChild(createP('Шаг 7. Итерации симплекс-алгоритма.', 'subtitle'));
         solutionContainer.appendChild(simplexIterationsStep);
     }
@@ -316,11 +316,13 @@ function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
     let container = document.createElement('div');
     container.id = 'deltaCalculatingStep';
 
-    let deltas = parseDeltasBasic(simplexTable.tableau[simplexTable.tableau.length - 1]);
+    let tableHTML = parseSimplexTable(simplexTable, true);
+
+    let deltas = getDeltasFromTable(tableHTML);
     let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, deltas, simplexTable.basis);
     container.appendChild(deltasAccordion);
     
-    container.appendChild(parseSimplexTable(simplexTable, true));
+    container.appendChild(tableHTML);
     return container;
 }
 
@@ -428,7 +430,7 @@ function parseCheckOptimality(step) {
     return container;
 }
 
-function parsePivotIterationsStep(pivotSteps) {
+function parsePivotIterationsStep(pivotSteps, answer) {
     let container = document.createElement('div');
     container.innerHTML = '';
 
@@ -436,20 +438,21 @@ function parsePivotIterationsStep(pivotSteps) {
         let step = pivotSteps[i];
         container.appendChild(createP(`Итерация ${i + 1}.`, 'subtitle'));
         if (step.success) {
-            let newSimplexTable = step.simplexTableAfter;
-            let deltas = parseDeltasBasic(newSimplexTable.tableau[newSimplexTable.tableau.length - 1]);
-            let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, deltas, newSimplexTable.basis);
             let optimalCheck = parseCheckOptimality(step.optimalityCheckStep);
-            container.appendChild(parsePivotIteration(step, deltasAccordion, optimalCheck));
+            container.appendChild(parsePivotIteration(step, optimalCheck));
         } else {
-            container.appendChild(parsePivotIteration(step, null, null));
+            container.appendChild(parsePivotIteration(step, null));
         }
+    }
+
+    if (answer.answerType == 'HAS_ART_VARS') {
+        container.appendChild(createP('Базис содержит искусственные переменные. Решения задачи не существует.'));
     }
 
     return container;
 }
 
-function parsePivotIteration(step, deltasAccordion, optimalCheck) {
+function parsePivotIteration(step, optimalCheck) {
     let container = document.createElement('div');
 
     let beforeTableP = document.createElement('p');
@@ -493,7 +496,9 @@ function parsePivotIteration(step, deltasAccordion, optimalCheck) {
                              `Переменная $x_${step.lastBasisVariableIndex + 1}$ выводится из базиса.`;
     
     container.appendChild(afterTableP);
-    container.appendChild(parseSimplexTable(step.simplexTableAfter, true));
+    let afterTableHTML = parseSimplexTable(step.simplexTableAfter, true);
+    container.appendChild(afterTableHTML);
+    let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, getDeltasFromTable(afterTableHTML), step.simplexTableAfter.basis);
     container.appendChild(deltasAccordion);
     container.appendChild(optimalCheck);
     return container;
@@ -538,6 +543,8 @@ function parseAnswer(answer) {
         answerP.innerText = 'Функция неограниченно возрастает. Оптимального решения нет.';
     } else if (answer.answerType == 'MIN_UNBOUNDED') {
         answerP.innerText = 'Функция неограниченно убывает. Оптимального решения нет.';
+    } else if (answer.answerType == 'HAS_ART_VARS') {
+        answerP.innerText = 'Решения задачи не существует.';
     }
 
     container.appendChild(titleP);
@@ -545,11 +552,11 @@ function parseAnswer(answer) {
     return container;
 }
 
-function parseDeltasBasic(deltasRow) {
+function getDeltasFromTable(table) {
+    const lastRow = table.rows[table.rows.length - 1];
     let deltas = [];
-
-    for (let i = 0; i < deltasRow.length; i++) {
-        deltas.push(fractionToLatex(deltasRow[i]));
+    for (let i = 1; i < lastRow.cells.length; i++) {
+        deltas.push(lastRow.cells[i].textContent.slice(1, -1)); // Убираем знаки $$
     }
 
     return deltas;

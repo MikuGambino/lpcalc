@@ -5,6 +5,11 @@ function parseBigMSimplexAnswer(solution) {
     algoTitle.innerText = 'Решение методом искуственного базиса (BigM)';
     solutionContainer.appendChild(algoTitle);
 
+    let inputBlock = document.getElementById('input-block');
+    removeAnswerContainers();
+
+    inputBlock.appendChild(parseAnswer(solution.answer));
+
     let addSlackAndArtStep = parseAddSlackAndArtVariables(solution.addArtAndSlackVariablesStep);
     solutionContainer.appendChild(createP('Шаг 1. Преобразование ограничений к равенствам и добавление искуственных переменных.', 'subtitle'));
     solutionContainer.appendChild(addSlackAndArtStep);
@@ -17,7 +22,7 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 3. Поиск первоначального базиса.', 'subtitle'));
     solutionContainer.appendChild(findBasisStep);
 
-    let calcDeltasStep = parseBigMCalcDeltasStep(solution.calculateDeltasStep, solution.simplexTableWithDeltas);
+    let calcDeltasStep = parseCalculatingDeltasStep(solution.simplexTableWithDeltas, solution.calculateDeltasStep);
     solutionContainer.appendChild(createP('Шаг 4. Расчёт дельт (оценок).', 'subtitle'));
     solutionContainer.appendChild(calcDeltasStep);
 
@@ -25,6 +30,11 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 5. Проверка оптимальности.', 'subtitle'));
     solutionContainer.appendChild(checkOptimalityStep);
 
+    let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
+    solutionContainer.appendChild(createP('Шаг 6. Итерации симплекс-алгоритма.', 'subtitle'));
+    solutionContainer.appendChild(simplexIterationsStep);
+
+    solutionContainer.appendChild(parseAnswer(solution.answer));
     activateAccordions();
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
@@ -154,29 +164,4 @@ function modifySimplexTableBigM(tableHTML, simplexTable, objectiveFunc, withQ = 
             rows[i].cells[0].textContent = `$u_${basis[i - 2] - artVariablesMinNumber + 1}$`;
         }
     }
-}
-
-function parseBigMCalcDeltasStep(step, table) {
-    let container = document.createElement('div');
-    container.id = 'calcDeltasStep';
-
-    let tableHTML = parseSimplexTable(table, true);
-
-    let deltas = getDeltasFromTable(tableHTML);
-    let deltasAccordion = parseDeltasCalculationsAccordion(step, deltas, table.basis);
-
-    container.appendChild(deltasAccordion);
-    container.appendChild(tableHTML);
-
-    return container;
-}
-
-function getDeltasFromTable(table) {
-    const lastRow = table.rows[table.rows.length - 1];
-    let deltas = [];
-    for (let i = 1; i < lastRow.cells.length; i++) {
-        deltas.push(lastRow.cells[i].textContent.slice(1, -1)); // Убираем знаки $$
-    }
-
-    return deltas;
 }
