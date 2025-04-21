@@ -12,4 +12,6 @@ public class BigMSolution implements Solution {
     private ObjectiveFunc objectiveFunc;
     private AddArtAndSlackVariablesStep addArtAndSlackVariablesStep = new AddArtAndSlackVariablesStep();
     private SimplexTableDTO initialSimplexTable;
+    private SimplexTableDTO simplexTableWithDeltas;
+    private BigMCalculateDeltasStep calculateDeltasStep;
 }

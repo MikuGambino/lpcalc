@@ -17,7 +17,17 @@ function renderKatexElement(elementId) {
     });
 }
 
+function mDeltaToFraction(core, mValue) {
+    return {
+        core: { numerator: core.numerator, denominator: core.denominator },
+        m: { numerator: mValue.numerator, denominator: mValue.denominator }
+    };
+}
+
 function fractionToLatex(fraction) {
+    if ('m' in fraction) {
+        return mFractionToLatex(fraction);
+    }
     if (fraction.denominator == 1) {
         return fraction.numerator;
     }
@@ -26,6 +36,23 @@ function fractionToLatex(fraction) {
         return `-\\frac{${Math.abs(fraction.numerator)}}{${fraction.denominator}}`;
     }
     return `\\frac{${fraction.numerator}}{${fraction.denominator}}`;
+}
+
+function mFractionToLatex(fraction) {
+    if (fraction.m.numerator == 0) {
+        return fractionToLatex(fraction.core);
+    } else if (fraction.core.numerator == 0) {
+        if (fraction.m.numerator == 1) {
+            return "M";
+        } else if (fraction.m.numerator == -1) {
+            return "-M";
+        }
+        return fractionToLatex(fraction.m) + "M";
+    } else if (fraction.m.positive){
+        return fractionToLatex(fraction.core) + "+" + fractionToLatex(fraction.m) + "M";
+    } else {
+        return fractionToLatex(fraction.core) + "" + fractionToLatex(fraction.m) + "M";
+    }
 }
 
 function updateMathFormula(elementId, formula, displayMode = false) {

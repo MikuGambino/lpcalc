@@ -94,6 +94,8 @@ public class Fraction {
         return numerator > 0;
     }
 
+    public boolean isMoreOrEqualZero() { return numerator >= 0; }
+
     public Double doubleValue() {
         return  numerator / (double) denominator;
     }

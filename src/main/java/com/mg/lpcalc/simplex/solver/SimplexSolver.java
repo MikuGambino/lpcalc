@@ -3,10 +3,9 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Method;
 import com.mg.lpcalc.simplex.model.*;
-import com.mg.lpcalc.simplex.model.solution.BasicSimplexSolution;
 import com.mg.lpcalc.simplex.model.solution.Solution;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
+import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class SimplexSolver {
         }
 
         if (method.equals(Method.BIG_M)) {
-            SimplexSolutionBuilderBigM solutionBuilder = new SimplexSolutionBuilderBigM(constraints, direction);
+            BigMSimplexSolutionBuilder solutionBuilder = new BigMSimplexSolutionBuilder(constraints, direction);
             simplexMethod = new BigMMethod(constraints, objectiveFunc, direction, numVars, numConstraints, solutionBuilder);
         }
 

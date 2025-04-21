@@ -140,7 +140,7 @@ function parseFindBasisStep(step) {
         container.appendChild(createP(`Ограничение ${i + 1} содержит балансовую переменную $x_${basisIndex + 1}$. Она входит в базис.`));
     }
 
-    parseSimplexTable(step.slackBasisTable, container);
+    container.appendChild(parseSimplexTable(step.slackBasisTable));
 
     for (let i = 0; i < step.subSteps.length; i++) {
         container.appendChild(document.createElement('hr'));
@@ -171,17 +171,18 @@ function parseFindBasisStep(step) {
         }
 
         container.appendChild(beforeBasisAddingTitle);
-        let beforeTable = parseSimplexTable(simplexTableBefore, container);
+        let beforeTable = parseSimplexTable(simplexTableBefore);
         highlightRowColumnAndIntersection(beforeTable, row + 2, column + 1);
+        container.appendChild(beforeTable);
         container.appendChild(afterBasisAddingTitle);
-        parseSimplexTable(simplexTableAfter, container);
+        container.appendChild(parseSimplexTable(simplexTableAfter));
     }
 
     container.appendChild(createP('Базиз успешно найден.'));
     return container;
 }
 
-function parseSimplexTable(simplexTable, container, withDeltas = false) {
+function parseSimplexTable(simplexTable, withDeltas = false) {
     const { tableau, costs, basis, numColumns } = simplexTable;
     let table = document.createElement('table');
     table.className = 'simplex-table';
@@ -216,7 +217,6 @@ function parseSimplexTable(simplexTable, container, withDeltas = false) {
             tableHTML += `<th>$?$</th>`;
         }
         
-        
         // Значения в ячейках
         for (let j = 0; j < tableau[i].length; j++) {
           const value = tableau[i][j];
@@ -226,20 +226,25 @@ function parseSimplexTable(simplexTable, container, withDeltas = false) {
     }
 
     if (withDeltas) {
+        let mValuesPresent = simplexTable.mvalues != null;
         tableHTML += '<tr>';
         tableHTML += '<th>$\\Delta$</th>';
         const lastRowIndex = tableau.length - 1;
         for (let j = 0; j < tableau[lastRowIndex].length; j++) {
-            tableHTML += `<td>$${fractionToLatex(tableau[lastRowIndex][j])}$</td>`;
+            let tableText = '';
+            if (mValuesPresent) {
+                tableText = `$${fractionToLatex(mDeltaToFraction(tableau[lastRowIndex][j], simplexTable.mvalues[j]))}$`;
+            } else {
+                tableText = `$${fractionToLatex(tableau[lastRowIndex][j])}$`;
+            }
+            tableHTML += `<td>${tableText}</td>`;
         }
         tableHTML += '</tr>';
     }
 
-    
     tableHTML += '</table>';
     
     table.innerHTML = tableHTML;
-    container.appendChild(table);
     return table;
 }
 
@@ -281,8 +286,9 @@ function parseRemoveNegativeBSteps(steps) {
         beforeSimplexTableP.innerText = 'В столбце $b$ присутствуют отрицательные значения.'
         container.appendChild(beforeSimplexTableP);
 
-        let beforeTable = parseSimplexTable(simplexTableBefore, container);
+        let beforeTable = parseSimplexTable(simplexTableBefore);
         highlightRowColumnAndIntersection(beforeTable, row + 2, column + 1);
+        container.appendChild(beforeTable);
 
         let afterSimplexTableP = document.createElement('p');
 
@@ -300,7 +306,7 @@ function parseRemoveNegativeBSteps(steps) {
                                        `Делим строку $${row + 1}$ на $${fractionToLatex(maxNegativeRowElement)}$. Из остальных строк вычитаем строку $${row + 1}$, умноженную на соответствующий элемент в столбце $${column + 1}$.`
         container.appendChild(afterSimplexTableP);
 
-        parseSimplexTable(simplexTableAfter, container);
+        container.appendChild(parseSimplexTable(simplexTableAfter));
     }
 
     return container;
@@ -310,10 +316,11 @@ function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
     let container = document.createElement('div');
     container.id = 'deltaCalculatingStep';
 
-    let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, simplexTable.tableau[simplexTable.tableau.length - 1], simplexTable.basis);
+    let deltas = parseDeltasBasic(simplexTable.tableau[simplexTable.tableau.length - 1]);
+    let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, deltas, simplexTable.basis);
     container.appendChild(deltasAccordion);
     
-    parseSimplexTable(simplexTable, container, true);
+    container.appendChild(parseSimplexTable(simplexTable, true));
     return container;
 }
 
@@ -359,20 +366,25 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
 
         p.innerText += ' - C_' + (i + 1) + " = ";
 
-        for (let j = 0; j < step.varLabels.length - 1; j += 2) {
+        for (let j = 0; j < step.varValues.length - 1; j += 2) {
             if (j != 0) {
-                if (step.varValues[i][j].numerator >= 0) {
+                if (step.varValues[i][j].moreOrEqualZero) {
                     p.innerText += " + ";
                 }
             }
-            if (step.varValues[i][j + 1].numerator >= 0) {
+            if (step.varValues[i][j + 1].moreOrEqualZero) {
                 p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot " + fractionToLatex(step.varValues[i][j + 1]);
             } else {
                 p.innerText += fractionToLatex(step.varValues[i][j]) + " \\cdot (" + fractionToLatex(step.varValues[i][j + 1]) + ")";
             }
         }
 
-        p.innerText += '-' + fractionToLatex(step.columnCost[i]) + ' = ' + fractionToLatex(deltas[i]) + "$";
+        let sign = '-';
+        if (!step.columnCost[i].moreOrEqualZero) {
+            sign = '';
+        }
+        p.innerText += sign + fractionToLatex(step.columnCost[i]) + ' = ' + deltas[i] + "$";
+        console.log(p.innerText);
         accordionContent.appendChild(p);
     }
 
@@ -425,7 +437,8 @@ function parsePivotIterationsStep(pivotSteps) {
         container.appendChild(createP(`Итерация ${i + 1}.`, 'subtitle'));
         if (step.success) {
             let newSimplexTable = step.simplexTableAfter;
-            let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, newSimplexTable.tableau[newSimplexTable.tableau.length - 1], newSimplexTable.basis);
+            let deltas = parseDeltasBasic(newSimplexTable.tableau[newSimplexTable.tableau.length - 1]);
+            let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, deltas, newSimplexTable.basis);
             let optimalCheck = parseCheckOptimality(step.optimalityCheckStep);
             container.appendChild(parsePivotIteration(step, deltasAccordion, optimalCheck));
         } else {
@@ -443,7 +456,7 @@ function parsePivotIteration(step, deltasAccordion, optimalCheck) {
     let afterTableP = document.createElement('p');
 
     if (step.success == false) {
-        parseSimplexTable(step.simplexTableBefore, container, true);
+        container.appendChild(parseSimplexTable(step.simplexTableBefore, true));
         if (step.direction == 'MAX') {
             beforeTableP.innerText += `Определяем стобец, в котором находится минимальная дельта.\n` + 
             `Минимальная дельта: $${fractionToLatex(step.minDelta)}$. Разрешающий столбец: $${step.column + 1}$.\n` + 
@@ -470,16 +483,17 @@ function parsePivotIteration(step, deltasAccordion, optimalCheck) {
                               `На пересечении найденных столбца и строки находится разрешающий элемент: $${fractionToLatex(step.pivotElement)}$`;
 
     container.appendChild(beforeTableP);
-    let beforeTable = parseSimplexTable(step.simplexTableBefore, container, true);
+    let beforeTable = parseSimplexTable(step.simplexTableBefore, true);
     addQColumn(beforeTable, step);
     highlightRowColumnAndIntersection(beforeTable, step.row + 2, step.column + 1);
+    container.appendChild(beforeTable);
 
     afterTableP.innerText += `Делим строку $${step.row + 1}$ на $${fractionToLatex(step.pivotElement)}$. Из остальных строк вычитаем строку $${step.row + 1}$, умноженную на соответствующий элемент в столбце $${step.column + 1}$.\n` +
                              `Базисной переменной для ограничения $${step.row + 1}$ становится $x_${step.column + 1}$.\n` +
                              `Переменная $x_${step.lastBasisVariableIndex + 1}$ выводится из базиса.`;
     
     container.appendChild(afterTableP);
-    parseSimplexTable(step.simplexTableAfter, container, true);
+    container.appendChild(parseSimplexTable(step.simplexTableAfter, true));
     container.appendChild(deltasAccordion);
     container.appendChild(optimalCheck);
     return container;
@@ -529,4 +543,14 @@ function parseAnswer(answer) {
     container.appendChild(titleP);
     container.appendChild(answerP);
     return container;
+}
+
+function parseDeltasBasic(deltasRow) {
+    let deltas = [];
+
+    for (let i = 0; i < deltasRow.length; i++) {
+        deltas.push(fractionToLatex(deltasRow[i]));
+    }
+
+    return deltas;
 }

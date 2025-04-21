@@ -215,7 +215,7 @@ a:hover {
   .accordion-trigger {
     text-decoration: underline;
     cursor: pointer;
-    margin: 10px 0 5px 0;
+    margin: 10px 0;
     display: block;
 }
 .accordion-content {

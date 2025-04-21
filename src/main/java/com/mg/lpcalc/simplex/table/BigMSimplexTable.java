@@ -5,7 +5,8 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
+import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,10 +15,10 @@ public class BigMSimplexTable extends SimplexTable {
 
     private Fraction[] mValues;
     private Direction direction;
-    private SimplexSolutionBuilderBigM builderBigM;
+    private BigMSimplexSolutionBuilder builderBigM;
 
     public BigMSimplexTable(int numSlack, int numAux, int numVars, int numConstraints, Fraction[] costs,
-                            List<Constraint> constraints, ObjectiveFunc objectiveFunc, SimplexSolutionBuilderBigM builder) {
+                            List<Constraint> constraints, ObjectiveFunc objectiveFunc, BigMSimplexSolutionBuilder builder) {
         this.builderBigM = builder;
         this.solutionBuilder = builderBigM.getBuilder();
         this.costs = costs;
@@ -83,29 +84,38 @@ public class BigMSimplexTable extends SimplexTable {
     public void calculateDeltas() {
         Fraction mValue = direction.equals(Direction.MAX) ? Fraction.ONE.negate() : Fraction.ONE;
         for (int i = 0; i < numColumns; i++) {
+            builderBigM.startDeltaColumnCalculating();
             Fraction delta = Fraction.ZERO;
             Fraction deltaM = Fraction.ZERO;
             for (int j = 0; j < numConstraints; j++) {
-                if (isAuxVariable(basis[j])) {
+                Fraction multiplier2 = tableau[j][i];
+                if (isArtVariable(basis[j])) {
                     deltaM = deltaM.add(mValue.multiply(tableau[j][i]));
+                    builderBigM.addDeltasProductWithM("C_" + (basis[j] + 1), "a_{" + (j + 1) + (i + 1) + "}", mValue, multiplier2);
                 } else {
-                    delta = delta.add(costs[basis[j]].multiply(tableau[j][i])); // Δi = ce1·a1i + ce2·a2i + ... + cem·ami
+                    Fraction multiplier1 = costs[basis[j]];
+                    delta = delta.add(multiplier1.multiply(multiplier2)); // Δi = ce1·a1i + ce2·a2i + ... + cem·ami
+                    builderBigM.addDeltasProduct("C_" + (basis[j] + 1), "a_{" + (j + 1) + (i + 1) + "}", multiplier1, multiplier2);
                 }
             }
             if (i != numColumns - 1) {
-                if (isAuxVariable(i)) {
+                if (isArtVariable(i)) {
                     deltaM = deltaM.subtract(mValue);
+                    builderBigM.addColumnCost(deltaM, true);
                 } else {
                     delta = delta.subtract(costs[i]);
+                    builderBigM.addColumnCost(delta, false);
                 }
             }
 
             tableau[numConstraints][i] = delta;
             mValues[i] = deltaM;
         }
+
+        builderBigM.endCalculateDeltas();
     }
 
-    private boolean isAuxVariable(int variable) {
+    private boolean isArtVariable(int variable) {
         return variable >= numSlack + numVars;
     }
 
@@ -177,7 +187,7 @@ public class BigMSimplexTable extends SimplexTable {
         System.out.println(Arrays.toString(mValues));
     }
 
-    public boolean pivot(Direction direction, SimplexSolutionBuilderBigM solutionBuilder) {
+    public boolean pivot(Direction direction, BigMSimplexSolutionBuilder solutionBuilder) {
         int pivotColumn = findPivotColumn(direction);
         int pivotRow = findPivotRow(pivotColumn);
         if (pivotRow == -1) {
@@ -188,5 +198,9 @@ public class BigMSimplexTable extends SimplexTable {
         gaussianElimination(pivotRow, pivotColumn);
         setBasisVariable(pivotColumn, pivotRow);
         return true;
+    }
+
+    public Fraction[] getMValues() {
+        return Arrays.copyOf(mValues, mValues.length);
     }
 }

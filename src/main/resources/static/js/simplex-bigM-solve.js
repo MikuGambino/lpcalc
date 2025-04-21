@@ -17,6 +17,10 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 3. Поиск первоначального базиса.', 'subtitle'));
     solutionContainer.appendChild(findBasisStep);
 
+    let calcDeltasStep = parseBigMCalcDeltasStep(solution.calculateDeltasStep, solution.simplexTableWithDeltas);
+    solutionContainer.appendChild(createP('Шаг 4. Расчёт дельт (оценок).', 'subtitle'));
+    solutionContainer.appendChild(calcDeltasStep);
+
     activateAccordions();
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
@@ -115,8 +119,9 @@ function parseFindBasisStepBigM(table, objectiveFunc) {
         }
     }
 
-    let simplexTableHTML = parseSimplexTable(table, container);
+    let simplexTableHTML = parseSimplexTable(table);
     modifySimplexTableBigM(simplexTableHTML, table, objectiveFunc);
+    container.appendChild(simplexTableHTML);
     container.appendChild(createP('Базиз успешно найден.'));
     return container;
 }
@@ -145,4 +150,29 @@ function modifySimplexTableBigM(tableHTML, simplexTable, objectiveFunc, withQ = 
             rows[i].cells[0].textContent = `$u_${basis[i - 2] - artVariablesMinNumber + 1}$`;
         }
     }
+}
+
+function parseBigMCalcDeltasStep(step, table) {
+    let container = document.createElement('div');
+    container.id = 'calcDeltasStep';
+
+    let tableHTML = parseSimplexTable(table, true);
+
+    let deltas = getDeltasFromTable(tableHTML);
+    let deltasAccordion = parseDeltasCalculationsAccordion(step, deltas, table.basis);
+
+    container.appendChild(deltasAccordion);
+    container.appendChild(tableHTML);
+
+    return container;
+}
+
+function getDeltasFromTable(table) {
+    const lastRow = table.rows[table.rows.length - 1];
+    let deltas = [];
+    for (let i = 1; i < lastRow.cells.length; i++) {
+        deltas.push(lastRow.cells[i].textContent.slice(1, -1)); // Убираем знаки $$
+    }
+
+    return deltas;
 }

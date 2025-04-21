@@ -4,15 +4,15 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
-import com.mg.lpcalc.simplex.model.solution.BasicSimplexSolution;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
 import com.mg.lpcalc.simplex.model.solution.Solution;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilderBigM;
+import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BigMMethod implements SimplexMethod {
@@ -24,10 +24,10 @@ public class BigMMethod implements SimplexMethod {
     private int numConstraints;
     private int numSlacks;
     private int numAuxVars;
-    private SimplexSolutionBuilderBigM solutionBuilder;
+    private BigMSimplexSolutionBuilder solutionBuilder;
 
     public BigMMethod(List<Constraint> constraints, ObjectiveFunc objectiveFunc, Direction direction,
-                              int numVars, int numConstraints, SimplexSolutionBuilderBigM solutionBuilder) {
+                              int numVars, int numConstraints, BigMSimplexSolutionBuilder solutionBuilder) {
         this.constraints = constraints;
         this.objectiveFunc = objectiveFunc;
         this.direction = direction;
@@ -54,6 +54,8 @@ public class BigMMethod implements SimplexMethod {
 
         simplexTable.print();
         simplexTable.calculateDeltas();
+        solutionBuilder.setSimplexTableWithDeltas(new SimplexTableDTO(simplexTable));
+        System.out.println(Arrays.toString(simplexTable.getMValues()));
         simplexTable.print();
 
         System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
