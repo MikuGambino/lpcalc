@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 *.java~
+*.html~
 
 ### STS ###
 .apt_generated
