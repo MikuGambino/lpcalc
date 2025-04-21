@@ -3,6 +3,7 @@ package com.mg.lpcalc.simplex.model.solution;
 import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
+import com.mg.lpcalc.simplex.table.SimplexTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,16 @@ public class SimplexTableDTO {
     private int numColumns;
     private int[] basis;
     private Fraction[] mValues;
+
+    public SimplexTableDTO(SimplexTable simplexTable) {
+        this.basis = simplexTable.getBasis().clone();
+        this.costs = simplexTable.costsCopy();
+        this.tableau = simplexTable.tableauCopy();
+        this.numVars = simplexTable.getNumVars();
+        this.numSlack = simplexTable.getNumSlack();
+        this.numConstraints = simplexTable.getNumConstraints();
+        this.numColumns = simplexTable.getNumColumns();
+    }
 
     public SimplexTableDTO(BasicSimplexTable simplexTable) {
         this.basis = simplexTable.getBasis().clone();
