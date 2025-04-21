@@ -4,10 +4,7 @@ import com.mg.lpcalc.model.Fraction;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.model.solution.BigMCalculateDeltasStep;
-import com.mg.lpcalc.simplex.model.solution.BigMSolution;
-import com.mg.lpcalc.simplex.model.solution.FractionM;
-import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
+import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 import lombok.Data;
 
@@ -79,5 +76,9 @@ public class BigMSimplexSolutionBuilder {
         solution.setSimplexTableWithDeltas(simplexTableDTO);
         solution.setCalculateDeltasStep(calculateDeltasStep);
         this.calculateDeltasStep = new BigMCalculateDeltasStep();
+    }
+
+    public void addOptimalityCheckStep(boolean optimal) {
+        this.solution.setOptimalityCheckStep(builder.createOptimalityCheckStep(optimal));
     }
 }

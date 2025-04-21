@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// todo возможно добавить абстрактных методов (но после реализации двухфазного симплекса)
+// todo возможно добавить абстрактных методов
 @Data
 public abstract class SimplexTable {
     protected Fraction[][] tableau;

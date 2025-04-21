@@ -55,10 +55,10 @@ public class BigMMethod implements SimplexMethod {
         simplexTable.print();
         simplexTable.calculateDeltas();
         solutionBuilder.setSimplexTableWithDeltas(new SimplexTableDTO(simplexTable));
-        System.out.println(Arrays.toString(simplexTable.getMValues()));
         simplexTable.print();
 
         System.out.println("Is optimal: " + simplexTable.isOptimal(direction));
+        solutionBuilder.addOptimalityCheckStep(simplexTable.isOptimal(direction));
         while (!simplexTable.isOptimal(direction)) {
             boolean success = simplexTable.pivot(direction, solutionBuilder);
             if (!success) {

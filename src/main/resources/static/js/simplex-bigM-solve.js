@@ -21,6 +21,10 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 4. Расчёт дельт (оценок).', 'subtitle'));
     solutionContainer.appendChild(calcDeltasStep);
 
+    let checkOptimalityStep = parseCheckOptimalityStep(solution.optimalityCheckStep);
+    solutionContainer.appendChild(createP('Шаг 5. Проверка оптимальности.', 'subtitle'));
+    solutionContainer.appendChild(checkOptimalityStep);
+
     activateAccordions();
     renderKatexElement('solution-container');
     renderKatexElement('input-block');

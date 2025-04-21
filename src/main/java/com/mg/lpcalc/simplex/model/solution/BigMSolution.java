@@ -14,4 +14,5 @@ public class BigMSolution implements Solution {
     private SimplexTableDTO initialSimplexTable;
     private SimplexTableDTO simplexTableWithDeltas;
     private BigMCalculateDeltasStep calculateDeltasStep;
+    private OptimalityCheckStep optimalityCheckStep;
 }

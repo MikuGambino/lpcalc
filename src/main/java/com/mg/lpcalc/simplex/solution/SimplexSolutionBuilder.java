@@ -12,7 +12,6 @@ import java.util.List;
 
 @Getter
 public class SimplexSolutionBuilder {
-    // todo добавить поле какой метод или отдельный класс для каждого метода
     private BasicSimplexSolution basicSimplexSolution = new BasicSimplexSolution();
     private Direction direction;
     private List<Constraint> constraints;
@@ -120,7 +119,11 @@ public class SimplexSolutionBuilder {
     }
 
     public void addOptimalityCheckStep(boolean optimal) {
-        this.basicSimplexSolution.setOptimalityCheckStep(new OptimalityCheckStep(optimal, direction));
+        this.basicSimplexSolution.setOptimalityCheckStep(createOptimalityCheckStep(optimal));
+    }
+
+    public OptimalityCheckStep createOptimalityCheckStep(boolean optimal) {
+        return new OptimalityCheckStep(optimal, direction);
     }
 
     public void saveSimplexRelations(List<Fraction> simplexRelations, Fraction targetQ) {
