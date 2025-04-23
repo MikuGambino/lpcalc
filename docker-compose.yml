@@ -1,0 +1,8 @@
+services:
+
+  app:
+    container_name: lpcalcV1
+    restart: always
+    build: .
+    ports:
+      - "8088:8080"

@@ -156,7 +156,7 @@ public class Graph implements SVGElement {
     private void addPerpendicularLine() {
         svg.append("\t\t");
         perpendicularLine.setStroke("#c20000");
-        perpendicularLine.setStrokeWidth(0.5);
+        perpendicularLine.setStrokeWidth(0.7);
         svg.append(perpendicularLine.toSVG());
     }
 

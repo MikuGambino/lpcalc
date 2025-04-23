@@ -186,7 +186,7 @@ function sendData() {
     const data = getData();
     console.log(data);
     
-    fetch('http://localhost:8080/solve/simplex', {
+    fetch('/solve/simplex', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

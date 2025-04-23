@@ -184,7 +184,7 @@ function sendData() {
     const data = getData();
     console.log(data);
 
-    fetch('http://localhost:8080/solve/graph', {
+    fetch('/solve/graph', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
