@@ -1,3 +1,5 @@
+let objectiveFunc;
+
 function printInput(input) {
     document.getElementById('func-dir').innerText = input.objective.direction == "MAX" ? "наибольшее" : "наименьшее";
     // Отрисовка целевой функции
@@ -16,6 +18,7 @@ function printInput(input) {
 }
 
 function parseBasicSimplexAnswer(solution) {
+    objectiveFunc = solution.objectiveFunc;
     let solutionContainer = document.getElementById('solution-container');
     solutionContainer.innerHTML = '';
     let algoTitle = document.createElement('h2');
@@ -317,6 +320,9 @@ function parseCalculatingDeltasStep(simplexTable, calculateDeltasStep) {
     container.id = 'deltaCalculatingStep';
 
     let tableHTML = parseSimplexTable(simplexTable, true);
+    if (simplexTable.mvalues != null) {
+        modifySimplexTableBigM(tableHTML, simplexTable);
+    }
 
     let deltas = getDeltasFromTable(tableHTML);
     let deltasAccordion = parseDeltasCalculationsAccordion(calculateDeltasStep, deltas, simplexTable.basis);
@@ -357,9 +363,9 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
 
     for (let i = 0; i < step.columnCost.length; i++) {
         let p = document.createElement('p');
-        p.innerText = `$\\Delta_${i + 1} = `;
+        p.innerText = `$\\Delta_{${i + 1}} = `;
         
-        for (let j = 0; j < step.varLabels.length - 1; j += 2) {
+        for (let j = 0; j < step.varLabels[i].length - 1; j += 2) {
             p.innerText += step.varLabels[i][j] + " \\cdot " + step.varLabels[i][j + 1];
             if (j + 2 < step.varLabels.length - 1) {
                 p.innerText += " + ";
@@ -368,7 +374,7 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
 
         p.innerText += ' - C_' + (i + 1) + " = ";
 
-        for (let j = 0; j < step.varValues.length - 1; j += 2) {
+        for (let j = 0; j < step.varValues[i].length - 1; j += 2) {
             if (j != 0) {
                 if (step.varValues[i][j].moreOrEqualZero) {
                     p.innerText += " + ";
@@ -386,7 +392,6 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
             sign = '';
         }
         p.innerText += sign + fractionToLatex(step.columnCost[i]) + ' = ' + deltas[i] + "$";
-        console.log(p.innerText);
         accordionContent.appendChild(p);
     }
 
@@ -445,10 +450,6 @@ function parsePivotIterationsStep(pivotSteps, answer) {
         }
     }
 
-    if (answer.answerType == 'HAS_ART_VARS') {
-        container.appendChild(createP('Базис содержит искусственные переменные. Решения задачи не существует.'));
-    }
-
     return container;
 }
 
@@ -487,6 +488,9 @@ function parsePivotIteration(step, optimalCheck) {
 
     container.appendChild(beforeTableP);
     let beforeTable = parseSimplexTable(step.simplexTableBefore, true);
+    if (step.simplexTableBefore.mvalues != null) {
+        modifySimplexTableBigM(beforeTable, step.simplexTableBefore);
+    }
     addQColumn(beforeTable, step);
     highlightRowColumnAndIntersection(beforeTable, step.row + 2, step.column + 1);
     container.appendChild(beforeTable);
@@ -497,6 +501,9 @@ function parsePivotIteration(step, optimalCheck) {
     
     container.appendChild(afterTableP);
     let afterTableHTML = parseSimplexTable(step.simplexTableAfter, true);
+    if (step.simplexTableAfter.mvalues != null) {
+        modifySimplexTableBigM(afterTableHTML, step.simplexTableBefore);
+    }
     container.appendChild(afterTableHTML);
     let deltasAccordion = parseDeltasCalculationsAccordion(step.calculateDeltasStep, getDeltasFromTable(afterTableHTML), step.simplexTableAfter.basis);
     container.appendChild(deltasAccordion);
@@ -561,3 +568,35 @@ function getDeltasFromTable(table) {
 
     return deltas;
 }
+function activateAccordions() {
+    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const content = trigger.nextElementSibling;
+            
+            trigger.classList.toggle('open');
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+}
+
+function removeAnswerContainers() {
+    const answerContainers = document.querySelectorAll('div.answerContainer');
+
+    answerContainers.forEach(container => {
+    container.remove();
+    });
+}
+
+function createP(text, classname = '') {
+    let p = document.createElement('p');
+    p.innerText = text;
+    if (classname != '') {
+        p.className = classname;
+    }
+    return p;
+} 

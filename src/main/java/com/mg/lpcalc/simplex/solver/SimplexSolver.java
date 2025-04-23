@@ -3,7 +3,7 @@ package com.mg.lpcalc.simplex.solver;
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Method;
 import com.mg.lpcalc.simplex.model.*;
-import com.mg.lpcalc.simplex.model.solution.Solution;
+import com.mg.lpcalc.simplex.model.solution.SimplexSolution;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 
@@ -26,7 +26,7 @@ public class SimplexSolver {
         this.method = problem.getMethod();
     }
 
-    public Solution solve() {
+    public SimplexSolution solve() {
         SimplexMethod simplexMethod = null;
         if (method.equals(Method.BASIC)) {
             SimplexSolutionBuilder solutionBuilder = new SimplexSolutionBuilder(constraints, direction);

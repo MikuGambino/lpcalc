@@ -20,9 +20,9 @@ public class Axis implements SVGElement {
         Text text;
         // Если ось X
         if (x1 == 0) {
-            text = new Text(x2 - 5, -(y2 - 6), "axis", "X₁");
+            text = new Text(x2 - 5, -(y2 - 8), "axis", "X₁");
         } else {
-            text = new Text(x2 - 8, -y2, "axis", "X₂");
+            text = new Text(x2 - 10, -y2, "axis", "X₂");
         }
 
         svg.append(text.toSVG());

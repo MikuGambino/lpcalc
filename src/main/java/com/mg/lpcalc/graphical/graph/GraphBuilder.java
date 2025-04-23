@@ -74,9 +74,6 @@ public class GraphBuilder {
         }
         graphLines.add(line);
 
-        // Сортировка точек многоугольника
-        System.out.println("FEASIBLE REGION!!");
-        System.out.println(feasibleRegion);
         // Преобразование координат в пиксели
         List<Point> feasibleRegionPx = feasibleRegionPointsToPx(feasibleRegion, graphLines);
         // Сортировка точек для построения многоугольника
@@ -88,8 +85,6 @@ public class GraphBuilder {
 
         Graph newGraph = new Graph(graphParams, graphLines, polygon, feasibleRegionPoints, axisCircles);
         this.graphs.add(newGraph);
-        System.out.println(newGraph.toSVG());
-        System.out.println("-------------------");
         return newGraph.toSVG();
     }
 
@@ -149,7 +144,6 @@ public class GraphBuilder {
     }
 
     private List<Circle> pointsToCircles(List<Point> points) {
-        System.out.println(points);
         List<Circle> circles = new ArrayList<>();
         for (Point point : points) {
             if (point.isUnbounded()) continue;
@@ -162,7 +156,8 @@ public class GraphBuilder {
     }
 
     private List<Point> feasibleRegionPointsToPx(List<Point> points, List<Line> lines) {
-        // "Бесконечная точка" и точка, выше которой располагается ОДР в данном алгоритме равнозначны
+        // Точка которая находится за пределами графика
+        // и точка, выше которой располагается ОДР в данном алгоритме равнозначны
         // Чтобы не писать дублирующего кода, "feasibleRegionIsAbove" точки делаем также Unbounded
         List<Point> pCopies = new ArrayList<>();
         for (Point point : points) {
@@ -180,7 +175,7 @@ public class GraphBuilder {
 
         for (Point point : pCopies) {
             Point pxPoint = toPx(point);
-            // Если точка не лежит не является "бесконечной", то точка добавляется в массив,
+            // Если точка не лежит в пределах видимого графика, то точка добавляется в массив,
             // и происходит переход к следующей
             if (!point.isUnbounded()) {
                 pointsPx.add(pxPoint);
@@ -203,7 +198,8 @@ public class GraphBuilder {
             }
 
             // Если точка не находится на прямой, значит она лежит на оси координат
-            // В таком случае, для "бесконечной" координаты точки используется край видимой области (ViewBox)
+            // В таком случае, для точки, которая лежит за пределами графика:
+            // в качестве координат точки используется край видимой области (ViewBox)
             Point newPoint = null;
 
             if (point.getY() == 0) {
@@ -286,10 +282,12 @@ public class GraphBuilder {
 
         Graph lastGraph = this.graphs.get(graphs.size() - 1);
         lastGraph.setObjectiveFunc(objectiveFuncArrow);
-        System.out.println(lastGraph.toSVG());
     }
 
-    public void getFinalGraph(ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
+    public String getFinalGraph(ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
+        if (optimalPoints.isEmpty()) {
+            return this.graphs.get(graphs.size() - 1).toSVG();
+        }
         Point answerPoint = optimalPoints.get(0);
         double a = objectiveFunc.getA();
         double b = objectiveFunc.getB();
@@ -297,13 +295,13 @@ public class GraphBuilder {
 
         // уравнение прямой через нормальный вектор
         Constraint perpendicularConstraint = new Constraint(a, b, c);
-        System.out.println(perpendicularConstraint);
         Line perpendicularLine = getLineByConstraint(perpendicularConstraint);
+        perpendicularLine.setStrokeWidth(0.7);
         List<Circle> answerCircles = pointsToCircles(optimalPoints);
         Graph lastGraph = this.graphs.get(graphs.size() - 1);
         lastGraph.setPerpendicularLine(perpendicularLine);
         lastGraph.setOptimalPoints(answerCircles);
-        System.out.println(lastGraph.toSVG());
+        return lastGraph.toSVG();
     }
 
     // Преобразования координат в пиксели
@@ -315,5 +313,4 @@ public class GraphBuilder {
     private double toCords(Double num) {
         return num / graphParams.getPxSize();
     }
-
 }

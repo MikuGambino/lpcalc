@@ -10,7 +10,7 @@ import java.util.Locale;
 @Data
 public class Graph implements SVGElement {
     private GraphParams graphParams;
-    private StringBuilder svg = new StringBuilder();
+    private StringBuilder svg;
     private List<Line> lines;
     private Polygon feasibleRegion;
     private List<Circle> feasibleRegionPoints;
@@ -68,7 +68,7 @@ public class Graph implements SVGElement {
     private void addLines() {
         for (int i = 0; i < lines.size(); i++) {
             Line line = lines.get(i);
-            String label = "(%s)".formatted(i);
+            String label = "(%s)".formatted(i + 1);
             Text text = getText(line, label);
             svg.append("\t\t");
             svg.append(line.toSVG());
@@ -169,6 +169,7 @@ public class Graph implements SVGElement {
     }
 
     public String toSVG() {
+        this.svg = new StringBuilder();
         addSvgMetadata();
         addAxis();
         addGroup();
@@ -185,6 +186,7 @@ public class Graph implements SVGElement {
         if (optimalPoints != null) {
             addOptimalPoints();
         }
+        svg.append("</g></svg>");
         return svg.toString();
     }
 }

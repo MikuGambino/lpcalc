@@ -4,6 +4,7 @@ import com.mg.lpcalc.graphical.graph.GraphBuilder;
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.ObjectiveFunc;
 import com.mg.lpcalc.graphical.model.Point;
+import com.mg.lpcalc.graphical.model.solution.GraphicalSolution;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -22,13 +23,14 @@ public class GraphicalSolutionBuilder {
         this.axisPoints.add(axisPoints);
     }
 
-    public void init(List<Point> points, ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
+    public GraphicalSolution getSolution(List<Point> points, ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
         this.graphBuilder = new GraphBuilder(points);
         for (int i = 0; i < constraints.size(); i++) {
             graphBuilder.addConstraint(constraints.get(i), feasibleRegions.get(i), axisPoints.get(i));
         }
 
         graphBuilder.addObjectiveFunc(objectiveFunc);
-        graphBuilder.getFinalGraph(objectiveFunc, optimalPoints);
+        String finalGraph = graphBuilder.getFinalGraph(objectiveFunc, optimalPoints);
+        return new GraphicalSolution(finalGraph);
     }
 }

@@ -6,9 +6,9 @@ import com.mg.lpcalc.model.enums.Operator;
 import com.mg.lpcalc.simplex.model.solution.Answer;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
-import com.mg.lpcalc.simplex.model.solution.bigm.BigMSolution;
+import com.mg.lpcalc.simplex.model.solution.bigm.BigMSimplexSolution;
 import com.mg.lpcalc.simplex.model.solution.SimplexTableDTO;
-import com.mg.lpcalc.simplex.model.solution.Solution;
+import com.mg.lpcalc.simplex.model.solution.SimplexSolution;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 
@@ -37,7 +37,7 @@ public class BigMMethod implements SimplexMethod {
     }
 
     @Override
-    public Solution run() {
+    public SimplexSolution run() {
         makeFreeCoefficientsPositive();
         countArtVariables();
 
@@ -75,7 +75,7 @@ public class BigMMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        BigMSolution solution = solutionBuilder.getSolution();
+        BigMSimplexSolution solution = solutionBuilder.getSolution();
         solution.setAnswer(answer);
         return solution;
     }

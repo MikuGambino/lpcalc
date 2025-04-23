@@ -1,4 +1,5 @@
 function parseBigMSimplexAnswer(solution) {
+    objectiveFunc = solution.objectiveFunc;
     let solutionContainer = document.getElementById('solution-container');
     solutionContainer.innerHTML = '';
     let algoTitle = document.createElement('h2');
@@ -30,9 +31,13 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 5. Проверка оптимальности.', 'subtitle'));
     solutionContainer.appendChild(checkOptimalityStep);
 
-    let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
-    solutionContainer.appendChild(createP('Шаг 6. Итерации симплекс-алгоритма.', 'subtitle'));
-    solutionContainer.appendChild(simplexIterationsStep);
+    if (solution.pivotSteps.length == 0) {
+        solutionContainer.appendChild(createP('Базис содержит искусственные переменные. Решения задачи не существует.'));
+    } else {
+        let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
+        solutionContainer.appendChild(createP('Шаг 6. Итерации симплекс-алгоритма.', 'subtitle'));
+        solutionContainer.appendChild(simplexIterationsStep);
+    }
 
     solutionContainer.appendChild(parseAnswer(solution.answer));
     activateAccordions();
@@ -111,9 +116,10 @@ function parseModifyObjectiveFuncStep(objectiveFunc, initialTable) {
     }
 
     for (let i = 0; i < artVariablesCount; i++) {
-        objectiveLatex += sign + 'Mu_' + (i + 1) + '$';
+        objectiveLatex += sign + 'Mu_' + (i + 1);
     }
 
+    objectiveLatex += '$';
     container.appendChild(createP(objectiveLatex, 'latex'));
     return container;
 }
@@ -134,13 +140,13 @@ function parseFindBasisStepBigM(table, objectiveFunc) {
     }
 
     let simplexTableHTML = parseSimplexTable(table);
-    modifySimplexTableBigM(simplexTableHTML, table, objectiveFunc);
+    modifySimplexTableBigM(simplexTableHTML, table);
     container.appendChild(simplexTableHTML);
     container.appendChild(createP('Базиз успешно найден.'));
     return container;
 }
 
-function modifySimplexTableBigM(tableHTML, simplexTable, objectiveFunc, withQ = 0) {
+function modifySimplexTableBigM(tableHTML, simplexTable, withQ = 0) {
     let artVariablesMinNumber = simplexTable.numSlack + simplexTable.numVars;
     let basis = simplexTable.basis;
 

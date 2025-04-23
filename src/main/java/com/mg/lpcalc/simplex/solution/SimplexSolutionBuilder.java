@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 public class SimplexSolutionBuilder {
-    private BasicSimplexSolution solution = new BasicSimplexSolution();
+    private BasicSimplexSimplexSolution solution = new BasicSimplexSimplexSolution();
     private Direction direction;
     private List<Constraint> constraints;
     private SimplexTableDTO initialSimplexTable;

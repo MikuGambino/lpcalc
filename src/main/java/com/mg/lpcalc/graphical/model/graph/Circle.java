@@ -12,7 +12,7 @@ public class Circle implements SVGElement {
     private double xCoordinate;
     private double yCoordinate;
     private double r = 2;
-    private String fill = "#DF6D14";
+    private String fill = "#F17C3A";
 
     public Circle(double cx, double cy, double xCoordinate, double yCoordinate) {
         this.cx = cx;

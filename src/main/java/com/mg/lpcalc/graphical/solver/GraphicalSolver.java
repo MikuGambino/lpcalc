@@ -1,5 +1,6 @@
 package com.mg.lpcalc.graphical.solver;
 
+import com.mg.lpcalc.graphical.model.solution.GraphicalSolution;
 import com.mg.lpcalc.graphical.solution.GraphicalSolutionBuilder;
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.ObjectiveFunc;
@@ -28,7 +29,7 @@ public class GraphicalSolver {
         this.objectiveFunc = optimizationProblem.getObjectiveFunc();
     }
 
-    public void solve() {
+    public GraphicalSolution solve() {
         List<Constraint> initialConstraints = initConstraints();
 
         for (Constraint c : initialConstraints) {
@@ -36,15 +37,13 @@ public class GraphicalSolver {
         }
 
         for (Constraint c : constraints) {
-            System.out.println("НОВАЯ ПРЯМАЯ НОВАЯ ПРЯМАЯ");
-            System.out.println(c);
             addConstraint(c);
         }
 
         List<Point> optimalPoints = findOptimalSolution();
-
         List<Point> allPoints = findAllFeasiblePoints();
-        solutionBuilder.init(allPoints, objectiveFunc, optimalPoints);
+
+        return solutionBuilder.getSolution(allPoints, objectiveFunc, optimalPoints);
     }
 
     private List<Point> findAllFeasiblePoints() {
@@ -73,15 +72,11 @@ public class GraphicalSolver {
         double maxX = allPoints.get(0).getX();
         double maxY = allPoints.get(0).getY();
 
-        System.out.println("AXIS INTER");
-        System.out.println(allPoints);
         for (Point point : allPoints) {
             if (point.getX() > maxX) maxX = point.getX();
             if (point.getY() > maxY) maxY = point.getY();
         }
 
-
-        System.out.println(maxX);
         this.maxX = maxX;
         this.maxY = maxY;
 
@@ -123,8 +118,6 @@ public class GraphicalSolver {
             }
         }
 
-        System.out.println("INTER INTER");
-        System.out.println(intersections);
         return intersections;
     }
 
@@ -222,15 +215,17 @@ public class GraphicalSolver {
     private List<Point> findOptimalSolution() {
         if (this.currentFeasibleRegion.isEmpty()) {
             System.out.println("Нет допустимых решений (ОДР пуста).");
+            return new ArrayList<>();
         }
 
+        // Вычисление значений целевой функции
         List<Double> zValues = new ArrayList<>();
         for (Point point : this.currentFeasibleRegion) {
             zValues.add(objectiveFunc.getA() * point.getX() + objectiveFunc.getB() * point.getY());
         }
 
         double optimalValue = zValues.get(0);
-        for (double z: zValues) {
+        for (double z : zValues) {
             if (objectiveFunc.isMaximization() && z > optimalValue) {
                 optimalValue = z;
             } else if (objectiveFunc.isMinimization() && z < optimalValue) {
@@ -238,21 +233,29 @@ public class GraphicalSolver {
             }
         }
 
-        System.out.println(zValues);
-
         List<Point> optimalPoints = new ArrayList<>();
         for (int i = 0; i < zValues.size(); i++) {
             if (Math.abs(zValues.get(i) - optimalValue) < EPS) {
                 optimalPoints.add(this.currentFeasibleRegion.get(i));
             }
         }
-
-        if (optimalPoints.size() == 1) {
+        if (zValues.size() == 1 ) {
+            System.out.println("Область допустимых решений точка");
             System.out.println("Оптимальное решение: " + optimalPoints.get(0));
+        } else if (optimalPoints.size() == 1 && hasPointOutsideGraph(optimalPoints)) {
+            System.out.println("Функция неограниченно убывает/возрастает");
+        } else if (optimalPoints.size() == 1) {
+            System.out.println("Оптимальное решение: " + optimalPoints.get(0));
+        } else if (hasPointOutsideGraph(optimalPoints)) {
+            System.out.println("Оптимальное решение находится на луче");
         } else {
             System.out.println("Множество оптимальных решений между вершинами: " + optimalPoints);
         }
 
         return optimalPoints;
+    }
+
+    public boolean hasPointOutsideGraph(List<Point> optimalPoints) {
+        return optimalPoints.stream().anyMatch(p -> p.isFeasibleRegionIsAbove() || p.isUnbounded());
     }
 }

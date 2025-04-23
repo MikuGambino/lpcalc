@@ -6,8 +6,20 @@
     <title>Graphical method</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/task-input.css">
+    <link rel="stylesheet" href="../css/svg-styles.css">
 </head>
 <body>
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">☼</div>
+            <div class="logo-text">LPCalc</div>
+        </a>
+    
+        <nav class="nav">
+            <a href="/simplex" class="nav-item">Симплекс метод</a>
+            <a href="/graphical" class="nav-item active">Графический метод</a>
+        </nav>
+    </header>
     <div id="content-container">
         <div id="input-container">
             <div class="settings-container">
@@ -77,12 +89,16 @@ MAX
                 </div>
             </dialog>
         </div>
+        <div id="solution-container">
+
+        </div>
     </div>
 </body>
 <script>
     
   </script>
   <script src="../js/graphical-method-input.js"></script>
+  <script src="../js/graphical-method-solve.js"></script>
   <script src="../js/popup.js"></script>
   <script src="../js/common-input.js"></script>
 </html>

@@ -5,7 +5,7 @@ import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.solution.*;
-import com.mg.lpcalc.simplex.model.solution.bigm.BigMSolution;
+import com.mg.lpcalc.simplex.model.solution.bigm.BigMSimplexSolution;
 import com.mg.lpcalc.simplex.table.BigMSimplexTable;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class BigMSimplexSolutionBuilder {
     private SimplexSolutionBuilder builder;
-    private BigMSolution solution = new BigMSolution();
+    private BigMSimplexSolution solution = new BigMSimplexSolution();
     private CalculateDeltasStep calculateDeltasStep = new CalculateDeltasStep();
 
     public BigMSimplexSolutionBuilder(List<Constraint> constraints, Direction direction) {

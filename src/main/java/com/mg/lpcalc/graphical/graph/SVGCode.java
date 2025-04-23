@@ -3,22 +3,6 @@ package com.mg.lpcalc.graphical.graph;
 public class SVGCode {
 
     public static final String SVG_METADATA = """
-            <style>
-                text {
-                  font-size: 6px;
-                  paint-order: stroke fill;
-                  transform: scale(1, -1);
-                  stroke: white;
-                  stroke-width: 2;
-                }
-                .no-stroke {
-                  stroke: none;
-                  stroke-width: 2;
-                }
-                .line-label {
-                  font-size: 5px;
-                }
-            </style>
             <svg xmlns='http://www.w3.org/2000/svg' transform='scale(1, -1)' viewBox='%.2f %.2f %.2f %.2f' width='%d' height='%d'>
               <defs>
                 <marker id="arrowhead" markerWidth="5" markerHeight="7"\s
@@ -45,5 +29,7 @@ public class SVGCode {
     public static final String CIRCLE = "<circle cx='%.2f' cy='%.2f' r='%.2f' fill='%s'/>\n";
 
     public static final String TEXT = "<text x='%.2f' y='%.2f' class='%s'>%s</text>\n";
+
+    public static final String TEXT_BACKGROUND = "<rect x='%.2f' y='%.2f' width='%.2f' height='%.2f' fill='#f4f5f7'/>\n";
 
 }

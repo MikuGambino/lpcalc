@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BigMSolution implements Solution {
+public class BigMSimplexSolution implements SimplexSolution {
     private Answer answer;
     private ObjectiveFunc objectiveFunc;
     private AddArtAndSlackVariablesStep addArtAndSlackVariablesStep = new AddArtAndSlackVariablesStep();

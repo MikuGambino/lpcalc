@@ -1,7 +1,7 @@
 package com.mg.lpcalc.simplex.solver;
 
-import com.mg.lpcalc.simplex.model.solution.Solution;
+import com.mg.lpcalc.simplex.model.solution.SimplexSolution;
 
 public interface SimplexMethod {
-    Solution run();
+    SimplexSolution run();
 }

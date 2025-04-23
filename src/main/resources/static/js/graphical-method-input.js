@@ -192,8 +192,9 @@ function sendData() {
         body: JSON.stringify(data)
     })
     .then(response => response.json())
-    .then(data => {
-        console.log('Результат:', data);
+    .then(solution => {
+        console.log('Результат:', solution);
+        parseGraphicalSolution(solution.finalGraphSVG);
     })
     .catch(error => {
         console.error('Ошибка:', error);

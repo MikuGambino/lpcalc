@@ -18,8 +18,8 @@ public class ViewBoxParams {
         this.minX = size + minX * pxSize - paddingPx;
 
         // Если ось не попадает во ViewBox
-        if (this.minX > 240) this.minX = 240;
-        if (this.minY > 240) this.minY = 240;
+        if (this.minX > size - 10) this.minX = size - 10;
+        if (this.minY > size - 10) this.minY = size - 10;
 
         this.size = size;
     }
