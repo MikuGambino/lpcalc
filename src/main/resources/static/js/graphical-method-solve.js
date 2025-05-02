@@ -9,6 +9,10 @@ function parseGraphicalSolution(solution) {
     let addConstraintsSteps = parseAddConstraintSteps(solution.addConstraintSteps);
     solutionContainer.appendChild(addConstraintsSteps);
 
+    let addObjectiveFuncStep = parseAddObjectiveFunc(solution.addObjectiveFunc);
+    solutionContainer.appendChild(createP('Добавление вектора-градиента целевой функции.', 'subtitle'));
+    solutionContainer.appendChild(addObjectiveFuncStep);
+
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
 }
@@ -35,11 +39,11 @@ function parseAddConstraintSteps(steps) {
     let stepsContainer = document.createElement('div');
 
     for (let i = 0; i < steps.length; i++) {
-        stepsContainer.appendChild(createP(`Шаг ${i + 1}. Добавление прямой ограничения.`, 'subtitle'))
+        stepsContainer.appendChild(createP(`Добавление прямой ограничения ${i + 1}.`, 'subtitle'))
 
         let stepContainer = document.createElement('div');
         stepContainer.id = 'addConstraintContainer-' + (i + 1);
-        stepContainer.className = 'addConstraintContainer';
+        stepContainer.className = 'stepContainer';
         let step = steps[i];
 
         stepContainer.appendChild(parseAddContraintStep(step, i + 1));
@@ -123,4 +127,22 @@ function parseAddContraintStep(step, number) {
     }
 
     return container;
+}
+
+function parseAddObjectiveFunc(step) {
+    const { objectiveFunc, inScale, graph } = step;
+
+    let objectiveFuncStepContainer = document.createElement('div');
+    objectiveFuncStepContainer.className = 'stepContainer';
+
+    let descriptionContainer = document.createElement('div');
+    descriptionContainer.appendChild(createP(`Строим вектор, координатами которого являются коэффициенты целевой функции. Координаты: $(${objectiveFunc.a}, ${objectiveFunc.b})$.`));
+    if (!inScale) {
+        descriptionContainer.appendChild(createP(`Вектор нарисован не в масштабе, так как он не помещается на графике.`));
+    }
+
+    objectiveFuncStepContainer.appendChild(descriptionContainer);
+    objectiveFuncStepContainer.appendChild(createSvgContainer(graph));
+
+    return objectiveFuncStepContainer;
 }

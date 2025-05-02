@@ -35,9 +35,9 @@ public class GraphicalSolutionBuilder {
             addConstraintSteps.add(addConstraintStep(constraints.get(i), graph));
         }
 
-        graphBuilder.addObjectiveFunc(objectiveFunc);
+        AddObjectiveFunc addObjectiveFunc = addObjectiveFunc(objectiveFunc);
         String finalGraph = graphBuilder.getFinalGraph(objectiveFunc, optimalPoints);
-        return new GraphicalSolution(finalGraph, addConstraintSteps);
+        return new GraphicalSolution(finalGraph, addConstraintSteps, addObjectiveFunc);
     }
 
     private AddConstraintStep addConstraintStep(Constraint constraint, String graph) {
@@ -134,5 +134,12 @@ public class GraphicalSolutionBuilder {
         steps.add(secondStep);
 
         return new FindInequalityRegion(steps, operator);
+    }
+
+    private AddObjectiveFunc addObjectiveFunc(ObjectiveFunc objectiveFunc) {
+        String graph = graphBuilder.addObjectiveFunc(objectiveFunc);
+        boolean inScale = !graphBuilder.objectiveFuncNotInScale(objectiveFunc);
+
+        return new AddObjectiveFunc(objectiveFunc, graph, inScale);
     }
 }

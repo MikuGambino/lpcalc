@@ -254,7 +254,7 @@ public class GraphBuilder {
         return !(Math.abs(crossProduct) > 1e-9);
     }
 
-    public void addObjectiveFunc(ObjectiveFunc objectiveFunc) {
+    public String addObjectiveFunc(ObjectiveFunc objectiveFunc) {
         ViewBoxParams viewBox = graphParams.getViewBoxParams();
         double minX = viewBox.getMinX() - viewBox.getSize();
         double minY = viewBox.getMinY() - viewBox.getSize();
@@ -266,7 +266,7 @@ public class GraphBuilder {
         double endY = b * graphParams.getPxSize();
 
         // Если функция выходит за график
-        if (endX < minX || endY < minY) {
+        if (objectiveFuncNotInScale(objectiveFunc)) {
             if (endX <= endY) {
                 endX = minX + 5;
                 endY = (objectiveFunc.getA() * endX) / objectiveFunc.getB();
@@ -282,6 +282,19 @@ public class GraphBuilder {
 
         Graph lastGraph = this.graphs.get(graphs.size() - 1);
         lastGraph.setObjectiveFunc(objectiveFuncArrow);
+
+        return lastGraph.toSVG();
+    }
+
+    public boolean objectiveFuncNotInScale(ObjectiveFunc objectiveFunc) {
+        ViewBoxParams viewBox = graphParams.getViewBoxParams();
+        double minX = viewBox.getMinX() - viewBox.getSize();
+        double minY = viewBox.getMinY() - viewBox.getSize();
+
+        double endX = objectiveFunc.getA() * graphParams.getPxSize();
+        double endY = objectiveFunc.getB() * graphParams.getPxSize();
+
+        return endX < minX || endY < minY;
     }
 
     public String getFinalGraph(ObjectiveFunc objectiveFunc, List<Point> optimalPoints) {
