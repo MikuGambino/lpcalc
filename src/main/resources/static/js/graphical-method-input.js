@@ -194,7 +194,8 @@ function sendData() {
     .then(response => response.json())
     .then(solution => {
         console.log('Результат:', solution);
-        parseGraphicalSolution(solution.finalGraphSVG);
+        printInput(data);
+        parseGraphicalSolution(solution);
     })
     .catch(error => {
         console.error('Ошибка:', error);

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GraphicalSolution {
-    private String finalGraphSVG;
-    private List<AddConstraintStep> addConstraintSteps;
+public class FindXStep {
+    private List<String> interceptSteps;
+    private String x;
 }

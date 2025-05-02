@@ -22,6 +22,13 @@ public class Constraint {
         this.c = c;
     }
 
+    public Constraint(Double a, Double b, Double c, Operator operator) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.operator = operator;
+    }
+
     public boolean isLEQ() {
         return operator.equals(Operator.LEQ);
     }

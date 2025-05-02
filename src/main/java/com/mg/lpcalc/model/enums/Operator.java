@@ -1,8 +1,5 @@
 package com.mg.lpcalc.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 public enum Operator {
     LEQ("<="), GEQ(">="), EQ("=");
 
@@ -13,5 +10,11 @@ public enum Operator {
 
     public String getTitle() {
         return title;
+    }
+
+    public Operator getInverted() {
+        if (this.equals(EQ)) return EQ;
+        if (this.equals(LEQ)) return GEQ;
+        return LEQ;
     }
 }

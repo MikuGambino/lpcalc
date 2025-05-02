@@ -91,3 +91,20 @@ function fractionToNumber(input) {
         return input.numerator + "/" + input.denominator;
     }
 }
+
+function printInput(input) {
+    document.getElementById('func-dir').innerText = input.objective.direction == "MAX" ? "наибольшее" : "наименьшее";
+    // Отрисовка целевой функции
+    let objectiveFunc = parseLHS(input.objective.coefficients);
+    updateMathFormula('objFuncInput', 'F = ' + objectiveFunc);
+
+    // Отрисовка ограничений
+    let constraints = '';
+    for (let i = 0; i < input.constraints.length; i++) {
+        let constraint = input.constraints[i];
+        constraints += parseLHS(constraint.coefficients) + parseRHS(constraint.operator, constraint.rhs) + '\\\\';
+    }
+    constraints = '\\begin{cases}' + constraints + '\\end{cases}';
+    updateMathFormula('constraintsInput', constraints);
+    document.getElementById('input-block').hidden = false;
+}

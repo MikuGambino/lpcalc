@@ -244,25 +244,21 @@ input[type=number]::-webkit-outer-spin-button {
     display: flex;
     align-items: center;
 }
-
 .logo {
     display: flex;
     align-items: center;
     gap: 0.8rem;
 }
-
 .logo-icon {
     color: var(--secondary-light);
     font-size: 1.8rem;
     font-weight: bold;
 }
-
 .logo-text {
     font-size: 1.5rem;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
-
 .nav {
     display: flex;
     gap: 1.8rem;
@@ -272,12 +268,10 @@ input[type=number]::-webkit-outer-spin-button {
     margin: 0 auto; 
     width: fit-content;
 }
-
 .logo {
     color: white;
     text-decoration: none;
 }
-
 .nav-item {
     font-size: 20px;
     color: white;
@@ -287,15 +281,12 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 0.5rem 0.2rem;
     position: relative;
 }
-
 .nav-item:hover, .logo-text:hover {
     color: var(--secondary-light);
 }
-
 .active {
     position: relative;
 }
-
 .active:after {
     content: '';
     position: absolute;
@@ -305,4 +296,26 @@ input[type=number]::-webkit-outer-spin-button {
     height: 3px;
     background-color: var(--secondary-light);
     border-radius: 2px;
+}
+.latex {
+    margin: 5px 0;
+}
+#func-dir {
+    font-weight: bold;
+}
+#slackVariablesListSpan {
+    font-weight: bold;
+}
+.findXContainer {
+    margin: 10px 0;
+    display: flex;
+}
+.findX2Container {
+    margin-left: 40px;
+    padding-left: 40px;
+    border-left: 2px solid;
+}
+.addConstraintContainer {
+    display: flex;
+    margin-bottom: 35px; 
 }
