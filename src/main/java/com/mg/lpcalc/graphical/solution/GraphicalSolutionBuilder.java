@@ -18,9 +18,20 @@ public class GraphicalSolutionBuilder {
     private List<Constraint> constraints = new ArrayList<>();
     private List<List<Point>> feasibleRegions = new ArrayList<>();
     private List<List<Point>> axisPoints = new ArrayList<>();
+    private ObjectiveFunc objectiveFunc;
     private GraphBuilder graphBuilder;
+    private GraphicalAnswer graphicalAnswer;
+    private boolean feasibleRegionEmpty = false;
+
+    public GraphicalSolutionBuilder(ObjectiveFunc objectiveFunc) {
+        this.objectiveFunc = objectiveFunc;
+    }
 
     public void addConstraint(Constraint constraint, List<Point> feasibleRegion, List<Point> axisPoints) {
+        if (feasibleRegion.isEmpty() && feasibleRegionEmpty) return;
+        if (feasibleRegion.isEmpty()){
+            feasibleRegionEmpty = true;
+        }
         constraints.add(constraint);
         feasibleRegions.add(feasibleRegion);
         this.axisPoints.add(axisPoints);
@@ -35,9 +46,12 @@ public class GraphicalSolutionBuilder {
             addConstraintSteps.add(addConstraintStep(constraints.get(i), graph));
         }
 
-        AddObjectiveFunc addObjectiveFunc = addObjectiveFunc(objectiveFunc);
+        AddObjectiveFunc addObjectiveFunc = null;
+        if (!optimalPoints.isEmpty()) {
+            addObjectiveFunc = addObjectiveFunc(objectiveFunc);
+        }
         String finalGraph = graphBuilder.getFinalGraph(objectiveFunc, optimalPoints);
-        return new GraphicalSolution(finalGraph, addConstraintSteps, addObjectiveFunc);
+        return new GraphicalSolution(finalGraph, addConstraintSteps, addObjectiveFunc, graphicalAnswer);
     }
 
     private AddConstraintStep addConstraintStep(Constraint constraint, String graph) {
@@ -141,5 +155,119 @@ public class GraphicalSolutionBuilder {
         boolean inScale = !graphBuilder.objectiveFuncNotInScale(objectiveFunc);
 
         return new AddObjectiveFunc(objectiveFunc, graph, inScale);
+    }
+
+    public PointSolution solutionOnePoint(Point point) {
+        boolean pointOnAxis = pointIsOnAxis(point);
+        String objValueLatex = calculateObjectiveFuncValue(objectiveFunc, point);
+        PointSolution pointSolution;
+
+        FindPointCoordinates findPointCoordinates;
+        if (!pointOnAxis) {
+            findPointCoordinates = parsePointIsIntersection(point);
+        } else {
+            findPointCoordinates = new FindPointCoordinates(true, point);
+        }
+
+        pointSolution = new PointSolution(point, objValueLatex, findPointCoordinates);
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_POINT, pointSolution);
+
+        return pointSolution;
+    }
+
+    private boolean pointIsOnAxis(Point point) {
+        return point.getY() == 0 || point.getX() == 0;
+    }
+
+    private FindPointCoordinates parsePointIsIntersection(Point point) {
+        List<Constraint> constraints = new ArrayList<>(point.getConstraints());
+        Constraint constraint1 = constraints.get(0);
+        Constraint constraint2 = constraints.get(1);
+        if (constraint1.getNumber() > constraint2.getNumber()) {
+            Constraint tmp = constraint1;
+            constraint1 = constraint2;
+            constraint2 = tmp;
+        }
+        String systemOfEquationsLatex = LatexParser.parseFindXFromSystem(List.of(constraint1, constraint2), point);
+        return new FindPointCoordinates(false, systemOfEquationsLatex, point,
+                constraint1.getNumber(), constraint2.getNumber());
+    }
+
+    private String calculateObjectiveFuncValue(ObjectiveFunc objectiveFunc, Point point) {
+        double value = objectiveFunc.getA() * point.getX() + objectiveFunc.getB() * point.getY();
+        return LatexParser.parseObjectiveFunc(objectiveFunc, point, value);
+    }
+
+    public void setSolutionSegment(Point point1, Point point2) {
+        PointSolution pointSolution1 = solutionOnePoint(point1);
+        PointSolution pointSolution2 = solutionOnePoint(point2);
+
+        SegmentSolution segmentSolution = new SegmentSolution(pointSolution1, pointSolution2);
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_SEGMENT, segmentSolution);
+    }
+
+    public void setSolutionRay(Point point1, Point point2) {
+        Point point;
+        Point unboundedPoint;
+
+        if (point1.isUnbounded()) {
+            unboundedPoint = point1;
+            point = point2;
+        } else {
+            unboundedPoint = point2;
+            point = point1;
+        }
+
+        PointSolution pointSolution = solutionOnePoint(point);
+        Constraint constraint = findRayConstraint(point, unboundedPoint);
+        String systemLatex = parseRayAnswerSystem(point, unboundedPoint, constraint);
+        String constraintLatex = LatexParser.parseConstraint(constraint);
+        int constraintNumber = constraint.getNumber();
+        RaySolution raySolution = new RaySolution(pointSolution, systemLatex, constraintLatex, constraintNumber);
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_RAY, raySolution);
+
+    }
+
+    private Constraint findRayConstraint(Point point, Point unboundedPoint) {
+        List<Constraint> pointConstraints = new ArrayList<>(point.getConstraints());
+        List<Constraint> unboundedPointConstraints = new ArrayList<>(unboundedPoint.getConstraints());
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (pointConstraints.get(i).getNumber() == unboundedPointConstraints.get(j).getNumber()) {
+                    return pointConstraints.get(i);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String parseRayAnswerSystem(Point point, Point unboundedPoint, Constraint constraint) {
+        String systemLatex;
+        if (unboundedPoint.getY() > point.getY()) {
+            systemLatex = LatexParser.parseParamSystemOfEquation(point, -constraint.getB(), constraint.getA());
+        } else {
+            systemLatex = LatexParser.parseParamSystemOfEquation(point, constraint.getB(), -constraint.getA());
+        }
+
+        return systemLatex;
+    }
+
+    public void setUnboundedFunction() {
+        if (objectiveFunc.isMinimization()) {
+            this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.UNBOUNDED_MIN);
+        } else {
+            this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.UNBOUNDED_MAX);
+        }
+    }
+
+    public void setFeasibleRegionPoint(Point point) {
+        PointSolution pointSolution = solutionOnePoint(point);
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.FEASIBLE_REGION_POINT, pointSolution);
+    }
+
+    public void setFeasibleRegionEmpty() {
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.FEASIBLE_REGION_EMPTY);
     }
 }

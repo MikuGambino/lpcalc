@@ -13,6 +13,7 @@ public class Circle implements SVGElement {
     private double yCoordinate;
     private double r = 2;
     private String fill = "#F17C3A";
+    private String label;
 
     public Circle(double cx, double cy, double xCoordinate, double yCoordinate) {
         this.cx = cx;
@@ -27,6 +28,12 @@ public class Circle implements SVGElement {
     }
 
     public String toSVG() {
-        return String.format(Locale.US, SVGCode.CIRCLE, cx, cy, r, fill);
+        StringBuilder svg = new StringBuilder();
+        if (label != null) {
+            Text text = new Text(cx + 1, -cy - 4, "no-stroke", label);
+            svg.append(text.toSVG());
+        }
+
+        return svg.append(String.format(Locale.US, SVGCode.CIRCLE, cx, cy, r, fill)).toString();
     }
 }

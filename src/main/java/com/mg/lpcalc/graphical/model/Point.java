@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 @Data
 @AllArgsConstructor
 @Builder
 public class Point {
-    double x;
-    double y;
-    boolean isUnbounded;
-    boolean feasibleRegionIsAbove;
-
-    // todo добавить точке список прямых
+    private double x;
+    private double y;
+    private boolean isUnbounded;
+    private boolean feasibleRegionIsAbove;
+    private HashSet<Constraint> constraints = new HashSet<>();
 
     public Point(double x, double y) {
         this.x = x;
@@ -25,12 +26,17 @@ public class Point {
         this.isUnbounded = false;
     }
 
+    public void addConstraints(Constraint... constraints) {
+        this.constraints.addAll(List.of(constraints));
+    }
+
     // Копирующий конструктор
     public Point(Point point) {
         this.x = point.getX();
         this.y = point.getY();
         this.isUnbounded = point.isUnbounded();
         this.feasibleRegionIsAbove = point.isFeasibleRegionIsAbove();
+        this.constraints = point.getConstraints();
     }
 
     @Override

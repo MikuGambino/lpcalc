@@ -6,3 +6,17 @@ function createP(text, classname = '') {
     }
     return p;
 } 
+
+function formatDoubleNumber(number) {
+    let rounded = Math.round(number * 100) / 100;
+
+    if (rounded === Math.floor(rounded)) {
+        return String(rounded);
+    }
+
+    let str = rounded.toFixed(2);
+
+    str = str.replace(/0+$/, '').replace(/\.$/, '');
+
+    return str;
+}

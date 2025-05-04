@@ -20,13 +20,14 @@ public class GraphicalSolver {
     private List<Constraint> currentConstraints = new ArrayList<>();
     private ObjectiveFunc objectiveFunc;
     private List<Point> currentFeasibleRegion = new ArrayList<>();
-    private GraphicalSolutionBuilder solutionBuilder = new GraphicalSolutionBuilder();
+    private GraphicalSolutionBuilder solutionBuilder;
     private double maxX;
     private double maxY;
 
     public GraphicalSolver(OptimizationProblem optimizationProblem) {
         this.constraints = new ArrayList<>(optimizationProblem.getConstraints());
         this.objectiveFunc = optimizationProblem.getObjectiveFunc();
+        this.solutionBuilder = new GraphicalSolutionBuilder(objectiveFunc);
     }
 
     public GraphicalSolution solve() {
@@ -36,8 +37,10 @@ public class GraphicalSolver {
             addConstraint(c);
         }
 
-        for (Constraint c : constraints) {
-            addConstraint(c);
+        for (int i = 0; i < constraints.size(); i++) {
+            Constraint constraint = constraints.get(i);
+            constraint.setNumber(i + 1);
+            addConstraint(constraint);
         }
 
         List<Point> optimalPoints = findOptimalSolution();
@@ -112,6 +115,8 @@ public class GraphicalSolver {
                     } else if (intersectionMaxCoordinate) {
                         point.setFeasibleRegionIsAbove(true);
                     }
+
+                    point.addConstraints(c1, c2);
 
                     intersections.add(point);
                 }
@@ -215,6 +220,7 @@ public class GraphicalSolver {
     private List<Point> findOptimalSolution() {
         if (this.currentFeasibleRegion.isEmpty()) {
             System.out.println("Нет допустимых решений (ОДР пуста).");
+            solutionBuilder.setFeasibleRegionEmpty();
             return new ArrayList<>();
         }
 
@@ -242,16 +248,22 @@ public class GraphicalSolver {
         if (zValues.size() == 1 ) {
             System.out.println("Область допустимых решений точка");
             System.out.println("Оптимальное решение: " + optimalPoints.get(0));
+            solutionBuilder.setFeasibleRegionPoint(optimalPoints.get(0));
         } else if (optimalPoints.size() == 1 && hasPointOutsideGraph(optimalPoints)) {
+            solutionBuilder.setUnboundedFunction();
             System.out.println("Функция неограниченно убывает/возрастает");
         } else if (optimalPoints.size() == 1) {
+            solutionBuilder.solutionOnePoint(optimalPoints.get(0));
             System.out.println("Оптимальное решение: " + optimalPoints.get(0));
         } else if (hasPointOutsideGraph(optimalPoints)) {
+            solutionBuilder.setSolutionRay(optimalPoints.get(0), optimalPoints.get(1));
             System.out.println("Оптимальное решение находится на луче");
         } else {
             System.out.println("Множество оптимальных решений между вершинами: " + optimalPoints);
+            solutionBuilder.setSolutionSegment(optimalPoints.get(0), optimalPoints.get(1));
         }
 
+        System.out.println(optimalPoints);
         return optimalPoints;
     }
 

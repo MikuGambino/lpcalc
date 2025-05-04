@@ -21,6 +21,7 @@
     background: var(--form-bg);
     border-radius: 15px;
     border: 1px solid;
+    margin-top: 25px;
 }
 .settings-container, #constraintsContainer {
     display: flex;

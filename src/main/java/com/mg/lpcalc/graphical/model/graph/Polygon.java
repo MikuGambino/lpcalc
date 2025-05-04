@@ -11,7 +11,7 @@ import java.util.Locale;
 public class Polygon implements SVGElement {
     private List<Point> points;
     private String fill = "#3E7CB4";
-    private double opacity = 1;
+    private double opacity = 0.8;
 
     public Polygon(List<Point> points) {
         this.points = points;

@@ -13,4 +13,5 @@ public class GraphicalSolution {
     private String finalGraphSVG;
     private List<AddConstraintStep> addConstraintSteps;
     private AddObjectiveFunc addObjectiveFunc;
+    private GraphicalAnswer graphicalAnswer;
 }

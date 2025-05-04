@@ -1,9 +1,12 @@
 package com.mg.lpcalc.graphical.model.solution;
 
 import com.mg.lpcalc.graphical.model.Constraint;
+import com.mg.lpcalc.graphical.model.ObjectiveFunc;
+import com.mg.lpcalc.graphical.model.Point;
 import com.mg.lpcalc.model.enums.Operator;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Locale;
 
 @Data
@@ -78,5 +81,70 @@ public class LatexParser {
         return String.format(Locale.US, "%.2f", rounded)
                 .replaceAll("0+$", "")
                 .replaceAll("\\.$", "");
+    }
+
+    private static StringBuilder parseSystemOfEquations(List<Constraint> constraints) {
+        Constraint c1 = constraints.get(1);
+        Constraint c2 = constraints.get(0);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\\begin{cases}");
+        stringBuilder.append(parseConstraint(c1.getA(), c1.getB(), c1.getC(), Operator.EQ)).append("\\\\");
+        stringBuilder.append(parseConstraint(c2.getA(), c2.getB(), c2.getC(), Operator.EQ));
+        stringBuilder.append("\\end{cases}");
+        return stringBuilder;
+    }
+
+    private static StringBuilder parseSystemOfX(Point point) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\\begin{cases}");
+        stringBuilder.append(parseConstraint(1, 0, point.getX(), Operator.EQ)).append("\\\\");
+        stringBuilder.append(parseConstraint(0, 1, point.getY(), Operator.EQ));
+        stringBuilder.append("\\end{cases}");
+        return stringBuilder;
+    }
+
+    public static String parseFindXFromSystem(List<Constraint> constraints, Point point) {
+        return new StringBuilder("$")
+                .append(parseSystemOfEquations(constraints))
+                .append("\\quad \\Rightarrow \\quad")
+                .append(parseSystemOfX(point))
+                .append("$")
+                .toString();
+    }
+
+    public static String parseObjectiveFunc(ObjectiveFunc objectiveFunc, Point point, double value) {
+        return new StringBuilder("$F = ")
+                .append(parseMultiply(objectiveFunc.getA(), point.getX(), false))
+                .append(parseMultiply(objectiveFunc.getB(), point.getY(), true))
+                .append(" = ").append(formatNumber(value)).append("$")
+                .toString();
+    }
+
+    private static String parseMultiply(double num1, double num2, boolean needPlusSignInBegin) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (needPlusSignInBegin && num1 > 0) {
+            stringBuilder.append("+");
+        }
+
+        stringBuilder.append(formatNumber(num1))
+                     .append("\\cdot");
+
+        if (num2 < 0) {
+            stringBuilder.append("(").append(formatNumber(num2)).append(")");
+        } else {
+            stringBuilder.append(formatNumber(num2));
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static String parseParamSystemOfEquation(Point point, double t1, double t2) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\\begin{cases}");
+        stringBuilder.append(parseConstraint(1, 0, point.getX(), Operator.EQ)).append(termToLatex(t1, "t", true)).append("\\\\");
+        stringBuilder.append(parseConstraint(0, 1, point.getY(), Operator.EQ)).append(termToLatex(t2, "t", true));
+        stringBuilder.append("\\end{cases}");
+        return stringBuilder.toString();
     }
 }

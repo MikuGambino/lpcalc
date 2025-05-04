@@ -9,6 +9,7 @@
     --text-light: #6E7A8E;   /* Светлый текст */
     --error: #E75D5D;        /* Красный для ошибок */
     --success: #4CAF50;      /* Зеленый для успеха */
+    --content-background: #eceff2;
 }
 html {
     background: var(--background);
@@ -25,6 +26,7 @@ p {
     flex-direction: column;
     max-width: 1200px;
     margin: 50px auto;
+    padding: 0 30px;
 }
 h2 {
     margin-top: 10px;
@@ -317,5 +319,15 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .stepContainer {
     display: flex;
+    justify-content: space-between;
     margin-bottom: 35px; 
+}
+.solve-container {
+    background: var(--content-background);
+    border-radius: 15px;
+    margin: 50px 0;
+    padding: 20px 25px;
+}
+.graphContainer {
+    padding-left: 50px;
 }

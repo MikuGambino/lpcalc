@@ -15,6 +15,16 @@ public class Constraint {
     private Operator operator;
     private boolean isUnbounded;
     private boolean isInitial;
+    private int number = 0;
+
+    public Constraint(Double a, Double b, Double c, Operator operator, boolean isUnbounded, boolean isInitial) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.operator = operator;
+        this.isUnbounded = isUnbounded;
+        this.isInitial = isInitial;
+    }
 
     public Constraint(Double a, Double b, Double c) {
         this.a = a;

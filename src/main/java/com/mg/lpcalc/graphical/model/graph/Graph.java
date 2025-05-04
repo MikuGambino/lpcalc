@@ -161,8 +161,11 @@ public class Graph implements SVGElement {
     }
 
     private void addOptimalPoints() {
-        for (Circle circle : optimalPoints) {
+        String[] labels = {"A", "B"};
+        for (int i = 0; i < optimalPoints.size(); i++) {
+            Circle circle = optimalPoints.get(i);
             svg.append("\t\t");
+            circle.setLabel(labels[i]);
             circle.setFill("#c20000");
             svg.append(circle.toSVG());
         }

@@ -301,10 +301,15 @@ public class GraphBuilder {
         if (optimalPoints.isEmpty()) {
             return this.graphs.get(graphs.size() - 1).toSVG();
         }
+        boolean unboundedMin = optimalPoints.size() == 1 && optimalPoints.get(0).isFeasibleRegionIsAbove();
         Point answerPoint = optimalPoints.get(0);
         double a = objectiveFunc.getA();
         double b = objectiveFunc.getB();
         double c = a * answerPoint.getX() + b * answerPoint.getY();
+        if (unboundedMin) {
+            c -= 1;
+            optimalPoints = new ArrayList<>();
+        }
 
         // уравнение прямой через нормальный вектор
         Constraint perpendicularConstraint = new Constraint(a, b, c);
