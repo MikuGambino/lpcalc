@@ -36,6 +36,11 @@ public class LatexParser {
         }
     }
 
+    public static String termToLatexZero(double num, String variable, boolean needPlusSign) {
+        if (num == 0) return "0";
+        return termToLatex(num, variable, needPlusSign);
+    }
+
     public static String termToLatex(double num, String variable, boolean needPlusSign) {
         if (num == 0) {
             return "";
@@ -139,12 +144,33 @@ public class LatexParser {
         return stringBuilder.toString();
     }
 
-    public static String parseParamSystemOfEquation(Point point, double t1, double t2) {
+    public static StringBuilder parseParamSystemOfEquation(Point point, double t1, double t2, String tLabel1, String tLabel2) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\\begin{cases}");
-        stringBuilder.append(parseConstraint(1, 0, point.getX(), Operator.EQ)).append(termToLatex(t1, "t", true)).append("\\\\");
-        stringBuilder.append(parseConstraint(0, 1, point.getY(), Operator.EQ)).append(termToLatex(t2, "t", true));
+        stringBuilder.append("x_1 = ").append(termToLatexZero(point.getX(), tLabel1, false)).append(termToLatex(t1, tLabel2, true)).append("\\\\");
+        stringBuilder.append("x_2 = ").append(termToLatexZero(point.getY(), tLabel1, false)).append(termToLatex(t2, tLabel2, true));
         stringBuilder.append("\\end{cases}");
-        return stringBuilder.toString();
+        return stringBuilder;
+    }
+
+    public static String addTConstraintRay(StringBuilder system, double fValue) {
+        return new StringBuilder("$").append(system).append("$")
+                .append("\nгде $t \\geq 0 \\\\")
+                .append("F = ").append(numToLatex(fValue, false)).append("$")
+                .toString();
+    }
+
+    public static String parseOnePointSolutionAnswer(Point point, double fValue) {
+        return new StringBuilder()
+                .append("$x_1 = ").append(formatNumber(point.getX())).append("\\\\")
+                .append("x_2 = ").append(formatNumber(point.getY())).append("\\\\")
+                .append("F = ").append(numToLatex(fValue, false)).append("$")
+                .toString();
+    }
+
+    public static String parseSegmentAnswer(Point p1, Point p2, double fValue) {
+        return "$" + parseParamSystemOfEquation(p1, p2.getX(), p2.getY(), "t", "(1 - t)")
+                .append("$\nгде $0 \\leq t \\leq 1 \\\\")
+                .append("F = ").append(numToLatex(fValue, false)).append("$");
     }
 }

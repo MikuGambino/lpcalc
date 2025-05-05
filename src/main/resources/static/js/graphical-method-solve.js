@@ -2,6 +2,10 @@ function parseGraphicalSolution(solution) {
     let solutionContainer = document.getElementById('solution-container');
     solutionContainer.innerHTML = '';
 
+    removeAnswerContainers();
+    let inputBlock = document.getElementById('input-block');
+    inputBlock.appendChild(parseAnswer(solution.graphicalAnswer.answer));
+    
     let algoTitle = document.createElement('h2');
     algoTitle.innerText = 'Решение ЗЛП графическим методом';
     solutionContainer.appendChild(algoTitle);
@@ -18,6 +22,8 @@ function parseGraphicalSolution(solution) {
     let answerDescriptionStep = parseAnswerDescription(solution.graphicalAnswer, solution.finalGraphSVG);
     solutionContainer.appendChild(createP('Поиск оптимальных точек.', 'subtitle'));
     solutionContainer.appendChild(answerDescriptionStep);
+
+    solutionContainer.appendChild(parseAnswer(solution.graphicalAnswer.answer));
 
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
@@ -228,7 +234,7 @@ function parseSegmentSolution(step) {
     container.appendChild(createP('Функция $F$ достигает оптимального значения в точках $A$ и $B$ одновременно.'));
     container.appendChild(parseOnePointSuccessSolution(step.pointSolution1, 'A'));
     container.appendChild(parseOnePointSuccessSolution(step.pointSolution2, 'B'));
-    container.appendChild(createP('Функция $F$ достигает своего наибольшего значения в любой точке отрезка $AB$.'));
+    container.appendChild(createP('Функция $F$ достигает своего оптимального значения в любой точке отрезка $AB$.'));
     container.appendChild(createP('Ответ найден.'));
 
     return container;
@@ -243,8 +249,7 @@ function parseRaySolution(step) {
     container.appendChild(createP(`Луч находится на прямой $${constraintNumber}$.`));
     container.appendChild(createP(`$${constraintLatex}$`));
     container.appendChild(createP(`На основании данного уравнения прямой, можно записать параметрическое уравнение луча:`));
-    container.appendChild(createP(`$${paramAnswerSystem}$`, 'latex'));
-    container.appendChild(createP(`Где $t \\geq 0$`));
+    container.appendChild(createP(paramAnswerSystem, 'latex'));
     container.appendChild(createP('Ответ найден.'));
 
     return container;
@@ -274,5 +279,15 @@ function parseFeasibleRegionEmptySolution() {
     let container = document.createElement('div');
     container.appendChild(createP('Ограничения несовместны.'));
     container.appendChild(createP('Область допустимого решения - пустое множество.'));
+    return container;
+}
+
+function parseAnswer(answer) {
+    let container = document.createElement('div');
+    container.className = 'answerContainer';
+
+    container.appendChild(createP('Ответ', 'subtitle'));
+    container.appendChild(createP(answer, 'latex'));
+
     return container;
 }

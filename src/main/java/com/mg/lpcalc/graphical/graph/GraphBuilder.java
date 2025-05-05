@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GraphBuilder {
+    private final double EPS = 1e-9;
     private final int GRAPH_SIZE = 500;
     private final double PADDING_PERCENTAGE = 0.2;
     private GraphParams graphParams;
@@ -156,6 +157,8 @@ public class GraphBuilder {
     }
 
     private List<Point> feasibleRegionPointsToPx(List<Point> points, List<Line> lines) {
+        ViewBoxParams viewBox = graphParams.getViewBoxParams();
+
         // Точка которая находится за пределами графика
         // и точка, выше которой располагается ОДР в данном алгоритме равнозначны
         // Чтобы не писать дублирующего кода, "feasibleRegionIsAbove" точки делаем также Unbounded
@@ -166,10 +169,8 @@ public class GraphBuilder {
                 pointCopy.setUnbounded(true);
             }
             pCopies.add(pointCopy);
-
         }
 
-        ViewBoxParams viewBox = graphParams.getViewBoxParams();
         List<Point> pointsPx = new ArrayList<>();
         Point cornerPoint = null;
 
@@ -212,6 +213,7 @@ public class GraphBuilder {
             if (newPoint != null) {
                 pointsPx.add(newPoint);
             }
+
             pointsPx.add(pxPoint);
          }
 

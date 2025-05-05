@@ -159,7 +159,8 @@ public class GraphicalSolutionBuilder {
 
     public PointSolution solutionOnePoint(Point point) {
         boolean pointOnAxis = pointIsOnAxis(point);
-        String objValueLatex = calculateObjectiveFuncValue(objectiveFunc, point);
+        double value = calcObjectiveValue(point);
+        String objValueLatex = calculateObjectiveFuncValueLatex(objectiveFunc, point, value);
         PointSolution pointSolution;
 
         FindPointCoordinates findPointCoordinates;
@@ -170,7 +171,8 @@ public class GraphicalSolutionBuilder {
         }
 
         pointSolution = new PointSolution(point, objValueLatex, findPointCoordinates);
-        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_POINT, pointSolution);
+        String answer = parseOnePointSolutionAnswer(point, value);
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_POINT, pointSolution, answer);
 
         return pointSolution;
     }
@@ -193,9 +195,8 @@ public class GraphicalSolutionBuilder {
                 constraint1.getNumber(), constraint2.getNumber());
     }
 
-    private String calculateObjectiveFuncValue(ObjectiveFunc objectiveFunc, Point point) {
-        double value = objectiveFunc.getA() * point.getX() + objectiveFunc.getB() * point.getY();
-        return LatexParser.parseObjectiveFunc(objectiveFunc, point, value);
+    private String calculateObjectiveFuncValueLatex(ObjectiveFunc objectiveFunc, Point point, double fValue) {
+        return LatexParser.parseObjectiveFunc(objectiveFunc, point, fValue);
     }
 
     public void setSolutionSegment(Point point1, Point point2) {
@@ -203,7 +204,8 @@ public class GraphicalSolutionBuilder {
         PointSolution pointSolution2 = solutionOnePoint(point2);
 
         SegmentSolution segmentSolution = new SegmentSolution(pointSolution1, pointSolution2);
-        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_SEGMENT, segmentSolution);
+        String answer = LatexParser.parseSegmentAnswer(point1, point2, calcObjectiveValue(point1));
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_SEGMENT, segmentSolution, answer);
     }
 
     public void setSolutionRay(Point point1, Point point2) {
@@ -224,8 +226,7 @@ public class GraphicalSolutionBuilder {
         String constraintLatex = LatexParser.parseConstraint(constraint);
         int constraintNumber = constraint.getNumber();
         RaySolution raySolution = new RaySolution(pointSolution, systemLatex, constraintLatex, constraintNumber);
-        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_RAY, raySolution);
-
+        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.SUCCESS_RAY, raySolution, systemLatex);
     }
 
     private Constraint findRayConstraint(Point point, Point unboundedPoint) {
@@ -244,30 +245,39 @@ public class GraphicalSolutionBuilder {
     }
 
     private String parseRayAnswerSystem(Point point, Point unboundedPoint, Constraint constraint) {
-        String systemLatex;
+        StringBuilder systemLatex;
         if (unboundedPoint.getY() > point.getY()) {
-            systemLatex = LatexParser.parseParamSystemOfEquation(point, -constraint.getB(), constraint.getA());
+            systemLatex = parseParamSystemOfEquation(point, -constraint.getB(), constraint.getA(), "", "t");
         } else {
-            systemLatex = LatexParser.parseParamSystemOfEquation(point, constraint.getB(), -constraint.getA());
+            systemLatex = parseParamSystemOfEquation(point, constraint.getB(), -constraint.getA(), "", "t");
         }
 
-        return systemLatex;
+        double fValue = calcObjectiveValue(point);
+        System.out.println(LatexParser.addTConstraintRay(systemLatex, fValue));
+        return LatexParser.addTConstraintRay(systemLatex, fValue);
     }
 
     public void setUnboundedFunction() {
         if (objectiveFunc.isMinimization()) {
             this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.UNBOUNDED_MIN);
+            graphicalAnswer.setAnswer("Функция неограниченно убывает.");
         } else {
             this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.UNBOUNDED_MAX);
+            graphicalAnswer.setAnswer("Функция неограниченно возрастает.");
         }
     }
 
     public void setFeasibleRegionPoint(Point point) {
-        PointSolution pointSolution = solutionOnePoint(point);
-        this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.FEASIBLE_REGION_POINT, pointSolution);
+        solutionOnePoint(point);
+        this.graphicalAnswer.setGraphicalSolutionType(GraphicalSolutionType.FEASIBLE_REGION_POINT);
     }
 
     public void setFeasibleRegionEmpty() {
         this.graphicalAnswer = new GraphicalAnswer(GraphicalSolutionType.FEASIBLE_REGION_EMPTY);
+        graphicalAnswer.setAnswer("Область допустимых решений - пустое множество.");
+    }
+
+    private double calcObjectiveValue(Point point) {
+        return objectiveFunc.getA() * point.getX() + objectiveFunc.getB() * point.getY();
     }
 }

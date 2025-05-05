@@ -584,11 +584,3 @@ function activateAccordions() {
         });
     });
 }
-
-function removeAnswerContainers() {
-    const answerContainers = document.querySelectorAll('div.answerContainer');
-
-    answerContainers.forEach(container => {
-        container.remove();
-    });
-}

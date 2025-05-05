@@ -80,13 +80,13 @@ public class GraphicalSolver {
             if (point.getY() > maxY) maxY = point.getY();
         }
 
-        this.maxX = maxX;
-        this.maxY = maxY;
+        this.maxX = Math.max(maxX, 2);
+        this.maxY = Math.max(maxY, 2);
 
         initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false, true));
         initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false, true));
-        initialConstraints.add(new Constraint(0., 1., maxY, Operator.LEQ, true, true));
-        initialConstraints.add(new Constraint(1., 0., maxX, Operator.LEQ, true, true));
+        initialConstraints.add(new Constraint(0., 1., this.maxY, Operator.LEQ, true, true));
+        initialConstraints.add(new Constraint(1., 0., this.maxX, Operator.LEQ, true, true));
 
         return initialConstraints;
     }
@@ -110,14 +110,13 @@ public class GraphicalSolver {
                     boolean intersectionMaxCoordinate = (point.getX() == this.maxX || point.getY() == this.maxY)
                              && (c1.isInitial() ? isFillInAbove(c2) : isFillInAbove(c1));
 
-                    if (c1.isUnbounded() || c2.isUnbounded()) {
+                    if (c1.isUnbounded() || c2.isUnbounded() || (maxX - point.getX() < EPS && maxY - point.getY() < EPS)) {
                         point.setUnbounded(true);
                     } else if (intersectionMaxCoordinate) {
                         point.setFeasibleRegionIsAbove(true);
                     }
 
                     point.addConstraints(c1, c2);
-
                     intersections.add(point);
                 }
             }

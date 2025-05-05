@@ -7,6 +7,7 @@ public class ViewBoxParams {
     private double minX;
     private double minY;
     private double size;
+    private double paddingPx;
 
     // minX - минимальная точка X на графике
     // minY - минимальная точка Y на графике
@@ -14,6 +15,7 @@ public class ViewBoxParams {
     // pxSize - перевод координат в пиксели
     // padding - отступ от краев
     public ViewBoxParams(double minX, double minY, double size, double pxSize, double paddingPx) {
+        this.paddingPx = paddingPx;
         this.minY = size + minY * pxSize - paddingPx;
         this.minX = size + minX * pxSize - paddingPx;
 
