@@ -15,6 +15,7 @@ public class Line implements SVGElement {
     private String stroke = "black";
     private double strokeWidth = 0.5;
     private String label;
+    private String clazz = "line";
 
     public Line(Point begin, Point end) {
         this.x1 = begin.getX();
@@ -32,6 +33,6 @@ public class Line implements SVGElement {
     }
 
     public String toSVG() {
-        return String.format(Locale.US, SVGCode.LINE, x1, y1, x2, y2, stroke, strokeWidth);
+        return String.format(Locale.US, SVGCode.LINE, x1, y1, x2, y2, stroke, strokeWidth, clazz);
     }
 }

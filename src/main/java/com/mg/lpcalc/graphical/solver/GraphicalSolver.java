@@ -80,8 +80,8 @@ public class GraphicalSolver {
             if (point.getY() > maxY) maxY = point.getY();
         }
 
-        this.maxX = Math.max(maxX, 2);
-        this.maxY = Math.max(maxY, 2);
+        this.maxX = Math.max(maxX, 2) * 1.2;
+        this.maxY = Math.max(maxY, 2) * 1.2;
 
         initialConstraints.add(new Constraint(1., 0., 0., Operator.GEQ, false, true));
         initialConstraints.add(new Constraint(0., 1., 0., Operator.GEQ, false, true));
@@ -139,10 +139,11 @@ public class GraphicalSolver {
         List<Point> intersections = new ArrayList<>();
 
         for (Constraint c : constraints) {
+            if (c.isInitial()) continue;
             // Пересечение с осью X
             if (Math.abs(c.getA()) > EPS) {
                 double x = c.getC() / c.getA();
-                intersections.add(new Point(x, 0.0));
+                    intersections.add(new Point(x, 0.0));
             }
 
             // Пересечение с осью Y

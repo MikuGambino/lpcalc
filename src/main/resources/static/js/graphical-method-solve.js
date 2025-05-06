@@ -10,16 +10,17 @@ function parseGraphicalSolution(solution) {
     algoTitle.innerText = 'Решение ЗЛП графическим методом';
     solutionContainer.appendChild(algoTitle);
     
-    let addConstraintsSteps = parseAddConstraintSteps(solution.addConstraintSteps);
+    lines = [];
+    let addConstraintsSteps = parseAddConstraintSteps(solution.addConstraintSteps, lines);
     solutionContainer.appendChild(addConstraintsSteps);
 
     if (solution.graphicalAnswer.graphicalSolutionType != 'FEASIBLE_REGION_EMPTY') {
-        let addObjectiveFuncStep = parseAddObjectiveFunc(solution.addObjectiveFunc);
+        let addObjectiveFuncStep = parseAddObjectiveFunc(solution.addObjectiveFunc, lines);
         solutionContainer.appendChild(createP('Добавление вектора-градиента целевой функции.', 'subtitle'));
         solutionContainer.appendChild(addObjectiveFuncStep);
     }
 
-    let answerDescriptionStep = parseAnswerDescription(solution.graphicalAnswer, solution.finalGraphSVG);
+    let answerDescriptionStep = parseAnswerDescription(solution.graphicalAnswer, solution.finalGraphSVG, lines);
     solutionContainer.appendChild(createP('Поиск оптимальных точек.', 'subtitle'));
     solutionContainer.appendChild(answerDescriptionStep);
 
@@ -43,12 +44,11 @@ function createSvgContainer(svgText) {
     }
     
     container.innerHTML = svgText;
-    // const svgElement = container.querySelector('svg');
     
     return container;
 }
 
-function parseAddConstraintSteps(steps) {
+function parseAddConstraintSteps(steps, lines) {
     let stepsContainer = document.createElement('div');
 
     for (let i = 0; i < steps.length; i++) {
@@ -60,8 +60,12 @@ function parseAddConstraintSteps(steps) {
         let step = steps[i];
 
         stepContainer.appendChild(parseAddContraintStep(step, i + 1));
-        stepContainer.appendChild(createSvgContainer(step.graph));
+        let svgContainer = createSvgContainer(step.graph);
+        stepContainer.appendChild(svgContainer);
         
+        lines.push({class: `line-${i+1}`, label: `$(${i+1})~${step.equalityLatex}$`});
+        svgContainer.appendChild(addLegend(lines, svgContainer));
+
         stepsContainer.appendChild(stepContainer);
     }
 
@@ -142,7 +146,7 @@ function parseAddContraintStep(step, number) {
     return container;
 }
 
-function parseAddObjectiveFunc(step) {
+function parseAddObjectiveFunc(step, lines) {
     const { objectiveFunc, inScale, graph } = step;
 
     let objectiveFuncStepContainer = document.createElement('div');
@@ -155,12 +159,14 @@ function parseAddObjectiveFunc(step) {
     }
 
     objectiveFuncStepContainer.appendChild(descriptionContainer);
-    objectiveFuncStepContainer.appendChild(createSvgContainer(graph));
+    let svgContainer = createSvgContainer(graph);
+    svgContainer.appendChild(addLegend(lines, svgContainer));
+    objectiveFuncStepContainer.appendChild(svgContainer);
 
     return objectiveFuncStepContainer;
 }
 
-function parseAnswerDescription(answer, graph) {
+function parseAnswerDescription(answer, graph, lines) {
     let container = document.createElement('div');
     container.className = 'stepContainer';
     if (answer.graphicalSolutionType == 'SUCCESS_POINT') {
@@ -180,7 +186,9 @@ function parseAnswerDescription(answer, graph) {
         container.appendChild(parseFeasibleRegionEmptySolution());
     }
 
-    container.appendChild(createSvgContainer(graph));
+    let svgContainer = createSvgContainer(graph);
+    svgContainer.appendChild(addLegend(lines, svgContainer));
+    container.appendChild(svgContainer);
     return container;
 }
 
@@ -290,4 +298,31 @@ function parseAnswer(answer) {
     container.appendChild(createP(answer, 'latex'));
 
     return container;
+}
+
+function addLegend(lines, svgContainer) {
+    let legendContainer = document.createElement('div');
+    legendContainer.className = 'legendContainer';
+
+    lines.forEach(item => {
+        let legendItem = createP(item.label);
+        legendItem.style.cursor = "pointer";
+        legendContainer.appendChild(legendItem);
+
+        let svgLine = svgContainer.querySelector(`.${item.class}`);
+        const strokeWidth = svgLine.getAttribute('stroke-width');
+        const stroke = svgLine.getAttribute('stroke');
+
+        legendItem.addEventListener('mouseenter', () => {
+            svgLine.setAttribute('stroke-width', 2);
+            svgLine.setAttribute('stroke', '#f17c3a');
+        });
+
+        legendItem.addEventListener('mouseleave', () => {
+            svgLine.setAttribute('stroke', 'black');
+            svgLine.setAttribute('stroke-width', strokeWidth);
+        });
+    });
+
+    return legendContainer;
 }

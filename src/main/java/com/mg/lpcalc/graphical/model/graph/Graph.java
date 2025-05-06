@@ -2,6 +2,7 @@ package com.mg.lpcalc.graphical.model.graph;
 
 import com.mg.lpcalc.graphical.graph.SVGCode;
 import com.mg.lpcalc.graphical.graph.ViewBoxParams;
+import com.mg.lpcalc.graphical.model.solution.LatexParser;
 import lombok.Data;
 
 import java.util.List;
@@ -68,6 +69,7 @@ public class Graph implements SVGElement {
     private void addLines() {
         for (int i = 0; i < lines.size(); i++) {
             Line line = lines.get(i);
+            line.setClazz("line-" + (i + 1));
             String label = "(%s)".formatted(i + 1);
             Text text = getText(line, label);
             svg.append("\t\t");
@@ -132,10 +134,10 @@ public class Graph implements SVGElement {
             if (isVerticalAxis || isHorizontalAxis) {
                 double coordinate = isVerticalAxis ? circle.getYCoordinate() : circle.getXCoordinate();
                 // Если координата целая – выводим целое значение, иначе выводим дробное
-                String text = (coordinate % 1 == 0) ? String.valueOf((int) coordinate) : String.valueOf(coordinate);
+                String text = LatexParser.formatNumber(coordinate);
 
                 if (isVerticalAxis) {
-                    pointLabel = new Text(-8, -circle.getCy() + circle.getR() * 2, "axis", text);
+                    pointLabel = new Text(-3 * text.length() - 4, -circle.getCy() + circle.getR() * 2, "axis", text);
                 } else if (isHorizontalAxis) {
                     pointLabel = new Text(circle.getCx() - circle.getR() * 2, 8, "axis", text);
                 }

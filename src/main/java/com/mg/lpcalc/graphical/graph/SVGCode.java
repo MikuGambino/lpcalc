@@ -16,7 +16,7 @@ public class SVGCode {
               </defs>
             """;
 
-    public static final String LINE = "<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='%s' stroke-width='%.2f'/>\n";
+    public static final String LINE = "<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='%s' stroke-width='%.2f' class='%s'/>\n";
 
     public static final String AXIS = "<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='black' marker-end='url(#arrowhead)'/>\n";
 

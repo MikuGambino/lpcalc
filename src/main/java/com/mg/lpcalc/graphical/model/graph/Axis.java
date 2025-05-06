@@ -22,7 +22,7 @@ public class Axis implements SVGElement {
         if (x1 == 0) {
             text = new Text(x2 - 5, -(y2 - 8), "axis", "X₁");
         } else {
-            text = new Text(x2 - 10, -y2, "axis", "X₂");
+            text = new Text(x2 - 11, -y2, "axis", "X₂");
         }
 
         svg.append(text.toSVG());
