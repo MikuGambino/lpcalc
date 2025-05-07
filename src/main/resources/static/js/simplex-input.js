@@ -93,7 +93,7 @@ let variableCountTextbox = document.getElementById("variableCount");
 variableCountTextbox.addEventListener('change', handleVariableCountChange);
 document.getElementById("variableCount").onchange = variablesList;
 window.addEventListener('load', () => handleVariableCountChange({target: variableCountTextbox}));
-window.addEventListener('load', () => variablesList());
+window.addEventListener('load', () => printVariablesList());
 constraintCountTextbox.addEventListener('change', handleVariableCountChange);
 
 function handleVariableCountChange() {
@@ -185,6 +185,7 @@ function removeObjectiveVariables(targetCount) {
 function sendData() {
     const data = getData();
     console.log(data);
+    if (!checkInput(data)) return;
     
     fetch('/solve/simplex', {
         method: 'POST',

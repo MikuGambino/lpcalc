@@ -53,6 +53,7 @@ function parseFraction(input) {
 
 function clearInputs() {
     // Находим все input элементы на странице и очищаем их
+    if (!confirm("Вы уверены, что хотите очистить все поля?")) return;
     const inputs = document.querySelectorAll('#input-container input[type="text"], #input-container input[type="number"]');
     inputs.forEach(input => {
         if (input.className != 'numTextBox') {
@@ -69,11 +70,11 @@ function clearInputs() {
     });
 }
 
-function variablesList() {
+function printVariablesList() {
     let variablesCount = document.getElementById("variableCount").value;
     let listSpan = document.getElementById("variablesList");
     listSpan.innerHTML = "";
-
+    
     for (let i = 0; i < variablesCount; i++) {
         listSpan.innerHTML += `x<sub>${i + 1}</sub>`;
         if (i != variablesCount - 1) {
@@ -107,4 +108,70 @@ function printInput(input) {
     constraints = '\\begin{cases}' + constraints + '\\end{cases}';
     updateMathFormula('constraintsInput', constraints);
     document.getElementById('input-block').hidden = false;
+}
+
+function createP(text, classname = '') {
+    let p = document.createElement('p');
+    p.innerText = text;
+    if (classname != '') {
+        p.className = classname;
+    }
+    return p;
+} 
+
+function formatDoubleNumber(number) {
+    let rounded = Math.round(number * 100) / 100;
+
+    if (rounded === Math.floor(rounded)) {
+        return String(rounded);
+    }
+
+    let str = rounded.toFixed(2);
+
+    str = str.replace(/0+$/, '').replace(/\.$/, '');
+
+    return str;
+}
+
+function removeAnswerContainers() {
+    const answerContainers = document.querySelectorAll('div.answerContainer');
+
+    answerContainers.forEach(container => {
+        container.remove();
+    });
+}
+
+function checkInput(data) {
+    for(let i = 0; i < data.constraints.length; i++) {
+        let constraint = data.constraints[i];
+        let allZero = true;
+        for (let j = 0; j < constraint.coefficients.length; j++) {
+            if (constraint.coefficients[j].numerator != 0) allZero = false;
+        }
+        if (allZero) {
+            printError(`Ошибка. Все коэффициенты ограничения $${i + 1}$ равны $0$.`);
+            return false;
+        }
+    }
+
+    let allZeroObjective = true;
+    for (let i = 0; i < data.objective.coefficients.length; i++) {
+        if (data.objective.coefficients[i].numerator != 0) allZeroObjective = false;
+    }
+
+    if (allZeroObjective) {
+        printError(`Ошибка. Все коэффициенты целевой функции равны $0$.`);
+        return false;
+    }
+
+     document.getElementById("errorContainer").hidden = true;
+     return true;
+}
+
+function printError(text) {
+    let errorContainer = document.getElementById("errorContainer");
+    errorContainer.innerHTML = '';
+    errorContainer.appendChild(createP(text, "error"));
+    renderKatexElement('errorContainer');
+    errorContainer.hidden = false;
 }

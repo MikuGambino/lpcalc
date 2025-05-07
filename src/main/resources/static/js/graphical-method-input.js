@@ -182,7 +182,7 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
 
 function sendData() {
     const data = getData();
-    console.log(data);
+    if (!checkInput(data)) return;
 
     fetch('/solve/graph', {
         method: 'POST',
