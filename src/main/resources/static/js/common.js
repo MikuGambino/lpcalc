@@ -142,7 +142,6 @@ function removeAnswerContainers() {
 }
 
 function checkInput(data) {
-    document.querySelectorAll('.solve-container').hidden = true;
     for(let i = 0; i < data.constraints.length; i++) {
         let constraint = data.constraints[i];
         let allZero = true;
@@ -165,9 +164,9 @@ function checkInput(data) {
         return false;
     }
 
-    document.querySelectorAll('.solve-container').hidden = false;
-     document.getElementById("errorContainer").hidden = true;
-     return true;
+    document.querySelector('.solve-container').hidden = false;
+    document.getElementById("errorContainer").hidden = true;
+    return true;
 }
 
 function printError(text) {
@@ -175,5 +174,6 @@ function printError(text) {
     errorContainer.innerHTML = '';
     errorContainer.appendChild(createP(text, "error"));
     renderKatexElement('errorContainer');
+    document.querySelector('.solve-container').hidden = true;
     errorContainer.hidden = false;
 }
