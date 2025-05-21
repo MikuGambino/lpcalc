@@ -2,10 +2,12 @@ package com.mg.lpcalc.simplex.solver;
 
 import com.mg.lpcalc.model.enums.Direction;
 import com.mg.lpcalc.model.enums.Method;
-import com.mg.lpcalc.simplex.model.*;
+import com.mg.lpcalc.simplex.model.Constraint;
+import com.mg.lpcalc.simplex.model.ObjectiveFunc;
+import com.mg.lpcalc.simplex.model.OptimizationProblem;
 import com.mg.lpcalc.simplex.model.solution.SimplexSolution;
-import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.solution.BigMSimplexSolutionBuilder;
+import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 
 import java.util.List;
 

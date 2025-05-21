@@ -2,7 +2,7 @@ package com.mg.lpcalc.graphical.model.graph;
 
 import com.mg.lpcalc.graphical.graph.SVGCode;
 import com.mg.lpcalc.graphical.graph.ViewBoxParams;
-import com.mg.lpcalc.graphical.model.solution.LatexParser;
+import com.mg.lpcalc.graphical.solution.LatexParser;
 import lombok.Data;
 
 import java.util.List;

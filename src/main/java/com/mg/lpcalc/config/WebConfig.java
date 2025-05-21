@@ -9,6 +9,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/html/simplex-method.html");
+        registry.addViewController("/").setViewName("forward:/html/main.html");
+        registry.addViewController("/simplex").setViewName("forward:/html/simplex-method.html");
+        registry.addViewController("/graphical").setViewName("forward:/html/graph-method.html");
+        registry.addViewController("/main").setViewName("forward:/html/main.html");
+        registry.addViewController("/theory").setViewName("forward:/html/theory.html");
+        registry.addViewController("/simplex-theory").setViewName("forward:/html/simplex-method-theory.html");
+        registry.addViewController("/graphical-theory").setViewName("forward:/html/graph-method-theory.html");
     }
 }

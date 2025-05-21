@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GraphBuilder {
-    private final double EPS = 1e-9;
     private final int GRAPH_SIZE = 500;
     private final double PADDING_PERCENTAGE = 0.2;
     private GraphParams graphParams;

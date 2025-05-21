@@ -1,4 +1,4 @@
-package com.mg.lpcalc.graphical.model.solution;
+package com.mg.lpcalc.graphical.solution;
 
 import com.mg.lpcalc.graphical.model.Constraint;
 import com.mg.lpcalc.graphical.model.ObjectiveFunc;

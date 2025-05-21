@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LPCalc</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<header class="header">
+    <a href="/" class="logo">
+        <div class="logo-text">LPCalc</div>
+    </a>
+
+    <nav class="nav">
+        <a href="/graphical" class="nav-item">Графический метод</a>
+        <a href="/simplex" class="nav-item">Симплекс метод</a>
+        <a href="/theory" class="nav-item">Теория</a>
+    </nav>
+</header>
+<div id="content-container" class="main-page">
+    <h1 class="text-center">Решение задач линейного программирования</h1>
+    <div class="cards">
+        <div class="card" onclick="window.location='/graphical';">
+            <div class="card-img">
+                <img src="../img/graph.png" alt="graph">
+            </div>
+            <div class="card-title">
+                <p>Калькулятор графического метода</p>
+            </div>
+        </div>
+        <div class="card" onclick="window.location='/simplex';">
+            <div class="card-img">
+                <img src="../img/table.png" alt="table">
+            </div>
+            <div class="card-title">
+                <p>Калькулятор симплекс-метода</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

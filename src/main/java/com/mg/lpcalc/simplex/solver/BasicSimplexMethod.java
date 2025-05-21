@@ -7,7 +7,7 @@ import com.mg.lpcalc.simplex.model.solution.*;
 import com.mg.lpcalc.simplex.model.Constraint;
 import com.mg.lpcalc.simplex.model.ObjectiveFunc;
 import com.mg.lpcalc.simplex.model.RowColumnPair;
-import com.mg.lpcalc.simplex.model.solution.basic.BasicSimplexSimplexSolution;
+import com.mg.lpcalc.simplex.model.solution.basic.BasicSimplexSolution;
 import com.mg.lpcalc.simplex.model.solution.basic.BasisMethod;
 import com.mg.lpcalc.simplex.solution.SimplexSolutionBuilder;
 import com.mg.lpcalc.simplex.table.BasicSimplexTable;
@@ -49,7 +49,9 @@ public class BasicSimplexMethod implements SimplexMethod {
                 solutionBuilder
         );
 
-        findInitialBasis();
+        if (!findInitialBasis()) {
+            return solutionBuilder.getSolution();
+        }
 
         if (simplexTable.isContainsNegativeB()) {
             boolean success = removeNegativeB();
@@ -75,7 +77,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         }
 
         Answer answer = simplexTable.getFinalAnswer();
-        BasicSimplexSimplexSolution basicSimplexSolution = solutionBuilder.getSolution();
+        BasicSimplexSolution basicSimplexSolution = solutionBuilder.getSolution();
         basicSimplexSolution.setAnswer(answer);
         return basicSimplexSolution;
     }
@@ -121,7 +123,7 @@ public class BasicSimplexMethod implements SimplexMethod {
         return num;
     }
 
-    private void findInitialBasis() {
+    private boolean findInitialBasis() {
         int[] basis = simplexTable.getBasis();
         solutionBuilder.setSlackBasis(basis);
         for (int i = 0; i < basis.length; i++) {
@@ -134,10 +136,13 @@ public class BasicSimplexMethod implements SimplexMethod {
             if (tryFindBasisUsingSingleNonZeroElements()) {
                 continue;
             }
-            createBasisUsingGaussianElimination(i);
+            if (!createBasisUsingGaussianElimination(i)) {
+                return false;
+            }
         }
 
         solutionBuilder.basisFound();
+        return true;
     }
 
     private boolean tryFindBasisUsingUnitVectors() {
@@ -171,14 +176,19 @@ public class BasicSimplexMethod implements SimplexMethod {
         return true;
     }
 
-    private void createBasisUsingGaussianElimination(int row) {
+    private boolean createBasisUsingGaussianElimination(int row) {
         SimplexTableDTO simplexTableBefore = new SimplexTableDTO(simplexTable);
         int column = simplexTable.findFirstNonBasisColumn();
+        if (column == -1) {
+            solutionBuilder.setNoBasisSolution();
+            return false;
+        }
         simplexTable.gaussianElimination(row, column);
 
         int[] basis = simplexTable.getBasis();
         basis[row] = column;
         solutionBuilder.addFindBasisSubStep(BasisMethod.GAUSS, column, row, simplexTableBefore, simplexTable);
+        return true;
     }
 
     private void makeConstraintsLEQ() {

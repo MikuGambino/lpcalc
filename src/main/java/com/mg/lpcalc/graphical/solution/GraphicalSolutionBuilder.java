@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mg.lpcalc.graphical.model.solution.LatexParser.*;
+import static com.mg.lpcalc.graphical.solution.LatexParser.*;
 
 @NoArgsConstructor
 public class GraphicalSolutionBuilder {

@@ -29,7 +29,4 @@ public class SVGCode {
     public static final String CIRCLE = "<circle cx='%.2f' cy='%.2f' r='%.2f' fill='%s'/>\n";
 
     public static final String TEXT = "<text x='%.2f' y='%.2f' class='%s'>%s</text>\n";
-
-    public static final String TEXT_BACKGROUND = "<rect x='%.2f' y='%.2f' width='%.2f' height='%.2f' fill='#f4f5f7'/>\n";
-
 }

@@ -43,6 +43,7 @@ function parseBigMSimplexAnswer(solution) {
     activateAccordions();
     renderKatexElement('solution-container');
     renderKatexElement('input-block');
+    document.querySelector(".solve-container").hidden = false;
 }
 
 function parseAddSlackAndArtVariables(step) {

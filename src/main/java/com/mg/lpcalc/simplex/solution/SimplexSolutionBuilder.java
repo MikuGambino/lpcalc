@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 public class SimplexSolutionBuilder {
-    private BasicSimplexSimplexSolution solution = new BasicSimplexSimplexSolution();
+    private BasicSimplexSolution solution = new BasicSimplexSolution();
     private Direction direction;
     private List<Constraint> constraints;
     private SimplexTableDTO initialSimplexTable;
@@ -186,5 +186,9 @@ public class SimplexSolutionBuilder {
         this.pivotStep.setCalculateDeltasStep(this.calculateDeltasStep);
         this.pivotStep.setOptimalityCheckStep(new OptimalityCheckStep(isOptimal, direction));
         this.solution.getPivotSteps().add(pivotStep);
+    }
+
+    public void setNoBasisSolution() {
+        this.solution.setAnswer(new Answer(AnswerType.NO_BASIS));
     }
 }

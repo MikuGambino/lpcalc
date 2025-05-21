@@ -24,7 +24,17 @@ public class SolveController {
     @PostMapping("/graph")
     public GraphicalSolution graphSolve(@RequestBody OptimizationProblemDTO optimizationProblemDTO) {
         GraphicalSolver graphicalSolver = new GraphicalSolver(graphicalConverter.convert(optimizationProblemDTO));
-        return graphicalSolver.solve();
+        GraphicalSolution solution = graphicalSolver.solve();
+        for (int i = 0; i < solution.getAddConstraintSteps().size(); i++) {
+            System.out.println(solution.getAddConstraintSteps().get(i).getGraph());
+            System.out.println(".");
+            System.out.println(".");
+            System.out.println(".");
+            System.out.println(".");
+            System.out.println(".");
+        }
+        System.out.println(solution.getFinalGraphSVG());
+        return solution;
     }
 
     @PostMapping("/simplex")

@@ -34,15 +34,6 @@ function parseGraphicalSolution(solution) {
 function createSvgContainer(svgText) {
     const container = document.createElement('div');
     container.className = 'graphContainer';
-    
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-    
-    const parserError = svgDoc.querySelector('parsererror');
-    if (parserError) {
-        throw new Error('Некорректный SVG: ' + parserError.textContent);
-    }
-    
     container.innerHTML = svgText;
     
     return container;

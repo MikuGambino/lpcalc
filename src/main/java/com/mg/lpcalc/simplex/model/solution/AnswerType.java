@@ -5,5 +5,6 @@ public enum AnswerType {
     NEGATIVE_B,
     MAX_UNBOUNDED,
     MIN_UNBOUNDED,
-    HAS_ART_VARS
+    HAS_ART_VARS,
+    NO_BASIS
 }

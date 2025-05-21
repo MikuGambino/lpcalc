@@ -83,7 +83,7 @@ input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(45, 91, 132, 0.2);
 }
-label, p, pre, span {
+label, p, pre, span, li {
     font-size: 18px;
 }
 pre {
@@ -240,6 +240,7 @@ input[type=number]::-webkit-outer-spin-button {
     transform: rotate(90deg);
 }
 .header {
+    height: 34px;
     background-color: var(--primary-light);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     padding: 1rem 2rem;
@@ -345,4 +346,90 @@ input[type=number]::-webkit-outer-spin-button {
 }
 #errorContainer {
     margin-top: 25px;
+}
+.theory-content-container {
+    font-size: 20px;
+}
+.theory-container {
+    display: flex;
+    justify-content: space-between;
+}
+@media (max-width: 700px) {
+    .findX2Container {
+        margin-left: 20px;
+        padding-left: 20px;
+    }
+    .graphContainer {
+        padding-left: 0;
+    }
+    svg {
+        width: 300px;
+        height: 350px;
+    }
+    #content-container {
+        max-width: none;
+        padding: 0 10px;
+    }
+    .stepContainer {
+        display: flex;
+        flex-direction: column;
+    }
+    .solve-container {
+        padding: 20px 10px;
+    }
+}
+.text-center {
+    text-align: center;
+}
+.card {
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 20px 10px;
+    cursor: pointer;
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    background: #e9eef6;
+}
+.card img {
+    max-height: 350px;
+    max-width: 350px;
+}
+.card p {
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+.card-img {
+    height: 100%;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid;
+    align-content: center;
+}
+.card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+}
+.main-page .cards {
+    margin-top: 100px;
+}
+.cards {
+    justify-content: space-around;
+    display: flex;
+    flex-direction: row;
+}
+.theory-container-image {
+    display: grid;
+    place-items: center;
+    margin-left: 20px;
+}
+.theory-graph img {
+    max-width: 500px;
+    max-height: 500px;
+}
+.theory-graph {
+    margin-left: 20px;
 }

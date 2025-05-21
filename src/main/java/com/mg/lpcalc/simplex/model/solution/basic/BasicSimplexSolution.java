@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class BasicSimplexSimplexSolution implements SimplexSolution {
+public class BasicSimplexSolution implements SimplexSolution {
     private Answer answer;
     private ConstraintTransformStep convertToLessOrEqualStep;
     private ConstraintToEqualityStep constraintToEqualityStep = new ConstraintToEqualityStep();

@@ -29,6 +29,12 @@ function parseBasicSimplexAnswer(solution) {
     removeAnswerContainers();
 
     inputBlock.appendChild(parseAnswer(solution.answer));
+    if (solution.answer.answerType == 'NO_BASIS') {
+        renderKatexElement('input-block');
+        document.querySelector(".solve-container").hidden = false;
+        algoTitle.innerText = '';
+        return;
+    }
 
     let lessOrEqualContainer = parseConvertToLessOrEqual(solution.convertToLessOrEqualStep);
     solutionContainer.appendChild(createP('Шаг 1. Преобразование неравенств со знаком $\\geq$.', 'subtitle'));
@@ -553,6 +559,8 @@ function parseAnswer(answer) {
         answerP.innerText = 'Функция неограниченно убывает. Оптимального решения нет.';
     } else if (answer.answerType == 'HAS_ART_VARS') {
         answerP.innerText = 'Решения задачи не существует.';
+    } else if (answer.answerType == 'NO_BASIS') {
+        answerP.innerText = 'Решения задачи не существует. Ограничения противоречат друг другу.';
     }
 
     container.appendChild(titleP);
