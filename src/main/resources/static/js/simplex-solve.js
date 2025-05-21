@@ -61,9 +61,11 @@ function parseBasicSimplexAnswer(solution) {
         solutionContainer.appendChild(createP('Шаг 6. Проверка оптимальности.', 'subtitle'));
         solutionContainer.appendChild(checkOptimalityStep);
 
-        let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
-        solutionContainer.appendChild(createP('Шаг 7. Итерации симплекс-алгоритма.', 'subtitle'));
-        solutionContainer.appendChild(simplexIterationsStep);
+        if (solution.optimalityCheckStep.optimal == false) {
+            let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
+            solutionContainer.appendChild(createP('Шаг 7. Итерации симплекс-алгоритма.', 'subtitle'));
+            solutionContainer.appendChild(simplexIterationsStep);
+        }
     }
 
     solutionContainer.appendChild(parseAnswer(solution.answer));
