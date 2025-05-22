@@ -142,16 +142,22 @@ function removeAnswerContainers() {
 }
 
 function checkInput(data) {
+    let allZeroRHS = true;
     for(let i = 0; i < data.constraints.length; i++) {
         let constraint = data.constraints[i];
         let allZero = true;
         for (let j = 0; j < constraint.coefficients.length; j++) {
             if (constraint.coefficients[j].numerator != 0) allZero = false;
         }
+        if (constraint.rhs.numerator != 0) allZeroRHS = false;
         if (allZero) {
             printError(`Ошибка. Все коэффициенты ограничения $${i + 1}$ равны $0$.`);
             return false;
         }
+    }
+    if (allZeroRHS) {
+        printError(`Ошибка. Все свободные коэффициенты равны $0$.`);
+        return false;
     }
 
     let allZeroObjective = true;

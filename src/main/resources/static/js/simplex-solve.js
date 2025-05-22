@@ -376,7 +376,7 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
         
         for (let j = 0; j < step.varLabels[i].length - 1; j += 2) {
             p.innerText += step.varLabels[i][j] + " \\cdot " + step.varLabels[i][j + 1];
-            if (j + 2 < step.varLabels.length - 1) {
+            if (j + 2 < step.varLabels[i].length - 1) {
                 p.innerText += " + ";
             }
         }
