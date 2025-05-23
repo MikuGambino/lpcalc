@@ -182,11 +182,17 @@ function removeObjectiveVariables(targetCount) {
     }
 }
 
+let problemObject = parseURL();
+if (problemObject.objective != null) {
+    problemToFields(problemObject);
+    sendData();
+}
+
 function sendData() {
     const data = getData();
     console.log(data);
     if (!checkInput(data)) return;
-    
+
     fetch('/solve/simplex', {
         method: 'POST',
         headers: {
@@ -214,7 +220,7 @@ function getData() {
     let objectiveFuncCoefficients = [];
     let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
     for (let i = 0; i < objectiveVars.length; i++) {
-        objectiveFuncCoefficients.push(parseFraction(document.getElementById(`obj${i}`).value));
+        objectiveFuncCoefficients.push(document.getElementById(`obj${i}`).value);
     }
 
     const objective = {
@@ -231,13 +237,13 @@ function getData() {
         
         for(let i = 0; i < variablesCount; i++) {
             const input = document.getElementById(`v${index}${i}`);
-            coeffs.push(parseFraction(input.value));
+            coeffs.push(input.value);
         }
 
         const constraint = {
             coefficients: coeffs,
             operator: document.querySelector(`#c${index} select`).value,
-            rhs: parseFraction(document.getElementById(`rhs${index}`).value)
+            rhs: document.getElementById(`rhs${index}`).value
         };
         
         console.log(constraint);
@@ -252,6 +258,25 @@ function getData() {
         method
     };
 
+    const params = new URLSearchParams({
+        objective: JSON.stringify(data.objective),
+        constraints: JSON.stringify(data.constraints),
+        method: data.method
+    });
+    history.replaceState(null, '', "/simplex?" + params);
+
+    for (let i = 0; i < data.objective.coefficients.length; i++) {
+        data.objective.coefficients[i] = parseFraction(data.objective.coefficients[i]);
+    }
+
+    for (let i = 0; i < data.constraints.length; i++) {
+        data.constraints[i].rhs = parseFraction(data.constraints[i].rhs);
+        for (let j = 0; j < data.constraints[i].coefficients.length; j++) {
+            data.constraints[i].coefficients[j] = parseFraction(data.constraints[i].coefficients[j]);
+        }
+    }
+
+    console.log(data);
     return data;
 }
 

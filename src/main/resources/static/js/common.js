@@ -183,3 +183,57 @@ function printError(text) {
     document.querySelector('.solve-container').hidden = true;
     errorContainer.hidden = false;
 }
+
+function parseURL() {
+    const encodedParams = new URLSearchParams(window.location.search);
+
+    const encodedObjective = encodedParams.get('objective');
+    const encodedConstraints = encodedParams.get('constraints');
+    const method = encodedParams.get('method');
+
+    const decodedObjective = decodeURIComponent(encodedObjective);
+    const decodedConstraints = decodeURIComponent(encodedConstraints);
+
+    const objectiveObj = JSON.parse(decodedObjective);
+    const constraintsObj = JSON.parse(decodedConstraints);
+
+    return paramsObj = {
+      objective: objectiveObj,
+      constraints: constraintsObj,
+      method: method
+    };
+}
+
+function problemToFields(data) {
+    const numConstraints = data.constraints.length;
+    const numVars = data.objective.coefficients.length;
+
+    document.getElementById("constraintCount").value = numConstraints;
+    const changeEvent = new Event("change", {
+        bubbles: false,    // событие всплывающее, если это необходимо
+        cancelable: false // событие нельзя отменить
+    });
+    document.getElementById("constraintCount").dispatchEvent(changeEvent);
+    if (document.getElementById("variableCount") != null) {
+        document.getElementById("variableCount").value = numVars;
+        document.getElementById("variableCount").dispatchEvent(changeEvent);
+    }
+
+    for (let i = 0; i < numConstraints; i++) {
+        for (let j = 0; j < numVars; j++) {
+            document.getElementById(`v${i}${j}`).value = data.constraints[i].coefficients[j];
+        }
+
+        document.querySelector(`#c${i} select`).value = data.constraints[i].operator;
+        document.getElementById(`rhs${i}`).value = data.constraints[i].rhs;
+    }
+
+    let objectiveVars = document.querySelectorAll('#objectiveVariables>.objVarDiv');
+    for (let i = 0; i < objectiveVars.length; i++) {
+        document.getElementById(`obj${i}`).value = data.objective.coefficients[i];
+    }
+    document.getElementById('directionSelect').value = data.objective.direction;
+    if (document.getElementById('method') != null && data.method != null) {
+        document.getElementById('method').value = data.method;
+    }
+}

@@ -180,6 +180,12 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
     };
   }
 
+let problemObject = parseURL();
+if (problemObject.objective != null) {
+  problemToFields(problemObject);
+  sendData();
+}
+
 function sendData() {
     const data = getData();
     if (!checkInput(data)) return;
@@ -205,8 +211,8 @@ function sendData() {
 function getData() {
     const objective = {
         coefficients: [
-            parseFraction(document.getElementById('obj0').value) || 0,
-            parseFraction(document.getElementById('obj1').value) || 0
+            document.getElementById('obj0').value || 0,
+            document.getElementById('obj1').value || 0
         ],
         direction: document.getElementById('directionSelect').value
     };
@@ -219,13 +225,13 @@ function getData() {
         
         for(let i = 0; i < 2; i++) {
             const input = document.getElementById(`v${index}${i}`);
-            coeffs.push(parseFraction(input.value) || 0);
+            coeffs.push(input.value || 0);
         }
 
         const constraint = {
             coefficients: coeffs,
             operator: document.querySelector(`#c${index} select`).value,
-            rhs: parseFraction(document.getElementById(`rhs${index}`).value) || 0
+            rhs: document.getElementById(`rhs${index}`).value || 0
         };
         
         constraints.push(constraint);
@@ -235,6 +241,23 @@ function getData() {
         objective,
         constraints
     };
+
+    const params = new URLSearchParams({
+        objective: JSON.stringify(data.objective),
+        constraints: JSON.stringify(data.constraints),
+    });
+    history.replaceState(null, '', "/graphical?" + params);
+
+    for (let i = 0; i < data.objective.coefficients.length; i++) {
+        data.objective.coefficients[i] = parseFraction(data.objective.coefficients[i]);
+    }
+
+    for (let i = 0; i < data.constraints.length; i++) {
+        data.constraints[i].rhs = parseFraction(data.constraints[i].rhs);
+        for (let j = 0; j < data.constraints[i].coefficients.length; j++) {
+            data.constraints[i].coefficients[j] = parseFraction(data.constraints[i].coefficients[j]);
+        }
+    }
 
     return data;
 }

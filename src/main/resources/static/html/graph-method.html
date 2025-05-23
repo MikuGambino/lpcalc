@@ -40,9 +40,15 @@
             <h3 class="text-title">Целевая функция:</h3>
             <div id="objectiveFunc">
                 <span>F = </span>
-                <input type="text" id="obj0" placeholder="0">
-                <span> + </span>
-                <input type="text" id="obj1" placeholder="0">
+                <div id="objectiveVariables">
+                    <div class="objVarDiv">
+                        <input type="text" id="obj0" placeholder="0">
+                        <span> + </span>
+                    </div>
+                    <div class="objVarDiv">
+                        <input type="text" id="obj1" placeholder="0">
+                    </div>
+                </div>
                 <span class="arrow">→</span>
                 <select id="directionSelect" class="direction-select">
                     <option value="MIN">min</option>
