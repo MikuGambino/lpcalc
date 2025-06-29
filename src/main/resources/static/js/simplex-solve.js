@@ -361,7 +361,7 @@ function parseDeltasCalculationsAccordion(step, deltas, basis) {
     spanTrigger.className = 'link accordion-trigger';
 
     let spanIndicator = document.createElement('span');
-    spanIndicator.innerHTML = '<span class="indicator">&#x25B6;</span>Подробный расчёт дельт';
+    spanIndicator.innerHTML = '<span class="indicator">&#x25B6;</span><span class="accordion-title">Подробный расчёт дельт</span>';
     spanTrigger.appendChild(spanIndicator);
 
     let accordionContent = document.createElement('div');
@@ -578,19 +578,4 @@ function getDeltasFromTable(table) {
     }
 
     return deltas;
-}
-function activateAccordions() {
-    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const content = trigger.nextElementSibling;
-            
-            trigger.classList.toggle('open');
-            
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-            }
-        });
-    });
 }

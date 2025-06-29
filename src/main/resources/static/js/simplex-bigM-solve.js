@@ -3,7 +3,7 @@ function parseBigMSimplexAnswer(solution) {
     let solutionContainer = document.getElementById('solution-container');
     solutionContainer.innerHTML = '';
     let algoTitle = document.createElement('h2');
-    algoTitle.innerText = 'Решение методом искуственного базиса (BigM)';
+    algoTitle.innerText = 'Решение методом искусственного базиса (BigM)';
     solutionContainer.appendChild(algoTitle);
 
     let inputBlock = document.getElementById('input-block');
@@ -31,12 +31,14 @@ function parseBigMSimplexAnswer(solution) {
     solutionContainer.appendChild(createP('Шаг 5. Проверка оптимальности.', 'subtitle'));
     solutionContainer.appendChild(checkOptimalityStep);
 
-    if (solution.pivotSteps.length == 0) {
-        solutionContainer.appendChild(createP('Базис содержит искусственные переменные. Решения задачи не существует.'));
-    } else {
+    if (solution.pivotSteps.length != 0) {
         let simplexIterationsStep = parsePivotIterationsStep(solution.pivotSteps, solution.answer);
         solutionContainer.appendChild(createP('Шаг 6. Итерации симплекс-алгоритма.', 'subtitle'));
         solutionContainer.appendChild(simplexIterationsStep);
+    }
+
+    if (solution.answer.answerType == "HAS_ART_VARS") {
+        solutionContainer.appendChild(createP('Базис содержит искусственные переменные. Решения задачи не существует.'));
     }
 
     solutionContainer.appendChild(parseAnswer(solution.answer));
@@ -102,7 +104,7 @@ function parseModifyObjectiveFuncStep(objectiveFunc, initialTable) {
     container.id = 'modifyObjectiveFuncStep';
 
     if (artVariablesCount == 0) {
-        container.appendChild(createP('Искуственные переменные не были добавлены. Модификация не нужна.'));
+        container.appendChild(createP('Искусственные переменные не были добавлены. Модификация не нужна.'));
         return container;
     }
 
@@ -110,9 +112,9 @@ function parseModifyObjectiveFuncStep(objectiveFunc, initialTable) {
     let sign;
     if (objectiveFunc.direction == 'MAX') {
         sign = '-';
-        container.appendChild(createP('В целевую функцию добавляем искусственные пременные с коэффициентом $-M$, где $M$ — очень большое число.'));
+        container.appendChild(createP('В целевую функцию добавляем искусственные переменные с коэффициентом $-M$, где $M$ — очень большое число.'));
     } else {
-        container.appendChild(createP('В целевую функцию добавляем искусственные пременные с коэффициентом $M$, где $M$ — очень большое число.'));
+        container.appendChild(createP('В целевую функцию добавляем искусственные переменные с коэффициентом $M$, где $M$ — очень большое число.'));
         sign = '+';
     }
 
@@ -143,7 +145,7 @@ function parseFindBasisStepBigM(table, objectiveFunc) {
     let simplexTableHTML = parseSimplexTable(table);
     modifySimplexTableBigM(simplexTableHTML, table);
     container.appendChild(simplexTableHTML);
-    container.appendChild(createP('Базиз успешно найден.'));
+    container.appendChild(createP('Базис успешно найден.'));
     return container;
 }
 

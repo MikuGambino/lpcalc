@@ -1,3 +1,5 @@
+activateAccordions();
+
 let constraintCountTextbox = document.getElementById("constraintCount");
 constraintCountTextbox.addEventListener('change', handleConstraintChange);
 window.addEventListener('load', () => handleConstraintChange({target: constraintCountTextbox}));
@@ -182,15 +184,19 @@ function removeObjectiveVariables(targetCount) {
     }
 }
 
-let problemObject = parseURL();
-if (problemObject.objective != null) {
+function loadExampleURL(number) {
+    number--;
+    const jsonProblems = ['{"objective":{"coefficients":["3","4"],"direction":"MAX"},"constraints":[{"coefficients":["1","1"],"operator":"EQ","rhs":"55"},{"coefficients":["2","3"],"operator":"GEQ","rhs":"120"},{"coefficients":["12","30"],"operator":"LEQ","rhs":"960"}],"method":"BASIC"}', '{"objective":{"coefficients":["3","4"],"direction":"MAX"},"constraints":[{"coefficients":["1","1"],"operator":"EQ","rhs":"55"},{"coefficients":["2","3"],"operator":"GEQ","rhs":"120"},{"coefficients":["12","30"],"operator":"LEQ","rhs":"960"}],"method":"BIG_M"}', '{"objective":{"coefficients":["1","1"],"direction":"MAX"},"constraints":[{"coefficients":["-1","2"],"operator":"LEQ","rhs":"1"},{"coefficients":["1","-2"],"operator":"LEQ","rhs":"2"}],"method":"BASIC"}', '{"objective":{"coefficients":["-1","-2"],"direction":"MIN"},"constraints":[{"coefficients":["-1","2"],"operator":"LEQ","rhs":"1"},{"coefficients":["1","-2"],"operator":"LEQ","rhs":"2"}],"method":"BASIC"}', '{"objective":{"coefficients":["1","1"],"direction":"MIN"},"constraints":[{"coefficients":["3","5"],"operator":"LEQ","rhs":"30"},{"coefficients":["4","-3"],"operator":"LEQ","rhs":"12"},{"coefficients":["1","-3"],"operator":"GEQ","rhs":"6"}],"method":"BASIC"}', '{"objective":{"coefficients":["1","1"],"direction":"MIN"},"constraints":[{"coefficients":["3","5"],"operator":"LEQ","rhs":"30"},{"coefficients":["4","-3"],"operator":"LEQ","rhs":"12"},{"coefficients":["1","-3"],"operator":"GEQ","rhs":"6"}],"method":"BIG_M"}'];
+    if (number < 0 || number >= jsonProblems.length) return;
+    let problemObject = JSON.parse(jsonProblems[number]);
     problemToFields(problemObject);
     sendData();
 }
 
+loadProblemViaURL();
+
 function sendData() {
     const data = getData();
-    console.log(data);
     if (!checkInput(data)) return;
 
     fetch('/solve/simplex', {
@@ -202,7 +208,6 @@ function sendData() {
     })
     .then(response => response.json())
     .then(answer => {
-        console.log('Результат:', answer);
         printInput(data);
         if (data.method == 'BASIC') {
             parseBasicSimplexAnswer(answer);
@@ -246,7 +251,6 @@ function getData() {
             rhs: document.getElementById(`rhs${index}`).value
         };
         
-        console.log(constraint);
         constraints.push(constraint);
     });
 
@@ -258,13 +262,15 @@ function getData() {
         method
     };
 
-    const params = new URLSearchParams({
-        objective: JSON.stringify(data.objective),
-        constraints: JSON.stringify(data.constraints),
-        method: data.method
-    });
-    history.replaceState(null, '', "/simplex?" + params);
+    if (new URLSearchParams(window.location.search).get("example") == null) {
+        const params = new URLSearchParams({
+            objective: JSON.stringify(data.objective),
+            constraints: JSON.stringify(data.constraints),
+            method: data.method
+        });
 
+        history.replaceState(null, '', "/simplex?" + params);
+    }
     for (let i = 0; i < data.objective.coefficients.length; i++) {
         data.objective.coefficients[i] = parseFraction(data.objective.coefficients[i]);
     }
@@ -276,7 +282,6 @@ function getData() {
         }
     }
 
-    console.log(data);
     return data;
 }
 
@@ -287,11 +292,8 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
     const reader = new FileReader();
     reader.onload = function (event) {
         const content = event.target.result;
-        // Выводим содержимое в консоль (можно убрать)
-        console.log("Содержимое файла:\n" + content);
         // Парсим содержимое файла
         const lpProblem = parseLPFile(content);
-        console.log(lpProblem);
 
         document.getElementById("constraintCount").value = lpProblem.numConstraints;
         const changeEvent = new Event("change", {

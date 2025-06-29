@@ -6,7 +6,6 @@ function parseFraction(input) {
     // Проверяем, содержит ли строка символ "/"
     if (input.includes('/')) {
         const parts = input.split('/');
-        console.log(parts);
         if (parts.length === 2) {
             const numerator = parseInt(parts[0].trim());
             const denominatorStr = parts[1].trim();
@@ -184,9 +183,7 @@ function printError(text) {
     errorContainer.hidden = false;
 }
 
-function parseURL() {
-    const encodedParams = new URLSearchParams(window.location.search);
-
+function parseURL(encodedParams) {
     const encodedObjective = encodedParams.get('objective');
     const encodedConstraints = encodedParams.get('constraints');
     const method = encodedParams.get('method');
@@ -235,5 +232,40 @@ function problemToFields(data) {
     document.getElementById('directionSelect').value = data.objective.direction;
     if (document.getElementById('method') != null && data.method != null) {
         document.getElementById('method').value = data.method;
+    }
+}
+
+function activateAccordions() {
+    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+            if (trigger.classList.contains('activated')) return;
+
+            trigger.classList.add('activated');
+            trigger.addEventListener('click', () => {
+            const content = trigger.nextElementSibling;
+
+            trigger.classList.toggle('open');
+
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+}
+
+function loadProblemViaURL() {
+    const encodedParams = new URLSearchParams(window.location.search);
+
+    let problemObject = parseURL(encodedParams);
+    if (problemObject.objective != null) {
+        problemToFields(problemObject);
+        sendData();
+        return;
+    }
+
+    let problemNumber = encodedParams.get("example");
+    if (problemNumber != null) {
+        loadExampleURL(problemNumber);
     }
 }

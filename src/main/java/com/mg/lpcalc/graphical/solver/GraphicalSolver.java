@@ -263,7 +263,6 @@ public class GraphicalSolver {
             solutionBuilder.setSolutionSegment(optimalPoints.get(0), optimalPoints.get(1));
         }
 
-        System.out.println(optimalPoints);
         return optimalPoints;
     }
 

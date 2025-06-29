@@ -253,7 +253,6 @@ public class GraphicalSolutionBuilder {
         }
 
         double fValue = calcObjectiveValue(point);
-        System.out.println(LatexParser.addTConstraintRay(systemLatex, fValue));
         return LatexParser.addTConstraintRay(systemLatex, fValue);
     }
 

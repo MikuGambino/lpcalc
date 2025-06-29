@@ -1,3 +1,5 @@
+activateAccordions();
+
 let constraintCountTextbox = document.getElementById("constraintCount");
 
 constraintCountTextbox.addEventListener('change', handleConstraintChange);
@@ -180,11 +182,16 @@ document.getElementById("fileInput").addEventListener("change", function (e) {
     };
   }
 
-let problemObject = parseURL();
-if (problemObject.objective != null) {
-  problemToFields(problemObject);
-  sendData();
+function loadExampleURL(number) {
+    number--;
+    const jsonProblems = ['{"objective":{"coefficients":["1","-1"],"direction":"MAX"},"constraints":[{"coefficients":["1","1"],"operator":"LEQ","rhs":"7"},{"coefficients":["0","1"],"operator":"LEQ","rhs":"5"},{"coefficients":["1","1"],"operator":"GEQ","rhs":"3"},{"coefficients":["0","1"],"operator":"GEQ","rhs":"2"},{"coefficients":["1","0"],"operator":"LEQ","rhs":"4"}]}', '{"objective":{"coefficients":["2","2"],"direction":"MIN"},"constraints":[{"coefficients":["1","2"],"operator":"LEQ","rhs":"8"},{"coefficients":["1","-1"],"operator":"LEQ","rhs":"2"},{"coefficients":["1","2"],"operator":"GEQ","rhs":"4"},{"coefficients":["1","0"],"operator":"GEQ","rhs":"1"}]}', '{"objective":{"coefficients":["1","2"],"direction":"MAX"},"constraints":[{"coefficients":["1","2"],"operator":"LEQ","rhs":"10"},{"coefficients":["1","2"],"operator":"GEQ","rhs":"2"},{"coefficients":["2","1"],"operator":"LEQ","rhs":"10"},{"coefficients":["3","1"],"operator":"GEQ","rhs":"3"}]}', '{"objective":{"coefficients":["2","2"],"direction":"MIN"},"constraints":[{"coefficients":["1","1"],"operator":"GEQ","rhs":"6"},{"coefficients":["3","-1"],"operator":"GEQ","rhs":"3"},{"coefficients":["1","-1"],"operator":"LEQ","rhs":"2"},{"coefficients":["0","1"],"operator":"LEQ","rhs":"6"},{"coefficients":["1","0"],"operator":"LEQ","rhs":"5"}]}', '{"objective":{"coefficients":["-1","1"],"direction":"MAX"},"constraints":[{"coefficients":["1","-2"],"operator":"LEQ","rhs":"4"},{"coefficients":["1","-1"],"operator":"GEQ","rhs":"1"},{"coefficients":["1","1"],"operator":"GEQ","rhs":"2"}]}', '{"objective":{"coefficients":["3","-1"],"direction":"MIN"},"constraints":[{"coefficients":["1","-1"],"operator":"LEQ","rhs":"8"},{"coefficients":["3","-1"],"operator":"GEQ","rhs":"3"},{"coefficients":["2","1"],"operator":"GEQ","rhs":"4"}]}', '{"objective":{"coefficients":["1","1"],"direction":"MAX"},"constraints":[{"coefficients":["3","2"],"operator":"GEQ","rhs":"6"},{"coefficients":["-1","1"],"operator":"LEQ","rhs":"1"},{"coefficients":["1","-2"],"operator":"LEQ","rhs":"1"}]}', '{"objective":{"coefficients":["1","-2"],"direction":"MIN"},"constraints":[{"coefficients":["2","1"],"operator":"GEQ","rhs":"2"},{"coefficients":["4","-6"],"operator":"LEQ","rhs":"12"},{"coefficients":["0","1"],"operator":"GEQ","rhs":"1"}]}', '{"objective":{"coefficients":["1","1"],"direction":"MAX"},"constraints":[{"coefficients":["1","1"],"operator":"GEQ","rhs":"1"},{"coefficients":["1","-1"],"operator":"GEQ","rhs":"1"},{"coefficients":["1","0"],"operator":"LEQ","rhs":"1"},{"coefficients":["2","1"],"operator":"GEQ","rhs":"1"},{"coefficients":["1","2"],"operator":"LEQ","rhs":"7"}]}', '{"objective":{"coefficients":["1","1"],"direction":"MAX"},"constraints":[{"coefficients":["3","5"],"operator":"LEQ","rhs":"30"},{"coefficients":["4","-3"],"operator":"LEQ","rhs":"12"},{"coefficients":["1","-3"],"operator":"GEQ","rhs":"6"}]}'];
+    if (number < 0 || number >= jsonProblems.length) return;
+    let problemObject = JSON.parse(jsonProblems[number]);
+    problemToFields(problemObject);
+    sendData();
 }
+
+loadProblemViaURL();
 
 function sendData() {
     const data = getData();
@@ -199,7 +206,6 @@ function sendData() {
     })
     .then(response => response.json())
     .then(solution => {
-        console.log('Результат:', solution);
         printInput(data);
         parseGraphicalSolution(solution);
     })
@@ -242,11 +248,13 @@ function getData() {
         constraints
     };
 
-    const params = new URLSearchParams({
-        objective: JSON.stringify(data.objective),
-        constraints: JSON.stringify(data.constraints),
-    });
-    history.replaceState(null, '', "/graphical?" + params);
+    if (new URLSearchParams(window.location.search).get("example") == null) {
+        const params = new URLSearchParams({
+            objective: JSON.stringify(data.objective),
+            constraints: JSON.stringify(data.constraints),
+        });
+        history.replaceState(null, '', "/graphical?" + params);
+    }
 
     for (let i = 0; i < data.objective.coefficients.length; i++) {
         data.objective.coefficients[i] = parseFraction(data.objective.coefficients[i]);
