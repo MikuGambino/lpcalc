@@ -3,7 +3,8 @@ WORKDIR /app
 COPY . .
 RUN mvn package
 
-FROM openjdk:17
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar prod.jar
 ENTRYPOINT ["java", "-jar", "/app/prod.jar"]
+
